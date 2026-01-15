@@ -63,3 +63,4 @@
     } finally {
         $db->close();
     }
+?>
