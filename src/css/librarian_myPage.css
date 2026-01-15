@@ -1,0 +1,155 @@
+/* --- 全体設定 --- */
+body {
+    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+    background-color: #f4f7f8;
+    margin: 0;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* --- ヘッダー --- */
+.main-header {
+    background-color: #2c3e50;
+    color: #fff;
+    padding: 10px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.header-logo a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.header-nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 20px;
+}
+
+.header-nav a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 0.9rem;
+    border: 1px solid #fff;
+    padding: 5px 15px;
+    border-radius: 4px;
+    transition: 0.3s;
+}
+
+.header-nav a:hover {
+    background-color: #fff;
+    color: #2c3e50;
+}
+
+/* --- メニューボタンエリア（1つのフォームに集約した場合） --- */
+.librarian-menu-form {
+    display: flex;        /* ボタンを横並びにする */
+    gap: 15px;           /* ボタン同士の間隔 */
+    padding: 0 40px;     /* 左右の余白 */
+    margin-bottom: 40px; /* テーブルとの距離を離す */
+    flex-wrap: wrap;     /* 画面が狭い時に折り返す */
+}
+
+.librarian-menu-form button {
+    flex: 1;             /* 幅を均等にする */
+    min-width: 160px;    /* ボタンが細くなりすぎないように */
+    padding: 15px 10px;
+    font-size: 15px;
+    font-weight: bold;
+    color: white;
+    background-color: #3498db;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.librarian-menu-form button:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px); /* 少し浮き上がる演出 */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+/* --- テーブルエリア（スクロール機能付き） --- */
+.info-table-container {
+    margin: 0 40px 40px 40px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden; /* 角丸を適用 */
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+/* タイトル部分のデザイン */
+.info-table-container h2 {
+    margin: 0 !important;                /* 外側の余白をリセット */
+    padding: 20px 15px !important;       /* 上下20px、左右15pxの余白 */
+    font-size: 1.25rem;       /* 文字の大きさ */
+    color: #2c3e50;           /* ヘッダーと同じ濃い紺色 */
+    background-color: #fff;   /* 背景は白 */
+    border-bottom: 1px solid #eee; /* テーブルとの区切り線 */
+    display: flex;
+    align-items: center;      /* 縦中央揃え */
+}
+
+/* 飾りのアイコン的な棒（左側の青い縦棒） */
+.info-table-container h2::before {
+    content: "";
+    display: inline-block;
+    width: 6px;
+    height: 1.2em;
+    background-color: #3498db; /* ボタンと同じ青色 */
+    margin-right: 10px;        /* 文字との距離 */
+    border-radius: 2px;
+}
+
+.scroll-wrapper {
+    max-height: 450px; /* 表示する最大の高さ */
+    overflow-y: auto;  /* 縦スクロールを有効に */
+}
+
+.info-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px;
+}
+
+/* 固定ヘッダー */
+.info-table th {
+    position: sticky;
+    top: 0;
+    background-color: #e6f0fa; /* 薄い青 */
+    color: #333;
+    padding: 15px;
+    text-align: left;
+    border-bottom: 2px solid #b0c4de;
+    z-index: 10;
+}
+
+.info-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #eee;
+}
+
+/* 偶数行の色分け */
+.info-table tr:nth-child(even) {
+    background-color: #fcfdfe;
+}
+
+/* ホバー時の行ハイライト */
+.info-table tr:hover {
+    background-color: #f0f7ff;
+}
+
+/* 状態別の色分け（必要に応じてPHPでクラスを付与） */
+.status-lending { color: #e74c3c; font-weight: bold; } /* 貸出中：赤 */
+.status-returned { color: #7f8c8d; }                   /* 返却済み：グレー */
