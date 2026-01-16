@@ -35,7 +35,7 @@
         $db = new db_connect();
         $db->connect(); //データベースへ接続
 
-        // 貸出処理を実行
+        // 入力された学生情報を取得
         $student_sql = "SELECT * FROM student WHERE grade = :grade AND class = :class AND number = :number";
         $stmt = $db->pdo->prepare($student_sql);
         $stmt->bindValue(':grade', $grade, PDO::PARAM_INT);
@@ -44,15 +44,17 @@
         $stmt->execute();
         $student = $stmt->fetch(PDO::FETCH_ASSOC);
 
+        // 検索条件に指定された書籍が存在するか確認
+        $book_sql = "SELECT book_status FROM book WHERE book_id = :book_id";
+        $stmt = $db->pdo->prepare($book_sql);
+        $stmt->bindValue(':book_id', $book_id, PDO::PARAM_STR);
+        $stmt->execute();
+        $status_array = $stmt->fetch(PDO::FETCH_ASSOC);
+
         //入力された学生が存在した場合
         if ($student) {
 
-            // 検索条件に指定された書籍が存在するか確認
-            $book_sql = "SELECT book_status FROM book WHERE book_id = :book_id";
-            $stmt = $db->pdo->prepare($book_sql);
-            $stmt->bindValue(':book_id', $book_id, PDO::PARAM_STR);
-            $stmt->execute();
-            $status_array = $stmt->fetch(PDO::FETCH_ASSOC);
+
 
             if ($status_array) {
                 $book_status = intval($status_array['book_status'], 10);
