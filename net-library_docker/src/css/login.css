@@ -1,0 +1,179 @@
+@charset "UTF-8";
+
+/* 基本の背景設定 */
+body {
+    background-color: #f4f7f6; /* 目に優しい薄いグレー */
+    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+/* ログインコンテナ（カード全体） */
+.login-container {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 450px;
+}
+
+/* タイトル */
+h1 {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 30px;
+    font-size: 24px;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 10px;
+}
+
+/* フォームグループのレイアウト */
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #555;
+    font-size: 14px;
+}
+
+/* 入力要素・セレクトボックスの共通スタイル */
+input[type="text"],
+input[type="password"],
+select {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-sizing: border-box; /* paddingを含めたサイズ計算 */
+    font-size: 16px;
+    transition: border-color 0.3s;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+}
+
+/* ログインボタン */
+button[type="submit"] {
+    width: 100%;
+    padding: 14px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 10px;
+}
+
+button[type="submit"]:hover {
+    background-color: #2980b9;
+}
+
+/* サブアクション（新規登録・司書用）のエリア */
+.sub-actions {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+/* サブボタンのスタイル */
+.sub-actions button {
+    flex: 1;
+    padding: 10px;
+    background-color: #f8f9fa;
+    color: #666;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.sub-actions button:hover {
+    background-color: #e9ecef;
+    color: #333;
+    border-color: #bbb;
+}
+
+/* 司書用ボタンだけ少し色を変えて区別する場合（任意） */
+.sub-actions button:last-child {
+    background-color: #fffaf0; /* ほんのりベージュ */
+}
+
+/* --- ヘッダーメニューのスタイル --- */
+
+/* bodyのレイアウト調整（ヘッダーを上部に固定するため） */
+body {
+    flex-direction: column;
+    justify-content: flex-start; /* 中央寄せから上部開始に変更 */
+}
+
+.main-header {
+    width: 100%;
+    background-color: #ffffff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 40px;
+    box-sizing: border-box;
+    position: fixed; /* 画面上部に固定 */
+    top: 0;
+    left: 0;
+    z-index: 1000;
+}
+
+.header-logo a {
+    font-size: 20px;
+    font-weight: bold;
+    color: #3498db;
+    text-decoration: none;
+    transition: opacity 0.3s;
+}
+
+.header-logo a:hover {
+    opacity: 0.7;
+}
+
+.header-nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 25px; /* メニュー間の余白 */
+}
+
+.header-nav a {
+    text-decoration: none;
+    color: #666;
+    font-size: 14px;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.header-nav a:hover {
+    color: #3498db;
+}
+
+/* ログインコンテナの位置調整（ヘッダーと被らないようにする） */
+.login-container {
+    margin-top: 100px; /* ヘッダーの高さ分、上に余白を作る */
+    margin-bottom: 40px;
+}
