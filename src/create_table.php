@@ -104,7 +104,6 @@
                 student_id INT,
                 book_id VARCHAR(20),
                 status_id INT,
-                reservation_date DATETIME,
                 reservation_date DATETIME DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 FOREIGN KEY (student_id) REFERENCES student(student_id),
@@ -119,7 +118,6 @@
                 lending_id INT AUTO_INCREMENT PRIMARY KEY,
                 student_id INT,
                 book_id VARCHAR(20),
-                lending_date DATETIME,
                 lending_date DATETIME DEFAULT CURRENT_TIMESTAMP,
                 return_date DATETIME,
                 FOREIGN KEY (student_id) REFERENCES student(student_id),
@@ -136,7 +134,6 @@
                 delivery_type INT,
                 delivery_status INT,
                 book_id VARCHAR(20),
-                delivery_date DATETIME,
                 delivery_date DATETIME DEFAULT CURRENT_TIMESTAMP,
                 arrival_date DATETIME,
                 FOREIGN KEY (from_school_id) REFERENCES school(school_id),
@@ -161,7 +158,6 @@
             );";
             $stmt = $db->pdo->prepare($sql);
             $stmt->execute();
-            $stmt->execute();   
 
             //外部キー制約を再度有効化
             $sql = "SET FOREIGN_KEY_CHECKS=1;";
