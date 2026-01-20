@@ -74,10 +74,9 @@
                 ['student_id' => 2, 'book_id' => '913001701', 'lending_date' => '2025-09-26 12:30:00', 'return_date' => '2025-10-02 12:25:00'],
 
                 /* 3.   他校の生徒によって予約されている */
+                ['student_id' => 6, 'book_id' => '913000402', 'lending_date' => '2025-09-29 12:30:00', 'return_date' => '2025-10-06 12:25:00'],
+                ['student_id' => 13, 'book_id' => '913000402', 'lending_date' => '2025-10-07 12:30:00', 'return_date' => '2025-10-13 12:25:00'],
                 
-                
-    
-
 
     /* 他校の本を借りる場合 */
 
@@ -92,13 +91,16 @@
         /* ・予約された際に生成されたレコードのイメージ↓
         ['student_id' => 2, 'book_id' => '913001701', 'status_id' => 1, 'reservation_date' => '2025-09-19 10:00:00']
         　　
-            ・受け取り後↓　
+            ・予約した学生が受け取った後(貸し出し処理がなされた後)はこうなる↓　
         */
         ['student_id' => 2, 'book_id' => '913001701', 'status_id' => 3, 'reservation_date' => '2025-09-19 10:00:00', 'updated_at' => '2025-09-26 12:30:01'],
 
 
         // 3.で付随する予約処理
-        ['student_id' => 6, 'book_id' => '913000402', 'status_id' => 1, 'reservation_date' => '2025-09-28 10:00:00'],
+        //10中から5小へ取り寄せ
+        ['student_id' => 6, 'book_id' => '913000402', 'status_id' => 3, 'reservation_date' => '2025-09-28 10:00:00', 'updated_at' => '2025-09-29 12:30:00'],
+        //5小から10中へ取り寄せ
+        ['student_id' => 13, 'book_id' => '913000402', 'status_id' => 3, 'reservation_date' => '2025-09-29 10:00:00'],
 
     ];
 
@@ -111,6 +113,9 @@
 
         // 3-3.配送が完了して、もう変わらないレコード↓
         ['from_school_id' => 10, 'to_school_id' => 5, 'delivery_type' => 1, 'delivery_status' => 3, 'book_id' => '913000402', 'delivery_date' => '2025-09-29 10:00:00', 'arrival_date' => '2025-09-29 10:40:00', 'updated_at' => '2025-09-29 10:40:00'],
+
+        // 3-4. 3-1~3と同じような要領で、復路のレコードも最終的にこのようになる↓
+        ['from_school_id' => 5, 'to_school_id' => 10, 'delivery_type' => 2, 'delivery_status' => 3, 'book_id' => '913000402', 'delivery_date' => '2025-10-07 10:00:00', 'arrival_date' => '2025-10-07 11:00:00', 'updated_at' => '2025-10-07 10:00:00'],
     ];
 
 
@@ -206,7 +211,7 @@
         ['book_id' => '913000301', 'school_id' => 5, 'title' => '羅生門', 'author_name' => '芥川龍之介', 'author_kana' => 'アクタガワリュウノスケ', 'publisher' => '岩波書店', 'publication_year' => '1998-03-01', 'status_id' => 2, 'position' => 5],
         ['book_id' => '913000302', 'school_id' => 6, 'title' => '羅生門', 'author_name' => '芥川龍之介', 'author_kana' => 'アクタガワリュウノスケ', 'publisher' => '新潮社', 'publication_year' => '2005-08-01', 'status_id' => 1, 'position' => 6],
         ['book_id' => '913000401', 'school_id' => 9, 'title' => '銀河鉄道の夜', 'author_name' => '宮沢賢治', 'author_kana' => 'ミヤザワケンジ', 'publisher' => '角川書店', 'publication_year' => '1996-07-07', 'status_id' => 1, 'position' => 9],
-        ['book_id' => '913000402', 'school_id' => 10, 'title' => '銀河鉄道の夜', 'author_name' => '宮沢賢治', 'author_kana' => 'ミヤザワケンジ', 'publisher' => '新潮社', 'publication_year' => '2001-11-01', 'status_id' => 2, 'position' => 9],
+        ['book_id' => '913000402', 'school_id' => 10, 'title' => '銀河鉄道の夜', 'author_name' => '宮沢賢治', 'author_kana' => 'ミヤザワケンジ', 'publisher' => '新潮社', 'publication_year' => '2001-11-01', 'status_id' => 1, 'position' => 10],
         ['book_id' => '913000501', 'school_id' => 1, 'title' => '坊っちゃん', 'author_name' => '夏目漱石', 'author_kana' => 'ナツメソウセキ', 'publisher' => '新潮社', 'publication_year' => '1989-02-01', 'status_id' => 1, 'position' => 1],
         ['book_id' => '913000502', 'school_id' => 6, 'title' => '坊っちゃん', 'author_name' => '夏目漱石', 'author_kana' => 'ナツメソウセキ', 'publisher' => '岩波書店', 'publication_year' => '2010-04-01', 'status_id' => 1, 'position' => 6],
         ['book_id' => '913000601', 'school_id' => 4, 'title' => '走れメロス', 'author_name' => '太宰治', 'author_kana' => 'ダザイオサム', 'publisher' => '新潮社', 'publication_year' => '1993-05-15', 'status_id' => 1, 'position' => 4],
