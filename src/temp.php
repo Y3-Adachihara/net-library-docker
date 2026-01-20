@@ -1,4 +1,267 @@
 <?php    
+
+
+
+    // 2. 学生マスタ
+    $student_master = [
+        //1
+        ['school_id' => 1, 'grade' => 6, 'class' => 'A', 'number' => 1, 'family_name' => '山田', 'first_name' => '太郎', 'password' => '1234'],
+        //2
+        ['school_id' => 1, 'grade' => 5, 'class' => 'B', 'number' => 3, 'family_name' => '佐藤', 'first_name' => '花子', 'password' => 'abcd'],
+        //3
+        ['school_id' => 2, 'grade' => 6, 'class' => '1', 'number' => 10, 'family_name' => '鈴木', 'first_name' => '一郎', 'password' => 'pass123'],
+        //4
+        ['school_id' => 3, 'grade' => 4, 'class' => '2', 'number' => 15, 'family_name' => '田中', 'first_name' => '次郎', 'password' => 'xyz789'],
+        //5
+        ['school_id' => 4, 'grade' => 5, 'class' => '1', 'number' => 8, 'family_name' => '高橋', 'first_name' => '愛', 'password' => 'qwerty'],
+        //6
+        ['school_id' => 5, 'grade' => 3, 'class' => "1", 'number' => 20, 'family_name' => "伊藤", 'first_name' => "健太", 'password' => 'zxcvbn'],
+        //7
+        ['school_id' => 6, 'grade' => 6, 'class' => "2", 'number' => 5, 'family_name' => "渡辺", 'first_name' => "美咲", 'password' => 'asdfgh'],
+        //8
+        ['school_id' => 7, 'grade' => 6, 'class' => "1", 'number' => 12, 'family_name' => "山本", 'first_name' => "図書無", 'password' => '0000'],
+        //9
+        ['school_id' => 8, 'grade' => 5, 'class' => "1", 'number' => 7, 'family_name' => "中村", 'first_name' => "遠方", 'password' => '1111'],
+        //10
+        ['school_id' => 9, 'grade' => 2, 'class' => "A", 'number' => 1, 'family_name' => "小林", 'first_name' => "中学", 'password' => 'password'],
+        //11
+        ['school_id' => 10, 'grade' => 1, 'class' => "1", 'number' => 30, 'family_name' => "吉田", 'first_name' => "新一", 'password' => '45gds'],
+        //12
+        ['school_id' => 9, 'grade' => 3, 'class' => "B", 'number' => 22, 'family_name' => "加藤", 'first_name' => "学", 'password' => 'lmno56'],
+        //13
+        ['school_id' => 10, 'grade' => 3, 'class' => "2", 'number' => 14, 'family_name' => "佐々木", 'first_name' => "受験", 'password' => 'abc123'],
+        //14
+        ['school_id' => 1, 'grade' => 6, 'class' => "A", 'number' => 2, 'family_name' => "松本", 'first_name' => "潤", 'password' => 'def456'],
+        //15
+        ['school_id' => 9, 'grade' => 2, 'class' => "A", 'number' => 2, 'family_name' => "井上", 'first_name' => "真央", 'password' => 'ghi789']
+    ];
+
+
+
+
+    /* 
+    --|-①自校にある本を借りる場合--|-その本が予約されていない①→二件登録済
+  |			      　|
+　|			　　　　|-その本がすでに別の生徒によって予約されている--|---最後に自校の生徒によって予約②→予約データ1件、貸出データ2件登録済み
+　|									      　|
+  |									　　　　|---最後に他校の生徒によって予約③→
+  |
+　|
+  |
+  |
+  |-②他校にある本を借りる場合--|---その本が予約されていない④
+				|
+				|---その本がすでに別の生徒によって予約されている--|---最後に自校の生徒によって予約⑤
+										  |
+  										  |---最後に他校の生徒によって予約⑥
+    */
+
+
+
+
+
+    $lending_list = [
+    /* 自校の本を借りる場合 */
+
+        //1.予約されていない場合（ストレート貸出）
+        ['student_id' => 1, 'book_id' => '913000501', 'lending_date' => '2025-09-10 12:30:00', 'return_date' => '2025-09-15 12:25:00'],
+        ['student_id' => 7, 'book_id' => '913001802', 'lending_date' => '2025-09-12 12:20:00', 'return_date' => '2025-09-17 12:30:00'],
+
+        /* 予約されている */
+            /* ↳その本がすでに別の生徒によって予約されている */
+                /* 2.自校の生徒によって予約されている */
+                ['student_id' => 14, 'book_id' => '913001701', 'lending_date' => '2025-09-18 12:30:00', 'return_date' => '2025-09-25 12:25:00'],
+                ['student_id' => 2, 'book_id' => '913001701', 'lending_date' => '2025-09-26 12:30:00', 'return_date' => '2025-10-02 12:25:00'],
+
+                /* 3.   他校の生徒によって予約されている */
+                
+                
+    
+
+
+    /* 他校の本を借りる場合 */
+
+
+
+
+    ];
+
+    //予約リスト
+    $reservation_list = [
+        //2.で付随する予約処理(予約が受け取られた＝貸出された際に予約状態が1=>3へ更新され、updated_atも貸出日時となる)
+        /* ・予約された際に生成されたレコードのイメージ↓
+        ['student_id' => 2, 'book_id' => '913001701', 'status_id' => 1, 'reservation_date' => '2025-09-19 10:00:00']
+        　　
+            ・受け取り後↓　
+        */
+        ['student_id' => 2, 'book_id' => '913001701', 'status_id' => 3, 'reservation_date' => '2025-09-19 10:00:00', 'updated_at' => '2025-09-26 12:30:01'],
+
+
+        // 3.で付随する予約処理
+        ['student_id' => 6, 'book_id' => '913000402', 'status_id' => 1, 'reservation_date' => '2025-09-28 10:00:00'],
+
+    ];
+
+    //配送リスト
+    $delivery_list = [
+
+        //3.で付随する配送処理（10中→5小）
+        // 3-1.学校側で運搬する本をまとめた後、配送待ちの書籍に対応した、このレコードが生成される→ ['from_school_id' => 10, 'to_school_id' => 5, 'delivery_type' => 1, 'delivery_status' => 1, 'book_id' => '913000402'],
+        // 3-2.配送員がまとめられた本を受け取り、運送用画面で本が配送中にされたとき、delivery_statusが2に変更され、delivery_dateとupdated_atに配送日時がセットされる → ['from_school_id' => 10, 'to_school_id' => 5, 'delivery_type' => 1, 'delivery_status' => 2, 'book_id' => '913000402', 'delivery_date' => '2025-09-29 10:00:00', 'updated_at' => '2025-09-29 10:00:00'],
+
+        // 3-3.配送が完了して、もう変わらないレコード↓
+        ['from_school_id' => 10, 'to_school_id' => 5, 'delivery_type' => 1, 'delivery_status' => 3, 'book_id' => '913000402', 'delivery_date' => '2025-09-29 10:00:00', 'arrival_date' => '2025-09-29 10:40:00', 'updated_at' => '2025-09-29 10:40:00'],
+    ];
+
+
+    // 5. 貸出リスト (日付を2025年9月以降にシフト)
+    // 貸出期間は7日間に設定
+    $lending_list = [
+        // --- 過去の貸出（返却済み） ---
+        ['student_id' => 1, 'book_id' => '913000501', 'lending_date' => '2025-09-10 10:00:00', 'return_date' => '2025-09-17 12:30:00'],
+        ['student_id' => 2, 'book_id' => '913000702', 'lending_date' => '2025-09-11 15:00:00', 'return_date' => '2025-09-18 09:00:00'],
+        ['student_id' => 3, 'book_id' => '913000201', 'lending_date' => '2025-09-15 11:00:00', 'return_date' => '2025-09-22 11:35:56'],
+        ['student_id' => 4, 'book_id' => '913000101', 'lending_date' => '2025-09-20 13:00:00', 'return_date' => '2025-09-27 10:00:00'],
+        ['student_id' => 8, 'book_id' => '933000201', 'lending_date' => '2025-10-01 10:00:00', 'return_date' => '2025-10-08 16:00:00'],
+        ['student_id' => 10, 'book_id' => '913000401', 'lending_date' => '2025-10-05 12:00:00', 'return_date' => '2025-10-12 12:00:00'],
+        ['student_id' => 11, 'book_id' => '913001502', 'lending_date' => '2025-10-10 14:00:00', 'return_date' => '2025-10-17 09:30:00'],
+        ['student_id' => 7, 'book_id' => '913001202', 'lending_date' => '2025-10-15 11:30:00', 'return_date' => '2025-10-22 15:00:00'],
+        ['student_id' => 14, 'book_id' => '913000801', 'lending_date' => '2025-10-20 10:00:00', 'return_date' => '2025-10-27 10:00:00'],
+        ['student_id' => 5, 'book_id' => '913000601', 'lending_date' => '2025-10-25 15:30:00', 'return_date' => '2025-11-01 09:00:00'],
+
+        // --- 現在貸出中 ---
+        // 返却期限(return_date)はNULL
+        ['student_id' => 1, 'book_id' => '913001902', 'lending_date' => '2026-01-10 10:00:00', 'return_date' => null], //学問のすゝめ
+        ['student_id' => 2, 'book_id' => '913001602', 'lending_date' => '2026-01-12 12:00:00', 'return_date' => null],
+        ['student_id' => 3, 'book_id' => '953000102', 'lending_date' => '2026-01-13 14:00:00', 'return_date' => null],
+        ['student_id' => 9, 'book_id' => '913000101', 'lending_date' => '2026-01-14 11:00:00', 'return_date' => null],
+        ['student_id' => 12, 'book_id' => '913000402', 'lending_date' => '2026-01-15 09:00:00', 'return_date' => null],
+        ['student_id' => 13, 'book_id' => '913003002', 'lending_date' => '2026-01-16 16:00:00', 'return_date' => null],
+        ['student_id' => 6, 'book_id' => '913000301', 'lending_date' => '2026-01-16 16:30:00', 'return_date' => null],
+        ['student_id' => 14, 'book_id' => '913001802', 'lending_date' => '2026-01-17 10:00:00', 'return_date' => null],
+        ['student_id' => 15, 'book_id' => '913000802', 'lending_date' => '2026-01-17 12:30:00', 'return_date' => null],
+        
+        // 延滞中 (2025年12月貸出)
+        ['student_id' => 10, 'book_id' => '943000102', 'lending_date' => '2025-12-20 10:00:00', 'return_date' => null]
+    ];
+
+    // 6. 予約リスト
+    // status_id は新しいテーブル定義で rv_status_id になります
+    $reservation_list = [
+        // 過去分
+        ['student_id' => 8, 'book_id' => '933000201', 'status_id' => 3, 'reservation_date' => '2025-09-28 10:00:00'],
+        ['student_id' => 9, 'book_id' => '913000101', 'status_id' => 3, 'reservation_date' => '2026-01-05 11:00:00'],
+        ['student_id' => 14, 'book_id' => '913001802', 'status_id' => 3, 'reservation_date' => '2026-01-10 10:00:00'],
+        ['student_id' => 3, 'book_id' => '913000501', 'status_id' => 2, 'reservation_date' => '2025-09-12 09:00:00'], // キャンセル
+
+        // 現在進行中 (2026年1月)
+        ['student_id' => 4, 'book_id' => '913000101', 'status_id' => 1, 'reservation_date' => '2026-01-15 10:00:00'],
+        ['student_id' => 6, 'book_id' => '913000301', 'status_id' => 1, 'reservation_date' => '2026-01-16 12:00:00'],
+        ['student_id' => 3, 'book_id' => '913000301', 'status_id' => 1, 'reservation_date' => '2026-01-17 09:00:00'],
+        
+        // 配送中・受取待ち系
+        ['student_id' => 8, 'book_id' => '913001101', 'status_id' => 1, 'reservation_date' => '2026-01-19 08:30:00'], // 配送中
+        ['student_id' => 9, 'book_id' => '913000701', 'status_id' => 1, 'reservation_date' => '2026-01-18 14:00:00'], // 配送中
+        ['student_id' => 1, 'book_id' => '913002601', 'status_id' => 1, 'reservation_date' => '2026-01-10 10:00:00'], // 受取待ち
+        ['student_id' => 13, 'book_id' => '933000102', 'status_id' => 1, 'reservation_date' => '2026-01-13 11:00:00'], // 受取待ち
+        
+        // 貸出待ち
+        ['student_id' => 14, 'book_id' => '913002002', 'status_id' => 1, 'reservation_date' => '2026-01-19 10:00:00'],
+        ['student_id' => 15, 'book_id' => '933000202', 'status_id' => 1, 'reservation_date' => '2026-01-19 11:00:00']
+    ];
+
+    // 7. 配送リスト
+    $delivery_list = [
+        // 過去
+        ['from_school_id' => 1, 'to_school_id' => 7, 'delivery_type' => 1, 'delivery_status' => 3, 'book_id' => '933000201', 'delivery_date' => '2025-09-28 10:00:00', 'arrival_date' => '2025-09-28 15:00:00'],
+        ['from_school_id' => 7, 'to_school_id' => 1, 'delivery_type' => 2, 'delivery_status' => 3, 'book_id' => '933000201', 'delivery_date' => '2025-10-08 16:00:00', 'arrival_date' => '2025-10-09 09:00:00'],
+        
+        // 又貸しリレー
+        ['from_school_id' => 2, 'to_school_id' => 4, 'delivery_type' => 1, 'delivery_status' => 3, 'book_id' => '913001202', 'delivery_date' => '2025-10-01 10:00:00', 'arrival_date' => '2025-10-01 14:00:00'],
+        ['from_school_id' => 4, 'to_school_id' => 6, 'delivery_type' => 1, 'delivery_status' => 3, 'book_id' => '913001202', 'delivery_date' => '2025-10-14 11:00:00', 'arrival_date' => '2025-10-14 15:00:00'],
+        ['from_school_id' => 6, 'to_school_id' => 2, 'delivery_type' => 2, 'delivery_status' => 3, 'book_id' => '913001202', 'delivery_date' => '2025-10-22 15:00:00', 'arrival_date' => '2025-10-23 10:00:00'],
+
+        // 現在貸出中の配送済み
+        ['from_school_id' => 3, 'to_school_id' => 8, 'delivery_type' => 1, 'delivery_status' => 3, 'book_id' => '913000101', 'delivery_date' => '2026-01-05 09:00:00', 'arrival_date' => '2026-01-05 13:00:00'],
+        ['from_school_id' => 10, 'to_school_id' => 9, 'delivery_type' => 1, 'delivery_status' => 3, 'book_id' => '913000402', 'delivery_date' => '2026-01-15 09:00:00', 'arrival_date' => '2026-01-15 11:00:00'],
+        ['from_school_id' => 4, 'to_school_id' => 1, 'delivery_type' => 1, 'delivery_status' => 3, 'book_id' => '913001802', 'delivery_date' => '2026-01-16 14:00:00', 'arrival_date' => '2026-01-17 09:00:00'],
+        ['from_school_id' => 2, 'to_school_id' => 9, 'delivery_type' => 1, 'delivery_status' => 3, 'book_id' => '943000102', 'delivery_date' => '2025-12-19 10:00:00', 'arrival_date' => '2025-12-19 14:00:00'], // 延滞中の本
+
+        // 進行中
+        ['from_school_id' => 1, 'to_school_id' => 7, 'delivery_type' => 1, 'delivery_status' => 2, 'book_id' => '913001101', 'delivery_date' => '2026-01-19 08:30:00', 'arrival_date' => null], // 配送中
+        ['from_school_id' => 2, 'to_school_id' => 8, 'delivery_type' => 1, 'delivery_status' => 2, 'book_id' => '913000701', 'delivery_date' => '2026-01-18 14:00:00', 'arrival_date' => null], // 配送中
+        ['from_school_id' => 9, 'to_school_id' => 10, 'delivery_type' => 1, 'delivery_status' => 3, 'book_id' => '933000102', 'delivery_date' => '2026-01-13 11:00:00', 'arrival_date' => '2026-01-13 15:00:00'], // 到着済み受取待ち
+
+        // 配送待ち
+        ['from_school_id' => 1, 'to_school_id' => 2, 'delivery_type' => 1, 'delivery_status' => 1, 'book_id' => '913002002', 'delivery_date' => '2026-01-19 10:00:00', 'arrival_date' => null]
+    ];
+
+    // 8. 書籍マスタ (updated_atは後で計算)
+    // registered_at は全データ共通で 2025-04-01 に設定 (活動開始前)
+    $book_master = [
+        ['book_id' => '913000101', 'school_id' => 3, 'title' => 'こころ', 'author_name' => '夏目漱石', 'author_kana' => 'ナツメソウセキ', 'publisher' => '岩波書店', 'publication_year' => '1990-01-01', 'status_id' => 2, 'position' => 8],
+        ['book_id' => '913000102', 'school_id' => 9, 'title' => 'こころ', 'author_name' => '夏目漱石', 'author_kana' => 'ナツメソウセキ', 'publisher' => '新潮社', 'publication_year' => '1995-05-01', 'status_id' => 1, 'position' => 9],
+        ['book_id' => '913000201', 'school_id' => 2, 'title' => '人間失格', 'author_name' => '太宰治', 'author_kana' => 'ダザイオサム', 'publisher' => '新潮社', 'publication_year' => '1992-04-01', 'status_id' => 1, 'position' => 2],
+        ['book_id' => '913000202', 'school_id' => 4, 'title' => '人間失格', 'author_name' => '太宰治', 'author_kana' => 'ダザイオサム', 'publisher' => '角川書店', 'publication_year' => '2000-12-01', 'status_id' => 1, 'position' => 4],
+        ['book_id' => '913000301', 'school_id' => 5, 'title' => '羅生門', 'author_name' => '芥川龍之介', 'author_kana' => 'アクタガワリュウノスケ', 'publisher' => '岩波書店', 'publication_year' => '1998-03-01', 'status_id' => 2, 'position' => 5],
+        ['book_id' => '913000302', 'school_id' => 6, 'title' => '羅生門', 'author_name' => '芥川龍之介', 'author_kana' => 'アクタガワリュウノスケ', 'publisher' => '新潮社', 'publication_year' => '2005-08-01', 'status_id' => 1, 'position' => 6],
+        ['book_id' => '913000401', 'school_id' => 9, 'title' => '銀河鉄道の夜', 'author_name' => '宮沢賢治', 'author_kana' => 'ミヤザワケンジ', 'publisher' => '角川書店', 'publication_year' => '1996-07-07', 'status_id' => 1, 'position' => 9],
+        ['book_id' => '913000402', 'school_id' => 10, 'title' => '銀河鉄道の夜', 'author_name' => '宮沢賢治', 'author_kana' => 'ミヤザワケンジ', 'publisher' => '新潮社', 'publication_year' => '2001-11-01', 'status_id' => 2, 'position' => 9],
+        ['book_id' => '913000501', 'school_id' => 1, 'title' => '坊っちゃん', 'author_name' => '夏目漱石', 'author_kana' => 'ナツメソウセキ', 'publisher' => '新潮社', 'publication_year' => '1989-02-01', 'status_id' => 1, 'position' => 1],
+        ['book_id' => '913000502', 'school_id' => 6, 'title' => '坊っちゃん', 'author_name' => '夏目漱石', 'author_kana' => 'ナツメソウセキ', 'publisher' => '岩波書店', 'publication_year' => '2010-04-01', 'status_id' => 1, 'position' => 6],
+        ['book_id' => '913000601', 'school_id' => 4, 'title' => '走れメロス', 'author_name' => '太宰治', 'author_kana' => 'ダザイオサム', 'publisher' => '新潮社', 'publication_year' => '1993-05-15', 'status_id' => 1, 'position' => 4],
+        ['book_id' => '913000701', 'school_id' => 2, 'title' => '雪国', 'author_name' => '川端康成', 'author_kana' => 'カワバタヤスナリ', 'publisher' => '新潮社', 'publication_year' => '1960-01-01', 'status_id' => 6, 'position' => 0],
+        ['book_id' => '913000702', 'school_id' => 3, 'title' => '雪国', 'author_name' => '川端康成', 'author_kana' => 'カワバタヤスナリ', 'publisher' => '岩波書店', 'publication_year' => '1980-01-01', 'status_id' => 1, 'position' => 3],
+        ['book_id' => '913000801', 'school_id' => 1, 'title' => '伊豆の踊子', 'author_name' => '川端康成', 'author_kana' => 'カワバタヤスナリ', 'publisher' => '新潮社', 'publication_year' => '1991-03-01', 'status_id' => 1, 'position' => 1],
+        ['book_id' => '913000802', 'school_id' => 9, 'title' => '伊豆の踊子', 'author_name' => '川端康成', 'author_kana' => 'カワバタヤスナリ', 'publisher' => '角川書店', 'publication_year' => '2005-06-01', 'status_id' => 2, 'position' => 9],
+        ['book_id' => '913000901', 'school_id' => 10, 'title' => '金閣寺', 'author_name' => '三島由紀夫', 'author_kana' => 'ミシマユキオ', 'publisher' => '新潮社', 'publication_year' => '1970-01-01', 'status_id' => 1, 'position' => 10],
+        ['book_id' => '913001001', 'school_id' => 3, 'title' => '吾輩は猫である', 'author_name' => '夏目漱石', 'author_kana' => 'ナツメソウセキ', 'publisher' => '岩波書店', 'publication_year' => '1988-10-01', 'status_id' => 1, 'position' => 3],
+        ['book_id' => '913001002', 'school_id' => 5, 'title' => '吾輩は猫である', 'author_name' => '夏目漱石', 'author_kana' => 'ナツメソウセキ', 'publisher' => '講談社', 'publication_year' => '2000-01-01', 'status_id' => 1, 'position' => 5],
+        ['book_id' => '913001101', 'school_id' => 1, 'title' => '風の又三郎', 'author_name' => '宮沢賢治', 'author_kana' => 'ミヤザワケンジ', 'publisher' => '岩波書店', 'publication_year' => '1995-11-01', 'status_id' => 6, 'position' => 0],
+        ['book_id' => '913001201', 'school_id' => 6, 'title' => '蜘蛛の糸', 'author_name' => '芥川龍之介', 'author_kana' => 'アクタガワリュウノスケ', 'publisher' => '新潮社', 'publication_year' => '1999-01-01', 'status_id' => 1, 'position' => 6],
+        ['book_id' => '913001202', 'school_id' => 4, 'title' => '蜘蛛の糸', 'author_name' => '芥川龍之介', 'author_kana' => 'アクタガワリュウノスケ', 'publisher' => '角川書店', 'publication_year' => '2008-01-01', 'status_id' => 1, 'position' => 4],
+        ['book_id' => '913001301', 'school_id' => 2, 'title' => '斜陽', 'author_name' => '太宰治', 'author_kana' => 'ダザイオサム', 'publisher' => '新潮社', 'publication_year' => '1980-05-01', 'status_id' => 1, 'position' => 2],
+        ['book_id' => '913001302', 'school_id' => 4, 'title' => '斜陽', 'author_name' => '太宰治', 'author_kana' => 'ダザイオサム', 'publisher' => '岩波書店', 'publication_year' => '1990-06-01', 'status_id' => 1, 'position' => 4],
+        ['book_id' => '913001401', 'school_id' => 9, 'title' => '細雪', 'author_name' => '谷崎潤一郎', 'author_kana' => 'タニザキジュンイチロウ', 'publisher' => '中公文庫', 'publication_year' => '1985-01-01', 'status_id' => 1, 'position' => 9],
+        ['book_id' => '913001501', 'school_id' => 5, 'title' => '山月記', 'author_name' => '中島敦', 'author_kana' => 'ナカジマアツシ', 'publisher' => '岩波書店', 'publication_year' => '1994-02-01', 'status_id' => 1, 'position' => 5],
+        ['book_id' => '913001502', 'school_id' => 10, 'title' => '山月記', 'author_name' => '中島敦', 'author_kana' => 'ナカジマアツシ', 'publisher' => '新潮社', 'publication_year' => '2003-07-01', 'status_id' => 1, 'position' => 10],
+        ['book_id' => '913001601', 'school_id' => 3, 'title' => '高瀬舟', 'author_name' => '森鴎外', 'author_kana' => 'モリオウガイ', 'publisher' => '岩波書店', 'publication_year' => '1982-01-01', 'status_id' => 1, 'position' => 3],
+        ['book_id' => '913001602', 'school_id' => 1, 'title' => '高瀬舟', 'author_name' => '森鴎外', 'author_kana' => 'モリオウガイ', 'publisher' => '新潮社', 'publication_year' => '1995-10-01', 'status_id' => 2, 'position' => 1],
+        ['book_id' => '913001701', 'school_id' => 1, 'title' => '舞姫', 'author_name' => '森鴎外', 'author_kana' => 'モリオウガイ', 'publisher' => '岩波書店', 'publication_year' => '1988-04-01', 'status_id' => 1, 'position' => 1],
+        ['book_id' => '913001702', 'school_id' => 5, 'title' => '舞姫', 'author_name' => '森鴎外', 'author_kana' => 'モリオウガイ', 'publisher' => '新潮社', 'publication_year' => '2001-01-01', 'status_id' => 1, 'position' => 5],
+        ['book_id' => '913001801', 'school_id' => 4, 'title' => '夜明け前', 'author_name' => '島崎藤村', 'author_kana' => 'シマザキトウソン', 'publisher' => '岩波書店', 'publication_year' => '1975-01-01', 'status_id' => 1, 'position' => 4],
+        ['book_id' => '913001802', 'school_id' => 6, 'title' => '夜明け前', 'author_name' => '島崎藤村', 'author_kana' => 'シマザキトウソン', 'publisher' => '新潮社', 'publication_year' => '1990-01-01', 'status_id' => 2, 'position' => 1],
+        ['book_id' => '913001901', 'school_id' => 3, 'title' => '学問のすゝめ', 'author_name' => '福沢諭吉', 'author_kana' => 'フクザワユキチ', 'publisher' => '岩波書店', 'publication_year' => '1980-01-01', 'status_id' => 1, 'position' => 3],
+        ['book_id' => '913001902', 'school_id' => 1, 'title' => '学問のすゝめ', 'author_name' => '福沢諭吉', 'author_kana' => 'フクザワユキチ', 'publisher' => '講談社', 'publication_year' => '2005-01-01', 'status_id' => 2, 'position' => 1],
+        ['book_id' => '913002001', 'school_id' => 1, 'title' => '武士道', 'author_name' => '新渡戸稲造', 'author_kana' => 'ニトベイナゾウ', 'publisher' => '岩波書店', 'publication_year' => '1990-01-01', 'status_id' => 1, 'position' => 1],
+        ['book_id' => '913002002', 'school_id' => 2, 'title' => '武士道', 'author_name' => '新渡戸稲造', 'author_kana' => 'ニトベイナゾウ', 'publisher' => '講談社', 'publication_year' => '2000-01-01', 'status_id' => 1, 'position' => 2],
+        ['book_id' => '913002301', 'school_id' => 1, 'title' => '東海道中膝栗毛', 'author_name' => '十返舎一九', 'author_kana' => 'ジッペンシャイック', 'publisher' => '岩波書店', 'publication_year' => '1985-01-01', 'status_id' => 1, 'position' => 1],
+        ['book_id' => '913002302', 'school_id' => 6, 'title' => '東海道中膝栗毛', 'author_name' => '十返舎一九', 'author_kana' => 'ジッペンシャイック', 'publisher' => '新潮社', 'publication_year' => '1995-01-01', 'status_id' => 1, 'position' => 6],
+        ['book_id' => '913003001', 'school_id' => 10, 'title' => 'コンビニ人間', 'author_name' => '村田沙耶香', 'author_kana' => 'ムラタサヤカ', 'publisher' => '文藝春秋', 'publication_year' => '2016-07-01', 'status_id' => 1, 'position' => 10],
+        ['book_id' => '913003002', 'school_id' => 10, 'title' => 'コンビニ人間', 'author_name' => '村田沙耶香', 'author_kana' => 'ムラタサヤカ', 'publisher' => '文藝春秋', 'publication_year' => '2016-07-01', 'status_id' => 2, 'position' => 10],
+        ['book_id' => '913002601', 'school_id' => 1, 'title' => '1Q84', 'author_name' => '村上春樹', 'author_kana' => 'ムラカミハルキ', 'publisher' => '新潮社', 'publication_year' => '2009-05-01', 'status_id' => 4, 'position' => 1],
+        ['book_id' => '933000201', 'school_id' => 1, 'title' => 'ハリー・ポッターと賢者の石', 'author_name' => 'J.K.ローリング', 'author_kana' => 'ローリング', 'publisher' => '静山社', 'publication_year' => '1999-12-01', 'status_id' => 1, 'position' => 1],
+        ['book_id' => '933000202', 'school_id' => 6, 'title' => 'ハリー・ポッターと賢者の石', 'author_name' => 'J.K.ローリング', 'author_kana' => 'ローリング', 'publisher' => '静山社', 'publication_year' => '1999-12-01', 'status_id' => 1, 'position' => 6],
+        ['book_id' => '953000101', 'school_id' => 2, 'title' => '星の王子さま', 'author_name' => 'サン=テグジュペリ', 'author_kana' => 'サンテグジュペリ', 'publisher' => '岩波書店', 'publication_year' => '2000-01-01', 'status_id' => 1, 'position' => 2],
+        ['book_id' => '953000102', 'school_id' => 2, 'title' => '星の王子さま', 'author_name' => 'サン=テグジュペリ', 'author_kana' => 'サンテグジュペリ', 'publisher' => '新潮社', 'publication_year' => '2006-01-01', 'status_id' => 2, 'position' => 2],
+        ['book_id' => '943000101', 'school_id' => 9, 'title' => '変身', 'author_name' => 'カフカ', 'author_kana' => 'カフカ', 'publisher' => '新潮社', 'publication_year' => '1952-01-01', 'status_id' => 1, 'position' => 9],
+        ['book_id' => '943000102', 'school_id' => 2, 'title' => '変身', 'author_name' => 'カフカ', 'author_kana' => 'カフカ', 'publisher' => '岩波書店', 'publication_year' => '1960-01-01', 'status_id' => 2, 'position' => 9],
+        ['book_id' => '933000102', 'school_id' => 9, 'title' => '老人と海', 'author_name' => 'ヘミングウェイ', 'author_kana' => 'ヘミングウェイ', 'publisher' => '新潮社', 'publication_year' => '1966-01-01', 'status_id' => 4, 'position' => 10],
+        ['book_id' => '933000301', 'school_id' => 3, 'title' => '赤毛のアン', 'author_name' => 'モンゴメリ', 'author_kana' => 'モンゴメリ', 'publisher' => '新潮社', 'publication_year' => '1955-01-01', 'status_id' => 1, 'position' => 3],
+    ];
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    /*
     $book_master = [
         ['book_id' => '913000101', 'school_id' => 3, 'title' => 'こころ', 'author_name' => '夏目 漱石', 'author_kana' => 'ナツメ ソウセキ', 'publisher' => '岩波文庫', 'publication_year' => '2000-01-01', 'status_id' => 1],
         ['book_id' => '913000102', 'school_id' => 9, 'title' => 'こころ', 'author_name' => '夏目 漱石', 'author_kana' => 'ナツメ ソウセキ', 'publisher' => '岩波文庫', 'publication_year' => '2005-04-10', 'status_id' => 1],
@@ -108,6 +371,7 @@
         ['book_id' => '936000101', 'school_id' => 9, 'title' => '赤毛のアン', 'author_name' => 'モンゴメリ', 'author_kana' => 'モンゴメリ', 'publisher' => '新潮文庫', 'publication_year' => '2008-02-01', 'status_id' => 1]
     ];
 
+    */
     
     //〇貸出履歴の仮データ（主キーはAUTO_INCREMENTなので指定しない）
     $lending_master = [
