@@ -73,14 +73,15 @@
                 ['student_id' => 14, 'book_id' => '913001701', 'lending_date' => '2025-09-18 12:30:00', 'return_date' => '2025-09-25 12:25:00'],
                 ['student_id' => 2, 'book_id' => '913001701', 'lending_date' => '2025-09-26 12:30:00', 'return_date' => '2025-10-02 12:25:00'],
 
-                /* 3.   他校の生徒によって予約されている */
+                /* 3. 他校の生徒によって予約されている */
                 ['student_id' => 6, 'book_id' => '913000402', 'lending_date' => '2025-09-29 12:30:00', 'return_date' => '2025-10-06 12:25:00'],
                 ['student_id' => 13, 'book_id' => '913000402', 'lending_date' => '2025-10-07 12:30:00', 'return_date' => '2025-10-13 12:25:00'],
                 
 
     /* 他校の本を借りる場合 */
 
-
+        //4. 予約されていない場合（ストレート貸出）
+        ['student_id' = 4, 'book_id' = '913003002', 'lending_date' = '2025-10-01 12:30:00', 'reservation_date' = '2025-09-30 13:00:00', 'return_date' = '2025-10-07 12:30:00']
 
 
     ];
@@ -97,10 +98,14 @@
 
 
         // 3.で付随する予約処理
-        //10中から5小へ取り寄せ
+        //3. 10中から5小へ取り寄せ
         ['student_id' => 6, 'book_id' => '913000402', 'status_id' => 3, 'reservation_date' => '2025-09-28 10:00:00', 'updated_at' => '2025-09-29 12:30:00'],
-        //5小から10中へ取り寄せ
-        ['student_id' => 13, 'book_id' => '913000402', 'status_id' => 3, 'reservation_date' => '2025-09-29 10:00:00'],
+        //3. 5小から10中へ取り寄せ
+        ['student_id' => 13, 'book_id' => '913000402', 'status_id' => 3, 'reservation_date' => '2025-09-29 10:00:00' 'updated_at' => '2025-10-07 12:30:00'],
+
+        //4.で付随する予約処理
+        //4-1. 3小の生徒が10中の書籍を取り寄せ
+        ['student_id' = 4, 'book_id' = '913003002', 'status_id' = 3, 'reservation_date' = '2025-09-30 13:00:00', 'updated_at' = '2025-10-01 10:20:00'];
 
     ];
 
@@ -111,11 +116,20 @@
         // 3-1.学校側で運搬する本をまとめた後、配送待ちの書籍に対応した、このレコードが生成される→ ['from_school_id' => 10, 'to_school_id' => 5, 'delivery_type' => 1, 'delivery_status' => 1, 'book_id' => '913000402'],
         // 3-2.配送員がまとめられた本を受け取り、運送用画面で本が配送中にされたとき、delivery_statusが2に変更され、delivery_dateとupdated_atに配送日時がセットされる → ['from_school_id' => 10, 'to_school_id' => 5, 'delivery_type' => 1, 'delivery_status' => 2, 'book_id' => '913000402', 'delivery_date' => '2025-09-29 10:00:00', 'updated_at' => '2025-09-29 10:00:00'],
 
-        // 3-3.配送が完了して、もう変わらないレコード↓
+        // 3-3.10中→5小への配送が完了して、もう変わらないレコード↓
         ['from_school_id' => 10, 'to_school_id' => 5, 'delivery_type' => 1, 'delivery_status' => 3, 'book_id' => '913000402', 'delivery_date' => '2025-09-29 10:00:00', 'arrival_date' => '2025-09-29 10:40:00', 'updated_at' => '2025-09-29 10:40:00'],
 
-        // 3-4. 3-1~3と同じような要領で、復路のレコードも最終的にこのようになる↓
+        // 3-4. 3-1~3と同じような要領で、復路（5小→10中）のレコードも最終的にこのようになる↓
         ['from_school_id' => 5, 'to_school_id' => 10, 'delivery_type' => 2, 'delivery_status' => 3, 'book_id' => '913000402', 'delivery_date' => '2025-10-07 10:00:00', 'arrival_date' => '2025-10-07 11:00:00', 'updated_at' => '2025-10-07 10:00:00'],
+
+
+
+        // 4. 10中から3小へ配送（往路）
+        ['from_school_id' = 10, 'to_school_id' = 3, 'delivery_type' = 1, 'delivery_status' = 3, 'book_id' = '913003002', 'delivery_date' = '2025-10-01 09:55:00', 'arrival_date' = '2025-10-01 10:20:00'],
+        // 4. 3小から10中へ配送（復路）
+        ['from_school_id' = 3, 'to_school_id' = 10, 'delivery_type' = 2, 'delivery_status' = 3, 'book_id' = '913003002', 'delivery_date' = '2025-10-08 09:00:00', 'arrival_date' = '2025-10-01 09:40:00'],
+
+        
     ];
 
 
