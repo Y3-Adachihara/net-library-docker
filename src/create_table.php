@@ -23,7 +23,9 @@
             $sql = "CREATE TABLE IF NOT EXISTS school (
                 school_id INT PRIMARY KEY,
                 school_name VARCHAR(100),
-                has_library BOOLEAN
+                has_library BOOLEAN,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
             );";
             $stmt = $db->pdo->prepare($sql);
             $stmt->execute();
@@ -32,6 +34,8 @@
             $sql = "CREATE TABLE IF NOT EXISTS user_role (
                 role_id INT PRIMARY KEY,
                 role_name VARCHAR(100),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
             );";
             $stmt = $db->pdo->prepare($sql);
             $stmt->execute();
@@ -48,6 +52,8 @@
                 family_name VARCHAR(50),
                 first_name VARCHAR(50),
                 password VARCHAR(100),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 FOREIGN KEY (role_id) REFERENCES user_role(role_id),
                 FOREIGN KEY (school_id) REFERENCES school(school_id),
                 UNIQUE (school_id, grade, class, number)
@@ -58,7 +64,9 @@
             //書籍状態テーブル作成
             $sql = "CREATE TABLE IF NOT EXISTS book_status (
                 status_id INT PRIMARY KEY,
-                status_name VARCHAR(50)
+                status_name VARCHAR(50),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
             );";
             $stmt = $db->pdo->prepare($sql);
             $stmt->execute();
@@ -66,7 +74,9 @@
             //予約状態テーブルの作成
             $sql = "CREATE TABLE IF NOT EXISTS reservation_status (
                 status_id INT PRIMARY KEY,
-                status_name VARCHAR(50)
+                status_name VARCHAR(50),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
             );";
             $stmt = $db->pdo->prepare($sql);
             $stmt->execute();
@@ -74,7 +84,9 @@
             //配送状態テーブルの作成
             $sql = "CREATE TABLE IF NOT EXISTS delivery_status (
                 status_id INT PRIMARY KEY,
-                status_name VARCHAR(50)
+                status_name VARCHAR(50),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
             );";
             $stmt = $db->pdo->prepare($sql);
             $stmt->execute();
@@ -82,7 +94,9 @@
             //配送タイプテーブルの作成
             $sql = "CREATE TABLE IF NOT EXISTS delivery_type (
                 type_id INT PRIMARY KEY,
-                type_name VARCHAR(50)
+                type_name VARCHAR(50),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
             );";
             $stmt = $db->pdo->prepare($sql);
             $stmt->execute();
@@ -94,7 +108,9 @@
                 author_name VARCHAR(100),
                 author_kana VARCHAR(100),
                 publisher VARCHAR(100),
-                publication_year DATE
+                publication_year DATE,
+                registed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
             );";
             $stmt = $db->pdo->prepare($sql);
             $stmt->execute();
@@ -174,6 +190,8 @@
                 password VARCHAR(100),
                 family_name VARCHAR(50),
                 first_name VARCHAR(50),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 FOREIGN KEY (school_id) REFERENCES school(school_id),
                 UNIQUE (school_id, login_id)
             );";
@@ -187,8 +205,9 @@
                 password VARCHAR(100),
                 family_name VARCHAR(50),
                 first_name VARCHAR(50),
-                FOREIGN KEY (school_id) REFERENCES school(school_id),
-                UNIQUE (school_id, login_id)
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                UNIQUE (login_id)
             );";
             $stmt = $db->pdo->prepare($sql);
             $stmt->execute();
