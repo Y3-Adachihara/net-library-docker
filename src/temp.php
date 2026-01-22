@@ -81,14 +81,14 @@
     /* 他校の本を借りる場合 */
 
         //4. 予約されていない場合（ストレート貸出）
-        ['student_id' = 4, 'book_id' = '913003002', 'lending_date' = '2025-10-01 12:30:00', 'return_date' = '2025-10-07 12:30:00'],
+        ['student_id' => 4, 'book_id' => '913003002', 'lending_date' => '2025-10-01 12:30:00', 'return_date' => '2025-10-07 12:30:00'],
 
 
 
-        //6. 
-        ['student_id' = 15, 'book_id' = '913002302', 'lending_date' = '2025-10-03 12:30:00', 'return_date' = '2025-10-08 12:30:00'],
-        ['student_id' = 7, 'book_id' = '913002302', 'lending_date' = '2025-10-09 12:00:00', 'return_date' = '2025-10-13 12:30:00'],
-        ['student_id' = 12, 'book_id' = '913002302', 'lending_date' = '2025-10-14 12:30:00', 'return_date' = '2025-10-20 12:30:00'],
+        //6. 最後に他校の生徒日本が予約されていた場合
+        ['student_id' => 15, 'book_id' => '913002302', 'lending_date' => '2025-10-03 12:30:00', 'return_date' => '2025-10-08 12:30:00'],
+        ['student_id' => 7, 'book_id' => '913002302', 'lending_date' => '2025-10-09 12:00:00', 'return_date' => '2025-10-13 12:30:00'],
+        ['student_id' => 12, 'book_id' => '913002302', 'lending_date' => '2025-10-14 12:30:00', 'return_date' => '2025-10-20 12:30:00'],
 
 
 
@@ -114,16 +114,16 @@
 
         //4.で付随する予約処理
         //4-1. 3小の生徒が10中の書籍を取り寄せ
-        ['student_id' = 4, 'book_id' = '913003002', 'status_id' = 3, 'reservation_date' = '2025-09-30 13:00:00', 'updated_at' = '2025-10-01 10:20:00'],
+        ['student_id' = 4, 'book_id' = '913003002', 'status_id' => 3, 'reservation_date' => '2025-09-30 13:00:00', 'updated_at' => '2025-10-01 10:20:00'],
 
 
         //6.で付随する予約処理
         // その1　9中のB1が6小の本を予約
-        ['student_id' = 15, 'book_id' = '913002302', 'status_id' = 3, 'reservation_date' = '2025-10-02 17:00:00', 'updated_at' = '2025-10-03 12:30:00'],
+        ['student_id' => 15, 'book_id' => '913002302', 'status_id' => 3, 'reservation_date' => '2025-10-02 17:00:00', 'updated_at' => '2025-10-03 12:30:00'],
         // その2　6小のAが、9中のB1に借りられている6小の本を予約
-        ['student_id' = 7, 'book_id' = '913002302', 'status_id' = 3, 'reservation_date' = '2025-10-06 14:00:00', 'updated_at' = '2025-10-09 12:00:00'],
+        ['student_id' => 7, 'book_id' => '913002302', 'status_id' => 3, 'reservation_date' => '2025-10-06 14:00:00', 'updated_at' => '2025-10-09 12:00:00'],
         // その3　9中のB2が、9中のAに借りられている6小の本を予約
-        ['student_id' = 7, 'book_id' = '913002302', 'status_id' = 3, 'reservation_date' = '2025-10-10 16:00:00', 'updated_at' = '2025-10-14 12:30:00'],
+        ['student_id' => 7, 'book_id' => '913002302', 'status_id' => 3, 'reservation_date' => '2025-10-10 16:00:00', 'updated_at' => '2025-10-14 12:30:00'],
 
 
 
@@ -146,25 +146,26 @@
 
 
         // 4. 10中から3小へ配送（往路）
-        ['from_school_id' = 10, 'to_school_id' = 3, 'delivery_type' = 1, 'delivery_status' = 3, 'book_id' = '913003002', 'delivery_date' = '2025-10-01 09:55:00', 'arrival_date' = '2025-10-01 10:20:00'],
+        ['from_school_id' => 10, 'to_school_id' => 3, 'delivery_type' => 1, 'delivery_status' => 3, 'book_id' => '913003002', 'delivery_date' => '2025-10-01 09:55:00', 'arrival_date' => '2025-10-01 10:20:00'],
         // 4. 3小から10中へ配送（復路）
-        ['from_school_id' = 3, 'to_school_id' = 10, 'delivery_type' = 2, 'delivery_status' = 3, 'book_id' = '913003002', 'delivery_date' = '2025-10-08 09:00:00', 'arrival_date' = '2025-10-01 09:40:00'],
+        ['from_school_id' => 3, 'to_school_id' => 10, 'delivery_type' => 2, 'delivery_status' => 3, 'book_id' => '913003002', 'delivery_date' => '2025-10-08 09:00:00', 'arrival_date' => '2025-10-01 09:40:00'],
 
         //6. に付随する配送処理
         // 6小→9中へ配送（往路）
-        ['from_school_id' = 6, 'to_school_id' = 9, 'delivery_type' = 1, 'delivery_status' = 3, 'book_id' = '913002302', 'delivery_date' = '2025-10-03 09:00:00', 'arrival_date' = '2025-10-03 10:00:00'],
+        ['from_school_id' => 6, 'to_school_id' => 9, 'delivery_type' = >1, 'delivery_status' => 3, 'book_id' => '913002302', 'delivery_date' => '2025-10-03 09:00:00', 'arrival_date' => '2025-10-03 10:00:00'],
         // 9中から6小へ配送（往路）
-        ['from_school_id' = 9, 'to_school_id' = 6, 'delivery_type' = 1, 'delivery_status' = 3, 'book_id' = '913002302', 'delivery_date' = '2025-10-09 09:00:00', 'arrival_date' = '2025-10-03 10:00:00'],
+        ['from_school_id' => 9, 'to_school_id' => 6, 'delivery_type' => 1, 'delivery_status' => 3, 'book_id' => '913002302', 'delivery_date' => '2025-10-09 09:00:00', 'arrival_date' => '2025-10-03 10:00:00'],
         // ６小から9中へ配送（往路）
-        ['from_school_id' = 6, 'to_school_id' = 9, 'delivery_type' = 1, 'delivery_status' = 3, 'book_id' = '913002302', 'delivery_date' = '2025-10-14 09:00:00', 'arrival_date' = '2025-10-14 10:00:00'],
+        ['from_school_id' => 6, 'to_school_id' => 9, 'delivery_type' => 1, 'delivery_status' => 3, 'book_id' => '913002302', 'delivery_date' => '2025-10-14 09:00:00', 'arrival_date' => '2025-10-14 10:00:00'],
         // 9中から6小へ配送（復路）
-        ['from_school_id' = 9, 'to_school_id' = 6, 'delivery_type' = 2, 'delivery_status' = 3, 'book_id' = '913002302', 'delivery_date' = '2025-10-21 09:00:00', 'arrival_date' = '2025-10-21 10:00:00'],
+        ['from_school_id' => 9, 'to_school_id' => 6, 'delivery_type' => 2, 'delivery_status' => 3, 'book_id' => '913002302', 'delivery_date' => '2025-10-21 09:00:00', 'arrival_date' => '2025-10-21 10:00:00'],
 
 
 
     ];
 
 
+    /*
     // 5. 貸出リスト (日付を2025年9月以降にシフト)
     // 貸出期間は7日間に設定
     $lending_list = [
@@ -246,6 +247,7 @@
         // 配送待ち
         ['from_school_id' => 1, 'to_school_id' => 2, 'delivery_type' => 1, 'delivery_status' => 1, 'book_id' => '913002002', 'delivery_date' => '2026-01-19 10:00:00', 'arrival_date' => null]
     ];
+    */
 
     // 8. 書籍マスタ (updated_atは後で計算)
     // registered_at は全データ共通で 2025-04-01 に設定 (活動開始前)
@@ -281,7 +283,7 @@
         ['book_id' => '913001701', 'school_id' => 1, 'title' => '舞姫', 'author_name' => '森鴎外', 'author_kana' => 'モリオウガイ', 'publisher' => '岩波書店', 'publication_year' => '1988-04-01', 'status_id' => 1, 'position' => 1],
         ['book_id' => '913001702', 'school_id' => 5, 'title' => '舞姫', 'author_name' => '森鴎外', 'author_kana' => 'モリオウガイ', 'publisher' => '新潮社', 'publication_year' => '2001-01-01', 'status_id' => 1, 'position' => 5],
         ['book_id' => '913001801', 'school_id' => 4, 'title' => '夜明け前', 'author_name' => '島崎藤村', 'author_kana' => 'シマザキトウソン', 'publisher' => '岩波書店', 'publication_year' => '1975-01-01', 'status_id' => 1, 'position' => 4],
-        ['book_id' => '913001802', 'school_id' => 6, 'title' => '夜明け前', 'author_name' => '島崎藤村', 'author_kana' => 'シマザキトウソン', 'publisher' => '新潮社', 'publication_year' => '1990-01-01', 'status_id' => 2, 'position' => 1],
+        ['book_id' => '913001802', 'school_id' => 6, 'title' => '夜明け前', 'author_name' => '島崎藤村', 'author_kana' => 'シマザキトウソン', 'publisher' => '新潮社', 'publication_year' => '1990-01-01', 'status_id' => 1, 'position' => 1],
         ['book_id' => '913001901', 'school_id' => 3, 'title' => '学問のすゝめ', 'author_name' => '福沢諭吉', 'author_kana' => 'フクザワユキチ', 'publisher' => '岩波書店', 'publication_year' => '1980-01-01', 'status_id' => 1, 'position' => 3],
         ['book_id' => '913001902', 'school_id' => 1, 'title' => '学問のすゝめ', 'author_name' => '福沢諭吉', 'author_kana' => 'フクザワユキチ', 'publisher' => '講談社', 'publication_year' => '2005-01-01', 'status_id' => 2, 'position' => 1],
         ['book_id' => '913002001', 'school_id' => 1, 'title' => '武士道', 'author_name' => '新渡戸稲造', 'author_kana' => 'ニトベイナゾウ', 'publisher' => '岩波書店', 'publication_year' => '1990-01-01', 'status_id' => 1, 'position' => 1],
@@ -289,7 +291,7 @@
         ['book_id' => '913002301', 'school_id' => 1, 'title' => '東海道中膝栗毛', 'author_name' => '十返舎一九', 'author_kana' => 'ジッペンシャイック', 'publisher' => '岩波書店', 'publication_year' => '1985-01-01', 'status_id' => 1, 'position' => 1],
         ['book_id' => '913002302', 'school_id' => 6, 'title' => '東海道中膝栗毛', 'author_name' => '十返舎一九', 'author_kana' => 'ジッペンシャイック', 'publisher' => '新潮社', 'publication_year' => '1995-01-01', 'status_id' => 1, 'position' => 6],
         ['book_id' => '913003001', 'school_id' => 10, 'title' => 'コンビニ人間', 'author_name' => '村田沙耶香', 'author_kana' => 'ムラタサヤカ', 'publisher' => '文藝春秋', 'publication_year' => '2016-07-01', 'status_id' => 1, 'position' => 10],
-        ['book_id' => '913003002', 'school_id' => 10, 'title' => 'コンビニ人間', 'author_name' => '村田沙耶香', 'author_kana' => 'ムラタサヤカ', 'publisher' => '文藝春秋', 'publication_year' => '2016-07-01', 'status_id' => 2, 'position' => 10],
+        ['book_id' => '913003002', 'school_id' => 10, 'title' => 'コンビニ人間', 'author_name' => '村田沙耶香', 'author_kana' => 'ムラタサヤカ', 'publisher' => '文藝春秋', 'publication_year' => '2016-07-01', 'status_id' => 1, 'position' => 10],
         ['book_id' => '913002601', 'school_id' => 1, 'title' => '1Q84', 'author_name' => '村上春樹', 'author_kana' => 'ムラカミハルキ', 'publisher' => '新潮社', 'publication_year' => '2009-05-01', 'status_id' => 4, 'position' => 1],
         ['book_id' => '933000201', 'school_id' => 1, 'title' => 'ハリー・ポッターと賢者の石', 'author_name' => 'J.K.ローリング', 'author_kana' => 'ローリング', 'publisher' => '静山社', 'publication_year' => '1999-12-01', 'status_id' => 1, 'position' => 1],
         ['book_id' => '933000202', 'school_id' => 6, 'title' => 'ハリー・ポッターと賢者の石', 'author_name' => 'J.K.ローリング', 'author_kana' => 'ローリング', 'publisher' => '静山社', 'publication_year' => '1999-12-01', 'status_id' => 1, 'position' => 6],

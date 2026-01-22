@@ -1,6 +1,6 @@
 <?php
     require_once 'db_connect.php';
-    $tables = ['delivery', 'reservation', 'lending', 'book', 'book_status', 'reservation_status', 'delivery_status', 'delivery_type', 'student', 'school', 'librarian'];
+    $tables = ['deliverer','delivery', 'reservation', 'lending', 'book_stack', 'book_info', 'book_status', 'reservation_status', 'delivery_status', 'delivery_type', 'student', 'user_role', 'school', 'librarian'];
 
     if (isset($_POST['reset_table'])) {
         $db = new db_connect();
@@ -28,10 +28,19 @@
             $stmt = $db->pdo->prepare($sql);
             $stmt->execute();
 
+            //ロールテーブル作成
+            $sql = "CREATE TABLE IF NOT EXISTS user_role (
+                role_id INT PRIMARY KEY,
+                role_name VARCHAR(100),
+            );";
+            $stmt = $db->pdo->prepare($sql);
+            $stmt->execute();
+
 
             //学生テーブル作成
             $sql = "CREATE TABLE IF NOT EXISTS student (
                 student_id INT AUTO_INCREMENT PRIMARY KEY,
+                role_id INT DEFAULT 1,
                 school_id INT NOT NULL,
                 grade INT NOT NULL,
                 class VARCHAR(10) NOT NULL,
@@ -39,6 +48,7 @@
                 family_name VARCHAR(50),
                 first_name VARCHAR(50),
                 password VARCHAR(100),
+                FOREIGN KEY (role_id) REFERENCES user_role(role_id),
                 FOREIGN KEY (school_id) REFERENCES school(school_id),
                 UNIQUE (school_id, grade, class, number)
             );";
@@ -77,19 +87,28 @@
             $stmt = $db->pdo->prepare($sql);
             $stmt->execute();
 
-            //書籍テーブル作成
-            $sql = "CREATE TABLE IF NOT EXISTS book (
-                book_id VARCHAR(20) PRIMARY KEY,
-                school_id INT,
+            //書籍情報テーブル作成
+            $sql = "CREATE TABLE IF NOT EXISTS book_info (
+                isbn VARCHAR(25) PRIMARY KEY,
                 title VARCHAR(200),
                 author_name VARCHAR(100),
                 author_kana VARCHAR(100),
                 publisher VARCHAR(100),
-                publication_year DATE,
+                publication_year DATE
+            );";
+            $stmt = $db->pdo->prepare($sql);
+            $stmt->execute();
+
+            //書籍所蔵テーブル
+            $sql = "CREATE TABLE IF NOT EXISTS book_stack (
+                stack_id VARCHAR(20) PRIMARY KEY,
+                isbn VARCHAR(25),
+                school_id INT,
                 status_id INT,
                 position INT,
                 registed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                FOREIGN KEY (isbn) REFERENCES book_info(isbn),
                 FOREIGN KEY (school_id) REFERENCES school(school_id),
                 FOREIGN KEY (status_id) REFERENCES book_status(status_id),
                 FOREIGN KEY (position) REFERENCES school(school_id)
@@ -100,14 +119,14 @@
             //予約テーブル作成
             $sql = "CREATE TABLE IF NOT EXISTS reservation (
                 reservation_id INT AUTO_INCREMENT PRIMARY KEY,
-                reservation_number INT,
+                reservation_number VARCHAR(10),
                 student_id INT,
                 book_id VARCHAR(20),
                 status_id INT,
                 reservation_date DATETIME DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 FOREIGN KEY (student_id) REFERENCES student(student_id),
-                FOREIGN KEY (book_id) REFERENCES book(book_id),
+                FOREIGN KEY (book_id) REFERENCES book_stack(stack_id),
                 FOREIGN KEY (status_id) REFERENCES reservation_status(status_id)
             );";
             $stmt = $db->pdo->prepare($sql);
@@ -121,7 +140,7 @@
                 lending_date DATETIME DEFAULT CURRENT_TIMESTAMP,
                 return_date DATETIME,
                 FOREIGN KEY (student_id) REFERENCES student(student_id),
-                FOREIGN KEY (book_id) REFERENCES book(book_id)
+                FOREIGN KEY (book_id) REFERENCES book_stack(stack_id)
             );";
             $stmt = $db->pdo->prepare($sql);
             $stmt->execute();
@@ -129,6 +148,7 @@
             //配送テーブル作成
             $sql = "CREATE TABLE IF NOT EXISTS delivery (
                 delivery_id INT AUTO_INCREMENT PRIMARY KEY,
+                deliverer_id INT,
                 from_school_id INT NOT NULL,
                 to_school_id INT NOT NULL,
                 delivery_type INT,
@@ -136,9 +156,10 @@
                 book_id VARCHAR(20),
                 delivery_date DATETIME DEFAULT CURRENT_TIMESTAMP,
                 arrival_date DATETIME,
+                FOREIGN KEY (deliverer_id) REFERENCES deliverer(deliverer_id),
                 FOREIGN KEY (from_school_id) REFERENCES school(school_id),
                 FOREIGN KEY (to_school_id) REFERENCES school(school_id),
-                FOREIGN KEY (book_id) REFERENCES book(book_id),
+                FOREIGN KEY (book_id) REFERENCES book_stack(stack_id),
                 FOREIGN KEY (delivery_type) REFERENCES delivery_type(type_id),
                 FOREIGN KEY (delivery_status) REFERENCES delivery_status(status_id)
             );";
@@ -149,6 +170,19 @@
             $sql = "CREATE TABLE IF NOT EXISTS librarian (
                 librarian_id INT AUTO_INCREMENT PRIMARY KEY,
                 school_id INT NOT NULL,
+                login_id VARCHAR(20) NOT NULL,
+                password VARCHAR(100),
+                family_name VARCHAR(50),
+                first_name VARCHAR(50),
+                FOREIGN KEY (school_id) REFERENCES school(school_id),
+                UNIQUE (school_id, login_id)
+            );";
+            $stmt = $db->pdo->prepare($sql);
+            $stmt->execute();
+
+            // 配送員テーブル作成
+            $sql = "CREATE TABLE IF NOT EXISTS deliverer (
+                deliverer_id INT AUTO_INCREMENT PRIMARY KEY,
                 login_id VARCHAR(20) NOT NULL,
                 password VARCHAR(100),
                 family_name VARCHAR(50),
