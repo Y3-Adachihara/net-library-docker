@@ -161,27 +161,6 @@
             $stmt = $db->pdo->prepare($sql);
             $stmt->execute();
 
-            //配送テーブル作成
-            $sql = "CREATE TABLE IF NOT EXISTS delivery (
-                delivery_id INT AUTO_INCREMENT PRIMARY KEY,
-                deliverer_id INT,
-                from_school_id INT NOT NULL,
-                to_school_id INT NOT NULL,
-                delivery_type INT,
-                delivery_status INT,
-                book_id VARCHAR(20),
-                delivery_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-                arrival_date DATETIME,
-                FOREIGN KEY (deliverer_id) REFERENCES deliverer(deliverer_id),
-                FOREIGN KEY (from_school_id) REFERENCES school(school_id),
-                FOREIGN KEY (to_school_id) REFERENCES school(school_id),
-                FOREIGN KEY (book_id) REFERENCES book_stack(stack_id),
-                FOREIGN KEY (delivery_type) REFERENCES delivery_type(type_id),
-                FOREIGN KEY (delivery_status) REFERENCES delivery_status(status_id)
-            );";
-            $stmt = $db->pdo->prepare($sql);
-            $stmt->execute();
-
             //司書テーブル作成
             $sql = "CREATE TABLE IF NOT EXISTS librarian (
                 librarian_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -208,6 +187,27 @@
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 UNIQUE (login_id)
+            );";
+            $stmt = $db->pdo->prepare($sql);
+            $stmt->execute();
+
+            //配送テーブル作成
+            $sql = "CREATE TABLE IF NOT EXISTS delivery (
+                delivery_id INT AUTO_INCREMENT PRIMARY KEY,
+                deliverer_id INT,
+                from_school_id INT NOT NULL,
+                to_school_id INT NOT NULL,
+                delivery_type INT,
+                delivery_status INT,
+                book_id VARCHAR(20),
+                delivery_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+                arrival_date DATETIME,
+                FOREIGN KEY (deliverer_id) REFERENCES deliverer(deliverer_id),
+                FOREIGN KEY (from_school_id) REFERENCES school(school_id),
+                FOREIGN KEY (to_school_id) REFERENCES school(school_id),
+                FOREIGN KEY (book_id) REFERENCES book_stack(stack_id),
+                FOREIGN KEY (delivery_type) REFERENCES delivery_type(type_id),
+                FOREIGN KEY (delivery_status) REFERENCES delivery_status(status_id)
             );";
             $stmt = $db->pdo->prepare($sql);
             $stmt->execute();
