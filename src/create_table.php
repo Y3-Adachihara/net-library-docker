@@ -109,7 +109,7 @@
                 author_kana VARCHAR(100),
                 publisher VARCHAR(100),
                 publication_year DATE,
-                registed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
             );";
             $stmt = $db->pdo->prepare($sql);
@@ -122,7 +122,7 @@
                 school_id INT,
                 status_id INT,
                 position INT,
-                registed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 FOREIGN KEY (isbn) REFERENCES book_info(isbn),
                 FOREIGN KEY (school_id) REFERENCES school(school_id),

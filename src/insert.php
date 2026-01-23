@@ -97,7 +97,7 @@
     ];
 
 
-    $status_master = [
+    $book_status_master = [
         ['status_id' => 1, 'status_name' => '貸出可能', 'created_at' => '2015-04-01 10:00:00', 'updated_at' => '2015-04-01 10:00:00'],
         ['status_id' => 2, 'status_name' => '貸出中', 'created_at' => '2015-04-01 10:00:00', 'updated_at' => '2015-04-01 10:00:00'],
         ['status_id' => 3, 'status_name' => '予約済み', 'created_at' => '2015-04-01 10:00:00', 'updated_at' => '2015-04-01 10:00:00'],
@@ -214,144 +214,145 @@
 
 
     $book_info = [
-        ['isbn' => '978-4-00-310101-8', 'title' => 'こころ', 'author_name' => '夏目漱石', 'author_kana' => 'ナツメソウセキ', 'publisher' => '岩波書店', 'publication_year' => '1990-01-01', 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['isbn' => '978-4-10-101003-7', 'title' => 'こころ', 'author_name' => '夏目漱石', 'author_kana' => 'ナツメソウセキ', 'publisher' => '新潮社', 'publication_year' => '1995-05-01', 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['isbn' => '978-4-10-100605-4', 'title' => '人間失格', 'author_name' => '太宰治', 'author_kana' => 'ダザイオサム', 'publisher' => '新潮社', 'publication_year' => '1992-04-01', 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['isbn' => '978-4-04-109900-1', 'title' => '人間失格', 'author_name' => '太宰治', 'author_kana' => 'ダザイオサム', 'publisher' => '角川書店', 'publication_year' => '2000-12-01', 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['isbn' => '978-4-00-310051-6', 'title' => '羅生門', 'author_name' => '芥川龍之介', 'author_kana' => 'アクタガワリュウノスケ', 'publisher' => '岩波書店', 'publication_year' => '1998-03-01', 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['isbn' => '978-4-10-102501-7', 'title' => '羅生門', 'author_name' => '芥川龍之介', 'author_kana' => 'アクタガワリュウノスケ', 'publisher' => '新潮社', 'publication_year' => '2005-08-01', 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['isbn' => '978-4-04-104003-4', 'title' => '銀河鉄道の夜', 'author_name' => '宮沢賢治', 'author_kana' => 'ミヤザワケンジ', 'publisher' => '角川書店', 'publication_year' => '1996-07-07', 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['isbn' => '978-4-10-109205-5', 'title' => '銀河鉄道の夜', 'author_name' => '宮沢賢治', 'author_kana' => 'ミヤザワケンジ', 'publisher' => '新潮社', 'publication_year' => '2001-11-01', 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['isbn' => '978-4-10-101001-3', 'title' => '坊っちゃん', 'author_name' => '夏目漱石', 'author_kana' => 'ナツメソウセキ', 'publisher' => '新潮社', 'publication_year' => '1989-02-01', 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['isbn' => '978-4-00-310103-2', 'title' => '坊っちゃん', 'author_name' => '夏目漱石', 'author_kana' => 'ナツメソウセキ', 'publisher' => '岩波書店', 'publication_year' => '2010-04-01', 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['isbn' => '978-4-10-100601-6', 'title' => '走れメロス', 'author_name' => '太宰治', 'author_kana' => 'ダザイオサム', 'publisher' => '新潮社', 'publication_year' => '1993-05-15', 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['isbn' => '978-4-10-100101-1', 'title' => '雪国', 'author_name' => '川端康成', 'author_kana' => 'カワバタヤスナリ', 'publisher' => '新潮社', 'publication_year' => '1960-01-01', 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['isbn' => '978-4-00-310813-0', 'title' => '雪国', 'author_name' => '川端康成', 'author_kana' => 'カワバタヤスナリ', 'publisher' => '岩波書店', 'publication_year' => '1980-01-01', 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['isbn' => '978-4-10-100102-8', 'title' => '伊豆の踊子', 'author_name' => '川端康成', 'author_kana' => 'カワバタヤスナリ', 'publisher' => '新潮社', 'publication_year' => '1991-03-01', 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['isbn' => '978-4-04-100506-4', 'title' => '伊豆の踊子', 'author_name' => '川端康成', 'author_kana' => 'カワバタヤスナリ', 'publisher' => '角川書店', 'publication_year' => '2005-06-01', 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['isbn' => '978-4-10-105008-6', 'title' => '金閣寺', 'author_name' => '三島由紀夫', 'author_kana' => 'ミシマユキオ', 'publisher' => '新潮社', 'publication_year' => '1970-01-01', 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['isbn' => '978-4-00-310102-5', 'title' => '吾輩は猫である', 'author_name' => '夏目漱石', 'author_kana' => 'ナツメソウセキ', 'publisher' => '岩波書店', 'publication_year' => '1988-10-01', 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['isbn' => '978-4-06-196009-1', 'title' => '吾輩は猫である', 'author_name' => '夏目漱石', 'author_kana' => 'ナツメソウセキ', 'publisher' => '講談社', 'publication_year' => '2000-01-01', 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['isbn' => '978-4-00-310702-7', 'title' => '風の又三郎', 'author_name' => '宮沢賢治', 'author_kana' => 'ミヤザワケンジ', 'publisher' => '岩波書店', 'publication_year' => '1995-11-01', 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['isbn' => '978-4-10-102502-4', 'title' => '蜘蛛の糸', 'author_name' => '芥川龍之介', 'author_kana' => 'アクタガワリュウノスケ', 'publisher' => '新潮社', 'publication_year' => '1999-01-01', 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['isbn' => '978-4-04-100307-7', 'title' => '蜘蛛の糸', 'author_name' => '芥川龍之介', 'author_kana' => 'アクタガワリュウノスケ', 'publisher' => '角川書店', 'publication_year' => '2008-01-01', 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['isbn' => '978-4-10-100604-7', 'title' => '斜陽', 'author_name' => '太宰治', 'author_kana' => 'ダザイオサム', 'publisher' => '新潮社', 'publication_year' => '1980-05-01', 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['isbn' => '978-4-00-310904-5', 'title' => '斜陽', 'author_name' => '太宰治', 'author_kana' => 'ダザイオサム', 'publisher' => '岩波書店', 'publication_year' => '1990-06-01', 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['isbn' => '978-4-12-200994-9', 'title' => '細雪', 'author_name' => '谷崎潤一郎', 'author_kana' => 'タニザキジュンイチロウ', 'publisher' => '中公文庫', 'publication_year' => '1985-01-01', 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['isbn' => '978-4-00-311451-3', 'title' => '山月記', 'author_name' => '中島敦', 'author_kana' => 'ナカジマアツシ', 'publisher' => '岩波書店', 'publication_year' => '1994-02-01', 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['isbn' => '978-4-10-106401-4', 'title' => '山月記', 'author_name' => '中島敦', 'author_kana' => 'ナカジマアツシ', 'publisher' => '新潮社', 'publication_year' => '2003-07-01', 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['isbn' => '978-4-00-310065-3', 'title' => '高瀬舟', 'author_name' => '森鴎外', 'author_kana' => 'モリオウガイ', 'publisher' => '岩波書店', 'publication_year' => '1982-01-01', 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['isbn' => '978-4-10-102004-3', 'title' => '高瀬舟', 'author_name' => '森鴎外', 'author_kana' => 'モリオウガイ', 'publisher' => '新潮社', 'publication_year' => '1995-10-01', 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['isbn' => '978-4-00-310060-8', 'title' => '舞姫', 'author_name' => '森鴎外', 'author_kana' => 'モリオウガイ', 'publisher' => '岩波書店', 'publication_year' => '1988-04-01', 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['isbn' => '978-4-10-102002-9', 'title' => '舞姫', 'author_name' => '森鴎外', 'author_kana' => 'モリオウガイ', 'publisher' => '新潮社', 'publication_year' => '2001-01-01', 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['isbn' => '978-4-00-310351-8', 'title' => '夜明け前', 'author_name' => '島崎藤村', 'author_kana' => 'シマザキトウソン', 'publisher' => '岩波書店', 'publication_year' => '1975-01-01', 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['isbn' => '978-4-10-105505-0', 'title' => '夜明け前', 'author_name' => '島崎藤村', 'author_kana' => 'シマザキトウソン', 'publisher' => '新潮社', 'publication_year' => '1990-01-01', 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['isbn' => '978-4-00-331021-2', 'title' => '学問のすゝめ', 'author_name' => '福沢諭吉', 'author_kana' => 'フクザワユキチ', 'publisher' => '岩波書店', 'publication_year' => '1980-01-01', 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['isbn' => '978-4-06-158498-3', 'title' => '学問のすゝめ', 'author_name' => '福沢諭吉', 'author_kana' => 'フクザワユキチ', 'publisher' => '講談社', 'publication_year' => '2005-01-01', 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['isbn' => '978-4-00-331181-3', 'title' => '武士道', 'author_name' => '新渡戸稲造', 'author_kana' => 'ニトベイナゾウ', 'publisher' => '岩波書店', 'publication_year' => '1990-01-01', 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['isbn' => '978-4-06-292100-8', 'title' => '武士道', 'author_name' => '新渡戸稲造', 'author_kana' => 'ニトベイナゾウ', 'publisher' => '講談社', 'publication_year' => '2000-01-01', 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['isbn' => '978-4-00-302301-3', 'title' => '東海道中膝栗毛', 'author_name' => '十返舎一九', 'author_kana' => 'ジッペンシャイック', 'publisher' => '岩波書店', 'publication_year' => '1985-01-01', 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['isbn' => '978-4-10-107001-5', 'title' => '東海道中膝栗毛', 'author_name' => '十返舎一九', 'author_kana' => 'ジッペンシャイック', 'publisher' => '新潮社', 'publication_year' => '1995-01-01', 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['isbn' => '978-4-16-390618-8', 'title' => 'コンビニ人間', 'author_name' => '村田沙耶香', 'author_kana' => 'ムラタサヤカ', 'publisher' => '文藝春秋', 'publication_year' => '2016-07-01', 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['isbn' => '978-4-10-353422-8', 'title' => '1Q84', 'author_name' => '村上春樹', 'author_kana' => 'ムラカミハルキ', 'publisher' => '新潮社', 'publication_year' => '2009-05-01', 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['isbn' => '978-4-915512-37-7', 'title' => 'ハリー・ポッターと賢者の石', 'author_name' => 'J.K.ローリング', 'author_kana' => 'ローリング', 'publisher' => '静山社', 'publication_year' => '1999-12-01', 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['isbn' => '978-4-00-325326-7', 'title' => '星の王子さま', 'author_name' => 'サン=テグジュペリ', 'author_kana' => 'サンテグジュペリ', 'publisher' => '岩波書店', 'publication_year' => '2000-01-01', 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['isbn' => '978-4-10-212204-4', 'title' => '星の王子さま', 'author_name' => 'サン=テグジュペリ', 'author_kana' => 'サンテグジュペリ', 'publisher' => '新潮社', 'publication_year' => '2006-01-01', 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['isbn' => '978-4-10-207101-4', 'title' => '変身', 'author_name' => 'カフカ', 'author_kana' => 'カフカ', 'publisher' => '新潮社', 'publication_year' => '1952-01-01', 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['isbn' => '978-4-00-324541-5', 'title' => '変身', 'author_name' => 'カフカ', 'author_kana' => 'カフカ', 'publisher' => '岩波書店', 'publication_year' => '1960-01-01', 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['isbn' => '978-4-10-210001-1', 'title' => '老人と海', 'author_name' => 'ヘミングウェイ', 'author_kana' => 'ヘミングウェイ', 'publisher' => '新潮社', 'publication_year' => '1966-01-01', 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['isbn' => '978-4-10-211301-1', 'title' => '赤毛のアン', 'author_name' => 'モンゴメリ', 'author_kana' => 'モンゴメリ', 'publisher' => '新潮社', 'publication_year' => '1955-01-01', 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00']
+        ['isbn' => '978-4-00-310101-8', 'title' => 'こころ', 'author_name' => '夏目漱石', 'author_kana' => 'ナツメソウセキ', 'publisher' => '岩波書店', 'publication_year' => '1990-01-01', 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['isbn' => '978-4-10-101003-7', 'title' => 'こころ', 'author_name' => '夏目漱石', 'author_kana' => 'ナツメソウセキ', 'publisher' => '新潮社', 'publication_year' => '1995-05-01', 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['isbn' => '978-4-10-100605-4', 'title' => '人間失格', 'author_name' => '太宰治', 'author_kana' => 'ダザイオサム', 'publisher' => '新潮社', 'publication_year' => '1992-04-01', 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['isbn' => '978-4-04-109900-1', 'title' => '人間失格', 'author_name' => '太宰治', 'author_kana' => 'ダザイオサム', 'publisher' => '角川書店', 'publication_year' => '2000-12-01', 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['isbn' => '978-4-00-310051-6', 'title' => '羅生門', 'author_name' => '芥川龍之介', 'author_kana' => 'アクタガワリュウノスケ', 'publisher' => '岩波書店', 'publication_year' => '1998-03-01', 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['isbn' => '978-4-10-102501-7', 'title' => '羅生門', 'author_name' => '芥川龍之介', 'author_kana' => 'アクタガワリュウノスケ', 'publisher' => '新潮社', 'publication_year' => '2005-08-01', 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['isbn' => '978-4-04-104003-4', 'title' => '銀河鉄道の夜', 'author_name' => '宮沢賢治', 'author_kana' => 'ミヤザワケンジ', 'publisher' => '角川書店', 'publication_year' => '1996-07-07', 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['isbn' => '978-4-10-109205-5', 'title' => '銀河鉄道の夜', 'author_name' => '宮沢賢治', 'author_kana' => 'ミヤザワケンジ', 'publisher' => '新潮社', 'publication_year' => '2001-11-01', 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['isbn' => '978-4-10-101001-3', 'title' => '坊っちゃん', 'author_name' => '夏目漱石', 'author_kana' => 'ナツメソウセキ', 'publisher' => '新潮社', 'publication_year' => '1989-02-01', 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['isbn' => '978-4-00-310103-2', 'title' => '坊っちゃん', 'author_name' => '夏目漱石', 'author_kana' => 'ナツメソウセキ', 'publisher' => '岩波書店', 'publication_year' => '2010-04-01', 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['isbn' => '978-4-10-100601-6', 'title' => '走れメロス', 'author_name' => '太宰治', 'author_kana' => 'ダザイオサム', 'publisher' => '新潮社', 'publication_year' => '1993-05-15', 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['isbn' => '978-4-10-100101-1', 'title' => '雪国', 'author_name' => '川端康成', 'author_kana' => 'カワバタヤスナリ', 'publisher' => '新潮社', 'publication_year' => '1960-01-01', 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['isbn' => '978-4-00-310813-0', 'title' => '雪国', 'author_name' => '川端康成', 'author_kana' => 'カワバタヤスナリ', 'publisher' => '岩波書店', 'publication_year' => '1980-01-01', 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['isbn' => '978-4-10-100102-8', 'title' => '伊豆の踊子', 'author_name' => '川端康成', 'author_kana' => 'カワバタヤスナリ', 'publisher' => '新潮社', 'publication_year' => '1991-03-01', 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['isbn' => '978-4-04-100506-4', 'title' => '伊豆の踊子', 'author_name' => '川端康成', 'author_kana' => 'カワバタヤスナリ', 'publisher' => '角川書店', 'publication_year' => '2005-06-01', 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['isbn' => '978-4-10-105008-6', 'title' => '金閣寺', 'author_name' => '三島由紀夫', 'author_kana' => 'ミシマユキオ', 'publisher' => '新潮社', 'publication_year' => '1970-01-01', 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['isbn' => '978-4-00-310102-5', 'title' => '吾輩は猫である', 'author_name' => '夏目漱石', 'author_kana' => 'ナツメソウセキ', 'publisher' => '岩波書店', 'publication_year' => '1988-10-01', 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['isbn' => '978-4-06-196009-1', 'title' => '吾輩は猫である', 'author_name' => '夏目漱石', 'author_kana' => 'ナツメソウセキ', 'publisher' => '講談社', 'publication_year' => '2000-01-01', 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['isbn' => '978-4-00-310702-7', 'title' => '風の又三郎', 'author_name' => '宮沢賢治', 'author_kana' => 'ミヤザワケンジ', 'publisher' => '岩波書店', 'publication_year' => '1995-11-01', 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['isbn' => '978-4-10-102502-4', 'title' => '蜘蛛の糸', 'author_name' => '芥川龍之介', 'author_kana' => 'アクタガワリュウノスケ', 'publisher' => '新潮社', 'publication_year' => '1999-01-01', 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['isbn' => '978-4-04-100307-7', 'title' => '蜘蛛の糸', 'author_name' => '芥川龍之介', 'author_kana' => 'アクタガワリュウノスケ', 'publisher' => '角川書店', 'publication_year' => '2008-01-01', 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['isbn' => '978-4-10-100604-7', 'title' => '斜陽', 'author_name' => '太宰治', 'author_kana' => 'ダザイオサム', 'publisher' => '新潮社', 'publication_year' => '1980-05-01', 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['isbn' => '978-4-00-310904-5', 'title' => '斜陽', 'author_name' => '太宰治', 'author_kana' => 'ダザイオサム', 'publisher' => '岩波書店', 'publication_year' => '1990-06-01', 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['isbn' => '978-4-12-200994-9', 'title' => '細雪', 'author_name' => '谷崎潤一郎', 'author_kana' => 'タニザキジュンイチロウ', 'publisher' => '中公文庫', 'publication_year' => '1985-01-01', 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['isbn' => '978-4-00-311451-3', 'title' => '山月記', 'author_name' => '中島敦', 'author_kana' => 'ナカジマアツシ', 'publisher' => '岩波書店', 'publication_year' => '1994-02-01', 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['isbn' => '978-4-10-106401-4', 'title' => '山月記', 'author_name' => '中島敦', 'author_kana' => 'ナカジマアツシ', 'publisher' => '新潮社', 'publication_year' => '2003-07-01', 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['isbn' => '978-4-00-310065-3', 'title' => '高瀬舟', 'author_name' => '森鴎外', 'author_kana' => 'モリオウガイ', 'publisher' => '岩波書店', 'publication_year' => '1982-01-01', 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['isbn' => '978-4-10-102004-3', 'title' => '高瀬舟', 'author_name' => '森鴎外', 'author_kana' => 'モリオウガイ', 'publisher' => '新潮社', 'publication_year' => '1995-10-01', 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['isbn' => '978-4-00-310060-8', 'title' => '舞姫', 'author_name' => '森鴎外', 'author_kana' => 'モリオウガイ', 'publisher' => '岩波書店', 'publication_year' => '1988-04-01', 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['isbn' => '978-4-10-102002-9', 'title' => '舞姫', 'author_name' => '森鴎外', 'author_kana' => 'モリオウガイ', 'publisher' => '新潮社', 'publication_year' => '2001-01-01', 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['isbn' => '978-4-00-310351-8', 'title' => '夜明け前', 'author_name' => '島崎藤村', 'author_kana' => 'シマザキトウソン', 'publisher' => '岩波書店', 'publication_year' => '1975-01-01', 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['isbn' => '978-4-10-105505-0', 'title' => '夜明け前', 'author_name' => '島崎藤村', 'author_kana' => 'シマザキトウソン', 'publisher' => '新潮社', 'publication_year' => '1990-01-01', 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['isbn' => '978-4-00-331021-2', 'title' => '学問のすゝめ', 'author_name' => '福沢諭吉', 'author_kana' => 'フクザワユキチ', 'publisher' => '岩波書店', 'publication_year' => '1980-01-01', 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['isbn' => '978-4-06-158498-3', 'title' => '学問のすゝめ', 'author_name' => '福沢諭吉', 'author_kana' => 'フクザワユキチ', 'publisher' => '講談社', 'publication_year' => '2005-01-01', 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['isbn' => '978-4-00-331181-3', 'title' => '武士道', 'author_name' => '新渡戸稲造', 'author_kana' => 'ニトベイナゾウ', 'publisher' => '岩波書店', 'publication_year' => '1990-01-01', 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['isbn' => '978-4-06-292100-8', 'title' => '武士道', 'author_name' => '新渡戸稲造', 'author_kana' => 'ニトベイナゾウ', 'publisher' => '講談社', 'publication_year' => '2000-01-01', 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['isbn' => '978-4-00-302301-3', 'title' => '東海道中膝栗毛', 'author_name' => '十返舎一九', 'author_kana' => 'ジッペンシャイック', 'publisher' => '岩波書店', 'publication_year' => '1985-01-01', 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['isbn' => '978-4-10-107001-5', 'title' => '東海道中膝栗毛', 'author_name' => '十返舎一九', 'author_kana' => 'ジッペンシャイック', 'publisher' => '新潮社', 'publication_year' => '1995-01-01', 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['isbn' => '978-4-16-390618-8', 'title' => 'コンビニ人間', 'author_name' => '村田沙耶香', 'author_kana' => 'ムラタサヤカ', 'publisher' => '文藝春秋', 'publication_year' => '2016-07-01', 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['isbn' => '978-4-10-353422-8', 'title' => '1Q84', 'author_name' => '村上春樹', 'author_kana' => 'ムラカミハルキ', 'publisher' => '新潮社', 'publication_year' => '2009-05-01', 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['isbn' => '978-4-915512-37-7', 'title' => 'ハリー・ポッターと賢者の石', 'author_name' => 'J.K.ローリング', 'author_kana' => 'ローリング', 'publisher' => '静山社', 'publication_year' => '1999-12-01', 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['isbn' => '978-4-00-325326-7', 'title' => '星の王子さま', 'author_name' => 'サン=テグジュペリ', 'author_kana' => 'サンテグジュペリ', 'publisher' => '岩波書店', 'publication_year' => '2000-01-01', 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['isbn' => '978-4-10-212204-4', 'title' => '星の王子さま', 'author_name' => 'サン=テグジュペリ', 'author_kana' => 'サンテグジュペリ', 'publisher' => '新潮社', 'publication_year' => '2006-01-01', 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['isbn' => '978-4-10-207101-4', 'title' => '変身', 'author_name' => 'カフカ', 'author_kana' => 'カフカ', 'publisher' => '新潮社', 'publication_year' => '1952-01-01', 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['isbn' => '978-4-00-324541-5', 'title' => '変身', 'author_name' => 'カフカ', 'author_kana' => 'カフカ', 'publisher' => '岩波書店', 'publication_year' => '1960-01-01', 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['isbn' => '978-4-10-210001-1', 'title' => '老人と海', 'author_name' => 'ヘミングウェイ', 'author_kana' => 'ヘミングウェイ', 'publisher' => '新潮社', 'publication_year' => '1966-01-01', 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['isbn' => '978-4-10-211301-1', 'title' => '赤毛のアン', 'author_name' => 'モンゴメリ', 'author_kana' => 'モンゴメリ', 'publisher' => '新潮社', 'publication_year' => '1955-01-01', 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00']
     ];
+
 
     $book_stack = [
         // --- 夏目漱石 ---
-        ['stack_id' => '913000101', 'isbn' => '978-4-00-310101-8', 'school_id' => 3, 'status_id' => 1, 'position' => 3, 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['stack_id' => '913000102', 'isbn' => '978-4-10-101003-7', 'school_id' => 9, 'status_id' => 1, 'position' => 9, 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['stack_id' => '913000501', 'isbn' => '978-4-10-101001-3', 'school_id' => 1, 'status_id' => 1, 'position' => 1, 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2025-09-15 12:25:00'], // 貸出返却
-        ['stack_id' => '913000502', 'isbn' => '978-4-00-310103-2', 'school_id' => 6, 'status_id' => 1, 'position' => 6, 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['stack_id' => '913001001', 'isbn' => '978-4-00-310102-5', 'school_id' => 3, 'status_id' => 1, 'position' => 3, 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['stack_id' => '913001002', 'isbn' => '978-4-06-196009-1', 'school_id' => 5, 'status_id' => 1, 'position' => 5, 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['stack_id' => '913000101', 'isbn' => '978-4-00-310101-8', 'school_id' => 3, 'status_id' => 1, 'position' => 3, 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['stack_id' => '913000102', 'isbn' => '978-4-10-101003-7', 'school_id' => 9, 'status_id' => 1, 'position' => 9, 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['stack_id' => '913000501', 'isbn' => '978-4-10-101001-3', 'school_id' => 1, 'status_id' => 1, 'position' => 1, 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2025-09-15 12:25:00'], // 貸出返却
+        ['stack_id' => '913000502', 'isbn' => '978-4-00-310103-2', 'school_id' => 6, 'status_id' => 1, 'position' => 6, 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['stack_id' => '913001001', 'isbn' => '978-4-00-310102-5', 'school_id' => 3, 'status_id' => 1, 'position' => 3, 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['stack_id' => '913001002', 'isbn' => '978-4-06-196009-1', 'school_id' => 5, 'status_id' => 1, 'position' => 5, 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
 
         // --- 太宰治 ---
-        ['stack_id' => '913000201', 'isbn' => '978-4-10-100605-4', 'school_id' => 2, 'status_id' => 1, 'position' => 2, 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['stack_id' => '913000202', 'isbn' => '978-4-04-109900-1', 'school_id' => 4, 'status_id' => 1, 'position' => 4, 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['stack_id' => '913000601', 'isbn' => '978-4-10-100601-6', 'school_id' => 4, 'status_id' => 1, 'position' => 4, 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['stack_id' => '913001301', 'isbn' => '978-4-10-100604-7', 'school_id' => 2, 'status_id' => 1, 'position' => 2, 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['stack_id' => '913001302', 'isbn' => '978-4-00-310904-5', 'school_id' => 4, 'status_id' => 1, 'position' => 4, 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['stack_id' => '913000201', 'isbn' => '978-4-10-100605-4', 'school_id' => 2, 'status_id' => 1, 'position' => 2, 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['stack_id' => '913000202', 'isbn' => '978-4-04-109900-1', 'school_id' => 4, 'status_id' => 1, 'position' => 4, 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['stack_id' => '913000601', 'isbn' => '978-4-10-100601-6', 'school_id' => 4, 'status_id' => 1, 'position' => 4, 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['stack_id' => '913001301', 'isbn' => '978-4-10-100604-7', 'school_id' => 2, 'status_id' => 1, 'position' => 2, 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['stack_id' => '913001302', 'isbn' => '978-4-00-310904-5', 'school_id' => 4, 'status_id' => 1, 'position' => 4, 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
 
         // --- 芥川龍之介 ---
-        ['stack_id' => '913000301', 'isbn' => '978-4-00-310051-6', 'school_id' => 5, 'status_id' => 1, 'position' => 5, 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['stack_id' => '913000302', 'isbn' => '978-4-10-102501-7', 'school_id' => 6, 'status_id' => 1, 'position' => 6, 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['stack_id' => '913001201', 'isbn' => '978-4-10-102502-4', 'school_id' => 6, 'status_id' => 1, 'position' => 6, 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['stack_id' => '913001202', 'isbn' => '978-4-04-100307-7', 'school_id' => 4, 'status_id' => 1, 'position' => 4, 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['stack_id' => '913000301', 'isbn' => '978-4-00-310051-6', 'school_id' => 5, 'status_id' => 1, 'position' => 5, 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['stack_id' => '913000302', 'isbn' => '978-4-10-102501-7', 'school_id' => 6, 'status_id' => 1, 'position' => 6, 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['stack_id' => '913001201', 'isbn' => '978-4-10-102502-4', 'school_id' => 6, 'status_id' => 1, 'position' => 6, 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['stack_id' => '913001202', 'isbn' => '978-4-04-100307-7', 'school_id' => 4, 'status_id' => 1, 'position' => 4, 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
 
         // --- 宮沢賢治 ---
-        ['stack_id' => '913000401', 'isbn' => '978-4-04-104003-4', 'school_id' => 9, 'status_id' => 1, 'position' => 9, 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['stack_id' => '913000402', 'isbn' => '978-4-10-109205-5', 'school_id' => 10, 'status_id' => 1, 'position' => 10, 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2025-10-13 12:25:00'], // 配送(往)→貸出→配送(復)→貸出返却
-        ['stack_id' => '913001101', 'isbn' => '978-4-00-310702-7', 'school_id' => 1, 'status_id' => 1, 'position' => 1, 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['stack_id' => '913000401', 'isbn' => '978-4-04-104003-4', 'school_id' => 9, 'status_id' => 1, 'position' => 9, 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['stack_id' => '913000402', 'isbn' => '978-4-10-109205-5', 'school_id' => 10, 'status_id' => 1, 'position' => 10, 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2025-10-13 12:25:00'], // 配送(往)→貸出→配送(復)→貸出返却
+        ['stack_id' => '913001101', 'isbn' => '978-4-00-310702-7', 'school_id' => 1, 'status_id' => 1, 'position' => 1, 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
 
         // --- 川端康成 ---
-        ['stack_id' => '913000701', 'isbn' => '978-4-10-100101-1', 'school_id' => 2, 'status_id' => 1, 'position' => 2, 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['stack_id' => '913000702', 'isbn' => '978-4-00-310813-0', 'school_id' => 3, 'status_id' => 1, 'position' => 3, 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['stack_id' => '913000801', 'isbn' => '978-4-10-100102-8', 'school_id' => 1, 'status_id' => 1, 'position' => 1, 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['stack_id' => '913000802', 'isbn' => '978-4-04-100506-4', 'school_id' => 9, 'status_id' => 1, 'position' => 9, 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['stack_id' => '913000701', 'isbn' => '978-4-10-100101-1', 'school_id' => 2, 'status_id' => 1, 'position' => 2, 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['stack_id' => '913000702', 'isbn' => '978-4-00-310813-0', 'school_id' => 3, 'status_id' => 1, 'position' => 3, 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['stack_id' => '913000801', 'isbn' => '978-4-10-100102-8', 'school_id' => 1, 'status_id' => 1, 'position' => 1, 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['stack_id' => '913000802', 'isbn' => '978-4-04-100506-4', 'school_id' => 9, 'status_id' => 1, 'position' => 9, 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
 
         // --- 三島由紀夫 ---
-        ['stack_id' => '913000901', 'isbn' => '978-4-10-105008-6', 'school_id' => 10, 'status_id' => 1, 'position' => 10, 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['stack_id' => '913000901', 'isbn' => '978-4-10-105008-6', 'school_id' => 10, 'status_id' => 1, 'position' => 10, 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
 
         // --- 谷崎潤一郎 ---
-        ['stack_id' => '913001401', 'isbn' => '978-4-12-200994-9', 'school_id' => 9, 'status_id' => 1, 'position' => 9, 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['stack_id' => '913001401', 'isbn' => '978-4-12-200994-9', 'school_id' => 9, 'status_id' => 1, 'position' => 9, 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
 
         // --- 中島敦 ---
-        ['stack_id' => '913001501', 'isbn' => '978-4-00-311451-3', 'school_id' => 5, 'status_id' => 1, 'position' => 5, 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['stack_id' => '913001502', 'isbn' => '978-4-10-106401-4', 'school_id' => 10, 'status_id' => 1, 'position' => 10, 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['stack_id' => '913001501', 'isbn' => '978-4-00-311451-3', 'school_id' => 5, 'status_id' => 1, 'position' => 5, 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['stack_id' => '913001502', 'isbn' => '978-4-10-106401-4', 'school_id' => 10, 'status_id' => 1, 'position' => 10, 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
 
         // --- 森鴎外 ---
-        ['stack_id' => '913001601', 'isbn' => '978-4-00-310065-3', 'school_id' => 3, 'status_id' => 1, 'position' => 3, 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['stack_id' => '913001602', 'isbn' => '978-4-10-102004-3', 'school_id' => 1, 'status_id' => 1, 'position' => 1, 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['stack_id' => '913001701', 'isbn' => '978-4-00-310060-8', 'school_id' => 1, 'status_id' => 1, 'position' => 1, 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2025-10-02 12:25:00'], // 予約→貸出返却
-        ['stack_id' => '913001702', 'isbn' => '978-4-10-102002-9', 'school_id' => 5, 'status_id' => 1, 'position' => 5, 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['stack_id' => '913001601', 'isbn' => '978-4-00-310065-3', 'school_id' => 3, 'status_id' => 1, 'position' => 3, 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['stack_id' => '913001602', 'isbn' => '978-4-10-102004-3', 'school_id' => 1, 'status_id' => 1, 'position' => 1, 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['stack_id' => '913001701', 'isbn' => '978-4-00-310060-8', 'school_id' => 1, 'status_id' => 1, 'position' => 1, 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2025-10-02 12:25:00'], // 予約→貸出返却
+        ['stack_id' => '913001702', 'isbn' => '978-4-10-102002-9', 'school_id' => 5, 'status_id' => 1, 'position' => 5, 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
 
         // --- 島崎藤村 ---
-        ['stack_id' => '913001801', 'isbn' => '978-4-00-310351-8', 'school_id' => 4, 'status_id' => 1, 'position' => 4, 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['stack_id' => '913001802', 'isbn' => '978-4-10-105505-0', 'school_id' => 6, 'status_id' => 1, 'position' => 6, 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2025-09-17 12:30:00'], // 貸出返却
+        ['stack_id' => '913001801', 'isbn' => '978-4-00-310351-8', 'school_id' => 4, 'status_id' => 1, 'position' => 4, 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['stack_id' => '913001802', 'isbn' => '978-4-10-105505-0', 'school_id' => 6, 'status_id' => 1, 'position' => 6, 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2025-09-17 12:30:00'], // 貸出返却
 
         // --- 福沢諭吉 ---
-        ['stack_id' => '913001901', 'isbn' => '978-4-00-331021-2', 'school_id' => 3, 'status_id' => 1, 'position' => 3, 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['stack_id' => '913001902', 'isbn' => '978-4-06-158498-3', 'school_id' => 1, 'status_id' => 1, 'position' => 1, 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['stack_id' => '913001901', 'isbn' => '978-4-00-331021-2', 'school_id' => 3, 'status_id' => 1, 'position' => 3, 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['stack_id' => '913001902', 'isbn' => '978-4-06-158498-3', 'school_id' => 1, 'status_id' => 1, 'position' => 1, 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
 
         // --- 新渡戸稲造 ---
-        ['stack_id' => '913002001', 'isbn' => '978-4-00-331181-3', 'school_id' => 1, 'status_id' => 1, 'position' => 1, 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['stack_id' => '913002002', 'isbn' => '978-4-06-292100-8', 'school_id' => 2, 'status_id' => 1, 'position' => 2, 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['stack_id' => '913002001', 'isbn' => '978-4-00-331181-3', 'school_id' => 1, 'status_id' => 1, 'position' => 1, 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['stack_id' => '913002002', 'isbn' => '978-4-06-292100-8', 'school_id' => 2, 'status_id' => 1, 'position' => 2, 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
 
         // --- 十返舎一九 ---
-        ['stack_id' => '913002301', 'isbn' => '978-4-00-302301-3', 'school_id' => 1, 'status_id' => 1, 'position' => 1, 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['stack_id' => '913002302', 'isbn' => '978-4-10-107001-5', 'school_id' => 6, 'status_id' => 1, 'position' => 6, 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2025-10-21 10:00:00'], // 配送(往復)→貸出→配送(往復) ※最後の配送完了日時
+        ['stack_id' => '913002301', 'isbn' => '978-4-00-302301-3', 'school_id' => 1, 'status_id' => 1, 'position' => 1, 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['stack_id' => '913002302', 'isbn' => '978-4-10-107001-5', 'school_id' => 6, 'status_id' => 1, 'position' => 6, 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2025-10-21 10:00:00'], // 配送(往復)→貸出→配送(往復) ※最後の配送完了日時
 
         // --- 村田沙耶香 ---
-        ['stack_id' => '913003001', 'isbn' => '978-4-16-390618-8', 'school_id' => 10, 'status_id' => 1, 'position' => 10, 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['stack_id' => '913003002', 'isbn' => '978-4-16-390618-8', 'school_id' => 10, 'status_id' => 1, 'position' => 10, 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2025-10-08 09:40:00'], // 配送(往)→貸出返却→配送(復)完了
+        ['stack_id' => '913003001', 'isbn' => '978-4-16-390618-8', 'school_id' => 10, 'status_id' => 1, 'position' => 10, 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['stack_id' => '913003002', 'isbn' => '978-4-16-390618-8', 'school_id' => 10, 'status_id' => 1, 'position' => 10, 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2025-10-08 09:40:00'], // 配送(往)→貸出返却→配送(復)完了
 
         // --- 村上春樹 ---
-        ['stack_id' => '913002601', 'isbn' => '978-4-10-353422-8', 'school_id' => 1, 'status_id' => 1, 'position' => 1, 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['stack_id' => '913002601', 'isbn' => '978-4-10-353422-8', 'school_id' => 1, 'status_id' => 1, 'position' => 1, 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
 
         // --- J.K.ローリング ---
-        ['stack_id' => '933000201', 'isbn' => '978-4-915512-37-7', 'school_id' => 1, 'status_id' => 1, 'position' => 1, 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['stack_id' => '933000202', 'isbn' => '978-4-915512-37-7', 'school_id' => 6, 'status_id' => 1, 'position' => 6, 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['stack_id' => '933000201', 'isbn' => '978-4-915512-37-7', 'school_id' => 1, 'status_id' => 1, 'position' => 1, 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['stack_id' => '933000202', 'isbn' => '978-4-915512-37-7', 'school_id' => 6, 'status_id' => 1, 'position' => 6, 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
 
         // --- サン=テグジュペリ ---
-        ['stack_id' => '953000101', 'isbn' => '978-4-00-325326-7', 'school_id' => 2, 'status_id' => 1, 'position' => 2, 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['stack_id' => '953000102', 'isbn' => '978-4-10-212204-4', 'school_id' => 2, 'status_id' => 1, 'position' => 2, 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['stack_id' => '953000101', 'isbn' => '978-4-00-325326-7', 'school_id' => 2, 'status_id' => 1, 'position' => 2, 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['stack_id' => '953000102', 'isbn' => '978-4-10-212204-4', 'school_id' => 2, 'status_id' => 1, 'position' => 2, 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
 
         // --- カフカ ---
-        ['stack_id' => '943000101', 'isbn' => '978-4-10-207101-4', 'school_id' => 9, 'status_id' => 1, 'position' => 9, 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
-        ['stack_id' => '943000102', 'isbn' => '978-4-00-324541-5', 'school_id' => 2, 'status_id' => 1, 'position' => 2, 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['stack_id' => '943000101', 'isbn' => '978-4-10-207101-4', 'school_id' => 9, 'status_id' => 1, 'position' => 9, 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['stack_id' => '943000102', 'isbn' => '978-4-00-324541-5', 'school_id' => 2, 'status_id' => 1, 'position' => 2, 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
 
         // --- ヘミングウェイ ---
-        ['stack_id' => '933000102', 'isbn' => '978-4-10-210001-1', 'school_id' => 9, 'status_id' => 1, 'position' => 9, 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['stack_id' => '933000102', 'isbn' => '978-4-10-210001-1', 'school_id' => 9, 'status_id' => 1, 'position' => 9, 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
 
         // --- モンゴメリ ---
-        ['stack_id' => '933000301', 'isbn' => '978-4-10-211301-1', 'school_id' => 3, 'status_id' => 1, 'position' => 3, 'registed_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
+        ['stack_id' => '933000301', 'isbn' => '978-4-10-211301-1', 'school_id' => 3, 'status_id' => 1, 'position' => 3, 'registered_at' => '2017-04-01 10:00:00', 'updated_at' => '2017-04-01 10:00:00'],
     ];
 
 
@@ -749,9 +750,17 @@
                 $stmt_school->execute();
             }
 
-            $stmt_role = $db->pdo->prepare("INSERT INTO user_role VALUES ");
+            $stmt_role = $db->pdo->prepare("INSERT INTO user_role VALUES (:role_id, :role_name, :created_at, :updated_at)");
 
-            foreach ($roll_master as )
+            foreach ($roll_master as $key => $values) {
+                $stmt_role->bindValue(':role_id', $key, PDO::PARAM_INT);
+
+                $stmt_role->bindValue(':role_name', $values['role_name'], PDO::PARAM_STR);
+                $stmt_role->bindValue(':created_at', $values['created_at'], PDO::PARAM_STR);
+                $stmt_role->bindValue(':updated_at', $values['updated_at'], PDO::PARAM_STR);
+
+                $stmt_role->execute();
+            }
 
             //学生テーブルに学生データを挿入
             $stmt_student = $db->pdo->prepare("INSERT INTO student (school_id, grade, class, number, family_name, first_name, password) VALUES (:school_id, :grade, :class, :number, :family_name, :first_name, :password)");
@@ -767,53 +776,68 @@
                 //パスワードは、元の配列で平文として入れられているので、ハッシュ化してから保存
                 $password = password_hash($student['password'], PASSWORD_DEFAULT);
                 $stmt_student->bindValue(':password', $password, PDO::PARAM_STR);
+
+                $stmt_student->bindValue(':created_at', $student['created_at'], PDO::PARAM_STR);
+                $stmt_student->bindValue(':updated_at', $student['updated_at'], PDO::PARAM_STR);
                 
                 $stmt_student->execute();
             }
 
 
             //書籍状態テーブルに書籍データを挿入
-            $stmt_status = $db->pdo->prepare("INSERT INTO book_status VALUES(:status_id, :status_name)");
+            $stmt_status = $db->pdo->prepare("INSERT INTO book_status VALUES(:status_id, :status_name, :created_at, :updated_at)");
 
-            foreach ($status_master as $key => $name) {
+            foreach ($book_status_master as $key => $name) {
                 $stmt_status->bindValue(':status_id', $key, PDO::PARAM_INT);
                 $stmt_status->bindValue(':status_name', $name, PDO::PARAM_STR);
+                $stmt_status->bindValue(':created_at', $name, PDO::PARAM_STR);
+                $stmt_status->bindValue(':updated_at', $name, PDO::PARAM_STR);
                 
                 $stmt_status->execute();
             }
 
             //予約状態テーブルに予約状態データを挿入
-            $stmt_reservation_status = $db->pdo->prepare("INSERT INTO reservation_status VALUES(:status_id, :status_name)");
+            $stmt_reservation_status = $db->pdo->prepare("INSERT INTO reservation_status VALUES(:status_id, :status_name, :created_at, :updated_at)");
 
             foreach ($reservation_status_master as $key => $name) {
                 $stmt_reservation_status->bindValue(':status_id', $key, PDO::PARAM_INT);
                 $stmt_reservation_status->bindValue(':status_name', $name, PDO::PARAM_STR);
+                $stmt_reservation_status->bindValue(':created_at', $name, PDO::PARAM_STR);
+                $stmt_reservation_status->bindValue(':updated_at', $name, PDO::PARAM_STR);
 
                 $stmt_reservation_status->execute();
             }
 
             //配送状態テーブルに配送状態データを挿入
-            $stmt_delivery_status = $db->pdo->prepare("INSERT INTO delivery_status VALUES(:status_id, :status_name)");
+            $stmt_delivery_status = $db->pdo->prepare("INSERT INTO delivery_status VALUES(:status_id, :status_name, :created_at, :updated_at)");
 
             foreach ($delivery_status_master as $key => $name) {
                 $stmt_delivery_status->bindValue(':status_id', $key, PDO::PARAM_INT);
                 $stmt_delivery_status->bindValue(':status_name', $name, PDO::PARAM_STR);
+                $stmt_delivery_status->bindValue(':created_at', $name, PDO::PARAM_STR);
+                $stmt_delivery_status->bindValue(':updated_at', $name, PDO::PARAM_STR);
 
                 $stmt_delivery_status->execute();
             }
 
             //配送タイプテーブルに配送タイプデータを挿入
-            $stmt_delivery_type = $db->pdo->prepare("INSERT INTO delivery_type VALUES(:type_id, :type_name)");
+            $stmt_delivery_type = $db->pdo->prepare("INSERT INTO delivery_type VALUES(:type_id, :type_name, :created_at, :updated_at)");
 
             foreach ($delivery_type_master as $key => $name) {
                 $stmt_delivery_type->bindValue(':type_id', $key, PDO::PARAM_INT);
                 $stmt_delivery_type->bindValue(':type_name', $name, PDO::PARAM_STR);
+                $stmt_delivery_type->bindValue(':created_at', $name, PDO::PARAM_STR);
+                $stmt_delivery_type->bindValue(':updated_at', $name, PDO::PARAM_STR);
 
                 $stmt_delivery_type->execute();
             }
 
             //書籍テーブルに書籍データを挿入
-            $stmt_book = $db->pdo->prepare("INSERT INTO book VALUES (:book_id, :school_id, :title, :author_name, :author_kana, :publisher, :publication_year, :status_id, :position);");
+            $stmt_book_info = $db->pdo->prepare("INSERT INTO book_info VALUES (:isbn, :title, :author_name, :author_kana, :publisher, :publication_year, :)");
+            
+            
+            
+            //(:book_id, :school_id, :title, :author_name, :author_kana, :publisher, :publication_year, :status_id, :position);");
 
             foreach ($book_master as $book) {
                 $stmt_book->bindValue(':book_id', $book['book_id'], PDO::PARAM_STR);
