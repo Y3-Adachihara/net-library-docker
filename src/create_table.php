@@ -117,7 +117,7 @@
 
             //書籍所蔵テーブル
             $sql = "CREATE TABLE IF NOT EXISTS book_stack (
-                stack_id VARCHAR(20) PRIMARY KEY,
+                book_id VARCHAR(20) PRIMARY KEY,
                 isbn VARCHAR(25),
                 school_id INT,
                 status_id INT,
