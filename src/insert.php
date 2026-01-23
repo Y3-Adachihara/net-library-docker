@@ -714,11 +714,11 @@
 
     $librarian_master = [
         // 第一小学校の司書
-        ['school_id' => 1, 'login_id' => 'lib01', 'password' => 'pass1234', 'family_name' => '図書', 'first_name' => '管理郎'],
+        ['school_id' => 1, 'login_id' => 'lib01', 'password' => 'pass1234', 'family_name' => '図書', 'first_name' => '管理郎', 'created_at' => '2015-04-01 10:00:00', 'updated_at' => '2015-04-01 10:00:00'],
         // 第二小学校の司書
-        ['school_id' => 2, 'login_id' => 'sato_sensei', 'password' => 'abcd5678', 'family_name' => '佐藤', 'first_name' => '司書郎'],
+        ['school_id' => 2, 'login_id' => 'sato_sensei', 'password' => 'abcd5678', 'family_name' => '佐藤', 'first_name' => '司書郎', 'created_at' => '2015-04-01 10:00:00', 'updated_at' => '2015-04-01 10:00:00'],
         // 同じ学校に2人いるケース（第一小学校）
-        ['school_id' => 1, 'login_id' => 'lib02', 'password' => 'pass5678', 'family_name' => '鈴木', 'first_name' => '根郎'],
+        ['school_id' => 1, 'login_id' => 'lib02', 'password' => 'pass5678', 'family_name' => '鈴木', 'first_name' => '根郎', 'created_at' => '2015-04-01 10:00:00', 'updated_at' => '2015-04-01 10:00:00']
     ];
 
 
@@ -750,6 +750,7 @@
                 $stmt_school->execute();
             }
 
+
             $stmt_role = $db->pdo->prepare("INSERT INTO user_role VALUES (:role_id, :role_name, :created_at, :updated_at)");
 
             foreach ($roll_master as $key => $values) {
@@ -763,7 +764,7 @@
             }
 
             //学生テーブルに学生データを挿入
-            $stmt_student = $db->pdo->prepare("INSERT INTO student (school_id, grade, class, number, family_name, first_name, password) VALUES (:school_id, :grade, :class, :number, :family_name, :first_name, :password)");
+            $stmt_student = $db->pdo->prepare("INSERT INTO student (school_id, grade, class, number, family_name, first_name, password, created_at, updated_at) VALUES (:school_id, :grade, :class, :number, :family_name, :first_name, :password, :created_at, :updated_at)");
 
             foreach ($student_master as $student) {
                 $stmt_student->bindValue(':school_id', $student['school_id'], PDO::PARAM_INT);
@@ -785,25 +786,26 @@
 
 
             //書籍状態テーブルに書籍データを挿入
-            $stmt_status = $db->pdo->prepare("INSERT INTO book_status VALUES(:status_id, :status_name, :created_at, :updated_at)");
+            $stmt_book_status = $db->pdo->prepare("INSERT INTO book_status VALUES(:status_id, :status_name, :created_at, :updated_at)");
 
-            foreach ($book_status_master as $key => $name) {
-                $stmt_status->bindValue(':status_id', $key, PDO::PARAM_INT);
-                $stmt_status->bindValue(':status_name', $name, PDO::PARAM_STR);
-                $stmt_status->bindValue(':created_at', $name, PDO::PARAM_STR);
-                $stmt_status->bindValue(':updated_at', $name, PDO::PARAM_STR);
+            foreach ($book_status_master as $b_status) {
+                $stmt_book_status->bindValue(':status_id', $b_status['status_id'], PDO::PARAM_INT);
+                $stmt_book_status->bindValue(':status_name', $b_status['status_name'], PDO::PARAM_STR);
+                $stmt_book_status->bindValue(':created_at', $b_status['created_at'], PDO::PARAM_STR);
+                $stmt_book_status->bindValue(':updated_at', $b_status['updated_at'], PDO::PARAM_STR);
                 
-                $stmt_status->execute();
+                $stmt_book_status->execute();
             }
 
             //予約状態テーブルに予約状態データを挿入
             $stmt_reservation_status = $db->pdo->prepare("INSERT INTO reservation_status VALUES(:status_id, :status_name, :created_at, :updated_at)");
 
-            foreach ($reservation_status_master as $key => $name) {
-                $stmt_reservation_status->bindValue(':status_id', $key, PDO::PARAM_INT);
-                $stmt_reservation_status->bindValue(':status_name', $name, PDO::PARAM_STR);
-                $stmt_reservation_status->bindValue(':created_at', $name, PDO::PARAM_STR);
-                $stmt_reservation_status->bindValue(':updated_at', $name, PDO::PARAM_STR);
+            foreach ($reservation_status_master as $r_status) {
+
+                $stmt_reservation_status->bindValue(':status_id', $r_status['status_id'], PDO::PARAM_INT);
+                $stmt_reservation_status->bindValue(':status_name', $r_status['status_name'], PDO::PARAM_STR);
+                $stmt_reservation_status->bindValue(':created_at', $r_status['created_at'], PDO::PARAM_STR);
+                $stmt_reservation_status->bindValue(':updated_at', $r_status['updated_at'], PDO::PARAM_STR);
 
                 $stmt_reservation_status->execute();
             }
@@ -811,11 +813,11 @@
             //配送状態テーブルに配送状態データを挿入
             $stmt_delivery_status = $db->pdo->prepare("INSERT INTO delivery_status VALUES(:status_id, :status_name, :created_at, :updated_at)");
 
-            foreach ($delivery_status_master as $key => $name) {
-                $stmt_delivery_status->bindValue(':status_id', $key, PDO::PARAM_INT);
-                $stmt_delivery_status->bindValue(':status_name', $name, PDO::PARAM_STR);
-                $stmt_delivery_status->bindValue(':created_at', $name, PDO::PARAM_STR);
-                $stmt_delivery_status->bindValue(':updated_at', $name, PDO::PARAM_STR);
+            foreach ($delivery_status_master as $d_status) {
+                $stmt_delivery_status->bindValue(':status_id', $d_status['status_id'], PDO::PARAM_INT);
+                $stmt_delivery_status->bindValue(':status_name', $d_status['status_name'], PDO::PARAM_STR);
+                $stmt_delivery_status->bindValue(':created_at', $d_status['created_at'], PDO::PARAM_STR);
+                $stmt_delivery_status->bindValue(':updated_at', $d_status['updated_at'], PDO::PARAM_STR);
 
                 $stmt_delivery_status->execute();
             }
@@ -823,45 +825,60 @@
             //配送タイプテーブルに配送タイプデータを挿入
             $stmt_delivery_type = $db->pdo->prepare("INSERT INTO delivery_type VALUES(:type_id, :type_name, :created_at, :updated_at)");
 
-            foreach ($delivery_type_master as $key => $name) {
-                $stmt_delivery_type->bindValue(':type_id', $key, PDO::PARAM_INT);
-                $stmt_delivery_type->bindValue(':type_name', $name, PDO::PARAM_STR);
-                $stmt_delivery_type->bindValue(':created_at', $name, PDO::PARAM_STR);
-                $stmt_delivery_type->bindValue(':updated_at', $name, PDO::PARAM_STR);
+            foreach ($delivery_type_master as $d_type) {
+                $stmt_delivery_type->bindValue(':type_id', $d_type['type_id'], PDO::PARAM_INT);
+                $stmt_delivery_type->bindValue(':type_name', $d_type['type_name'], PDO::PARAM_STR);
+                $stmt_delivery_type->bindValue(':created_at', $d_type['created_at'], PDO::PARAM_STR);
+                $stmt_delivery_type->bindValue(':updated_at', $d_type['updated_at'], PDO::PARAM_STR);
 
                 $stmt_delivery_type->execute();
             }
 
             //書籍テーブルに書籍データを挿入
-            $stmt_book_info = $db->pdo->prepare("INSERT INTO book_info VALUES (:isbn, :title, :author_name, :author_kana, :publisher, :publication_year, :)");
-            
-            
+            $stmt_book_info = $db->pdo->prepare("INSERT INTO book_info VALUES (:isbn, :title, :author_name, :author_kana, :publisher, :publication_year, :registered_at, :updated_at)");
             
             //(:book_id, :school_id, :title, :author_name, :author_kana, :publisher, :publication_year, :status_id, :position);");
 
-            foreach ($book_master as $book) {
-                $stmt_book->bindValue(':book_id', $book['book_id'], PDO::PARAM_STR);
-                $stmt_book->bindValue(':school_id', $book['school_id'], PDO::PARAM_INT);
-                $stmt_book->bindValue(':title', $book['title'], PDO::PARAM_STR);
-                $stmt_book->bindValue(':author_name', $book['author_name'], PDO::PARAM_STR);
-                $stmt_book->bindValue(':author_kana', $book['author_kana'], PDO::PARAM_STR);
-                $stmt_book->bindValue(':publisher', $book['publisher'], PDO::PARAM_STR);
-                $stmt_book->bindValue(':publication_year', $book['publication_year'], PDO::PARAM_STR);
-                $stmt_book->bindValue(':status_id', $book['status_id'], PDO::PARAM_STR);
-                $stmt_book->bindValue(':position', $book['position'], PDO::PARAM_INT);
+            foreach ($book_info as $b_i) {
+                $stmt_book_info->bindValue(':isbn', $b_i['isbn'], PDO::PARAM_STR);
+                $stmt_book_info->bindValue(':title', $b_i['title'], PDO::PARAM_STR);
+                $stmt_book_info->bindValue(':author_name', $b_i['author_name'], PDO::PARAM_STR);
+                $stmt_book_info->bindValue(':author_kana', $b_i['author_kana'], PDO::PARAM_STR);
+                $stmt_book_info->bindValue(':publisher', $b_i['publisher'], PDO::PARAM_STR);
+                $stmt_book_info->bindValue(':publication_year', $b_i['publication_year'], PDO::PARAM_STR);
+                $stmt_book_info->bindValue(':registered_at', $b_i['registered_at'], PDO::PARAM_STR);
+                $stmt_book_info->bindValue(':updated_at', $b_i['updated_at'], PDO::PARAM_STR);
                 
-                $stmt_book->execute();
+                $stmt_book_info->execute();
+            }
+
+
+            // 書籍所蔵テーブルに書籍所蔵データを挿入
+            $stmt_book_stack = $db->pdo->prepare("INSERT INTO book_stack VALUES (:book_id, :isbn, :school_id, :status_id, :position, :registered_at, :updated_at)");
+
+            foreach ($book_stack as $b_s) {
+                $stmt_book_stack->bindValue(':book_id', $b_s['stack_id'], PDO::PARAM_STR);
+                $stmt_book_stack->bindValue(':isbn', $b_s['isbn'], PDO::PARAM_STR);
+                $stmt_book_stack->bindValue(':school_id', $b_s['school_id'], PDO::PARAM_INT);
+                $stmt_book_stack->bindValue(':status_id', $b_s['status_id'], PDO::PARAM_INT);
+                $stmt_book_stack->bindValue(':position', $b_s['position'], PDO::PARAM_INT);
+                $stmt_book_stack->bindValue(':registered_at', $b_s['registered_at'], PDO::PARAM_STR);
+                $stmt_book_stack->bindValue(':updated_at', $b_s['updated_at'], PDO::PARAM_STR);
+                
+                $stmt_book_stack->execute();
             }
 
 
             //予約テーブルに予約履歴を挿入
-            $stmt_reservation = $db->pdo->prepare("INSERT INTO reservation(student_id, book_id, status_id, reservation_date) VALUES(:student_id, :book_id, :status_id, :reservation_date)");
+            $stmt_reservation = $db->pdo->prepare("INSERT INTO reservation(reservation_number, student_id, book_id, status_id, reservation_date, updated_at) VALUES(:reservation_number, :student_id, :book_id, :status_id, :reservation_date, :updated_at)");
 
             foreach($reservation_list as $reservation) {
+                $stmt_reservation->bindValue(':reservation_number', $reservation['reservation_number'], PDO::PARAM_STR);
                 $stmt_reservation->bindValue(':student_id', $reservation['student_id'], PDO::PARAM_INT);
                 $stmt_reservation->bindValue(':book_id', $reservation['book_id'], PDO::PARAM_STR);
                 $stmt_reservation->bindValue(':status_id', $reservation['status_id'], PDO::PARAM_INT);
                 $stmt_reservation->bindValue(':reservation_date', $reservation['reservation_date'], PDO::PARAM_STR);
+                $stmt_reservation->bindValue(':updated_at', $reservation['updated_at'], PDO::PARAM_STR);
 
                 $stmt_reservation->execute();
             }
@@ -878,23 +895,9 @@
                 $stmt_lending->execute();
             }
 
-            //配送テーブルに配送データを挿入
-            $stmt_delivery = $db->pdo->prepare("INSERT INTO delivery(from_school_id, to_school_id, delivery_type, delivery_status, book_id, delivery_date, arrival_date) VALUES(:from_school_id, :to_school_id, :delivery_type, :delivery_status, :book_id, :delivery_date, :arrival_date)");
-
-            foreach($delivery_list as $delivery) {
-                $stmt_delivery->bindValue(':from_school_id', $delivery['from_school_id'], PDO::PARAM_INT);
-                $stmt_delivery->bindValue(':to_school_id', $delivery['to_school_id'], PDO::PARAM_INT);
-                $stmt_delivery->bindValue(':delivery_type', $delivery['delivery_type'], PDO::PARAM_INT);
-                $stmt_delivery->bindValue(':delivery_status', $delivery['delivery_status'], PDO::PARAM_INT);
-                $stmt_delivery->bindValue(':book_id', $delivery['book_id'], PDO::PARAM_STR);
-                $stmt_delivery->bindValue(':delivery_date', $delivery['delivery_date'], PDO::PARAM_STR);
-                $stmt_delivery->bindValue(':arrival_date', $delivery['arrival_date'], PDO::PARAM_STR);
-
-                $stmt_delivery->execute();
-            }
 
             //司書テーブルに司書データを挿入
-            $stmt_librarian = $db->pdo->prepare("INSERT INTO librarian (school_id, login_id, password, family_name, first_name) VALUES (:school_id, :login_id, :password, :family_name, :first_name)");
+            $stmt_librarian = $db->pdo->prepare("INSERT INTO librarian (school_id, login_id, password, family_name, first_name, created_at, updated_at) VALUES (:school_id, :login_id, :password, :family_name, :first_name, :created_at, :updated_at)");
 
             foreach($librarian_master as $librarian) {
                 $stmt_librarian->bindValue(':school_id', $librarian['school_id'], PDO::PARAM_INT);
@@ -906,8 +909,44 @@
 
                 $stmt_librarian->bindValue(':family_name', $librarian['family_name'], PDO::PARAM_STR);
                 $stmt_librarian->bindValue(':first_name', $librarian['first_name'], PDO::PARAM_STR);
+                $stmt_librarian->bindValue(':created_at', $librarian['created_at'], PDO::PARAM_STR);
+                $stmt_librarian->bindValue(':updated_at', $librarian['updated_at'], PDO::PARAM_STR);
 
                 $stmt_librarian->execute();
+            }
+
+
+            $stmt_deliverer = $db->pdo->prepare("INSERT INTO deliverer (login_id, password, family_name, first_name, created_at, updated_at) VALUES (:login_id, :password, :family_name, :first_name, :created_at, :updated_at)");
+
+            foreach($deliverer_master as $deliverer) {
+                $stmt_deliverer->bindValue(':login_id', $deliverer['login_id'], PDO::PARAM_STR);
+
+                //パスワードは、元の配列で平文として入れられているので、ハッシュ化してから保存
+                $password = password_hash($deliverer['password'], PASSWORD_DEFAULT);
+                $stmt_deliverer->bindValue(':password', $password, PDO::PARAM_STR);
+
+                $stmt_deliverer->bindValue(':family_name', $deliverer['family_name'], PDO::PARAM_STR);
+                $stmt_deliverer->bindValue(':first_name', $deliverer['first_name'], PDO::PARAM_STR);
+                $stmt_deliverer->bindValue(':created_at', $deliverer['created_at'], PDO::PARAM_STR);
+                $stmt_deliverer->bindValue(':updated_at', $deliverer['updated_at'], PDO::PARAM_STR);
+
+                $stmt_deliverer->execute();
+            }
+
+            //配送テーブルに配送データを挿入
+            $stmt_delivery = $db->pdo->prepare("INSERT INTO delivery(deliverer_id, from_school_id, to_school_id, delivery_type, delivery_status, book_id, delivery_date, arrival_date) VALUES(:deliverer_id, :from_school_id, :to_school_id, :delivery_type, :delivery_status, :book_id, :delivery_date, :arrival_date)");
+
+            foreach($delivery_list as $delivery) {
+                $stmt_delivery->bindValue(':deliverer_id', $delivery['deliverer_id'], PDO::PARAM_INT);
+                $stmt_delivery->bindValue(':from_school_id', $delivery['from_school_id'], PDO::PARAM_INT);
+                $stmt_delivery->bindValue(':to_school_id', $delivery['to_school_id'], PDO::PARAM_INT);
+                $stmt_delivery->bindValue(':delivery_type', $delivery['delivery_type'], PDO::PARAM_INT);
+                $stmt_delivery->bindValue(':delivery_status', $delivery['delivery_status'], PDO::PARAM_INT);
+                $stmt_delivery->bindValue(':book_id', $delivery['book_id'], PDO::PARAM_STR);
+                $stmt_delivery->bindValue(':delivery_date', $delivery['delivery_date'], PDO::PARAM_STR);
+                $stmt_delivery->bindValue(':arrival_date', $delivery['arrival_date'], PDO::PARAM_STR);
+
+                $stmt_delivery->execute();
             }
 
             $db->pdo->commit();
@@ -915,6 +954,9 @@
             $error_message = "テーブルの再作成が完了しました。";
             echo "<script>alert('" . htmlspecialchars($error_message, ENT_QUOTES, 'UTF-8') . "');</script>";
 
+        } catch (PDOException $pe) {
+            $db->pdo->rollBack();
+            echo "<p>エラーが発生しました: " . htmlspecialchars($e->getMessage()) . "</p>";
         } catch (Exception $e) {
             $db->pdo->rollBack();
             echo "<p>エラーが発生しました: " . htmlspecialchars($e->getMessage()) . "</p>";

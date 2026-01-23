@@ -142,7 +142,7 @@
                 reservation_date DATETIME DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 FOREIGN KEY (student_id) REFERENCES student(student_id),
-                FOREIGN KEY (book_id) REFERENCES book_stack(stack_id),
+                FOREIGN KEY (book_id) REFERENCES book_stack(book_id),
                 FOREIGN KEY (status_id) REFERENCES reservation_status(status_id)
             );";
             $stmt = $db->pdo->prepare($sql);
@@ -156,7 +156,7 @@
                 lending_date DATETIME DEFAULT CURRENT_TIMESTAMP,
                 return_date DATETIME,
                 FOREIGN KEY (student_id) REFERENCES student(student_id),
-                FOREIGN KEY (book_id) REFERENCES book_stack(stack_id)
+                FOREIGN KEY (book_id) REFERENCES book_stack(book_id)
             );";
             $stmt = $db->pdo->prepare($sql);
             $stmt->execute();
@@ -205,7 +205,7 @@
                 FOREIGN KEY (deliverer_id) REFERENCES deliverer(deliverer_id),
                 FOREIGN KEY (from_school_id) REFERENCES school(school_id),
                 FOREIGN KEY (to_school_id) REFERENCES school(school_id),
-                FOREIGN KEY (book_id) REFERENCES book_stack(stack_id),
+                FOREIGN KEY (book_id) REFERENCES book_stack(book_id),
                 FOREIGN KEY (delivery_type) REFERENCES delivery_type(type_id),
                 FOREIGN KEY (delivery_status) REFERENCES delivery_status(status_id)
             );";
