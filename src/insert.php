@@ -18,8 +18,8 @@
     ];
 
     $roll_master = [
-        1 => '学生',
-        2 => '図書係'
+        1 => ['role_name' => '学生', 'created_at' => '2015-04-01 10:00:00', 'updated_at' => '2015-04-01 10:00:00'],
+        2 => ['role_name' => '図書係', 'created_at' => '2015-04-01 10:00:00', 'updated_at' => '2015-04-01 10:00:00']
     ];
 
 
@@ -725,7 +725,7 @@
         $db = new db_connect();
         $db->connect();
 
-        $tables = ['delivery', 'reservation', 'lending', 'book', 'book_status', 'reservation_status', 'delivery_status', 'delivery_type', 'student', 'school', 'librarian'];
+        $tables = ['delivery', 'deliverer', 'librarian', 'lending', 'reservation', 'book_stack', 'book_info', 'delivery_type', 'delivery_status', 'reservation_status', 'book_status', 'student', 'user_role', 'school'];
 
         try {
             $db->pdo->beginTransaction();
@@ -736,16 +736,22 @@
             }
 
             //学校テーブルに学校データを挿入
-            $stmt_school = $db->pdo->prepare("INSERT INTO school VALUES (:school_id, :school_name, :has_library)");
+            $stmt_school = $db->pdo->prepare("INSERT INTO school VALUES (:school_id, :school_name, :has_library, :created_at, :updated_at)");
 
             foreach ($school_master as $key => $values) {
                 $stmt_school->bindValue(':school_id', $key, PDO::PARAM_INT);
                 
                 $stmt_school->bindValue(':school_name', $values['school_name'], PDO::PARAM_STR);
                 $stmt_school->bindValue(':has_library', $values['has_library'], PDO::PARAM_BOOL);
+                $stmt_school->bindValue(':created_at', $values['created_at'], PDO::PARAM_STR);
+                $stmt_school->bindValue(':updated_at', $values['updated_at'], PDO::PARAM_STR);
                 
                 $stmt_school->execute();
             }
+
+            $stmt_role = $db->pdo->prepare("INSERT INTO user_role VALUES ");
+
+            foreach ($roll_master as )
 
             //学生テーブルに学生データを挿入
             $stmt_student = $db->pdo->prepare("INSERT INTO student (school_id, grade, class, number, family_name, first_name, password) VALUES (:school_id, :grade, :class, :number, :family_name, :first_name, :password)");
