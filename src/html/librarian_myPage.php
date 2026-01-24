@@ -168,7 +168,7 @@
                 csrf_token_generate($csrf_token);
             ?>
             <button type="submit" formaction="../html/検索画面.html" class="add-book-button">書籍検索</button>
-            <button type="submit" formaction="../html/貸出返却.html" class="manage-users-button">貸出・返却</button>
+            <button type="submit" formaction="../html/貸出返却.php" class="manage-users-button">貸出・返却</button>
             <button type="submit" formaction="../html/librarian_manageUsers.php" class="manage-users-button">予約状況参照</button>
             <button type="submit" formaction="../html/書籍登録.html" class="add-book-button">新規書籍登録</button>
         </form>

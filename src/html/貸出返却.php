@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>貸出・返却</title>
-    <link rel = "stylesheet" href="貸出返却.css">
+    <link rel = "stylesheet" href="../css/貸出返却.css">
 </head>
 <body>
 <div class="container">
@@ -12,15 +12,6 @@
     <h1>貸出・返却</h1>
     <form>
         <div class="form-group">
-
-            <?php 
-                $toke_byte = random_bytes(16);
-                $csrf_token = bin2hex($toke_byte);
-                // CSRF対策用のトークンをセッションに保存
-                $_SESSION['csrf_token'] = $csrf_token;
-            ?>
-            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
-
             <label>学年：</label>
             <select name="school-year" required>
                 <option value="">選択してください</option>

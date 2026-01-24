@@ -1,0 +1,72 @@
+/* 検索画面専用の青枠（手書き図の再現） */
+.search-section {
+    border: 1px solid #4a90e2;
+    padding: 25px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+    background-color: #fff;
+}
+
+/* ラベルと入力スタックの横並び */
+.title-or-id-group {
+    display: flex;
+    align-items: center;
+}
+
+.label-box {
+    width: 100px;
+    display: flex;
+    flex-direction: column;
+    text-align: right;
+    margin-right: 20px;
+    font-weight: bold;
+}
+
+.or-text {
+    font-size: 0.8em;
+    color: #666;
+    text-align: center;
+    padding: 2px 0;
+}
+
+/* 入力欄を縦に2つ並べるスタック */
+.input-stack {
+    flex: 1;
+    max-width: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px; /* 2つの入力欄の間の隙間 */
+}
+
+/* 詳細セクション内の余白調整 */
+.detailed-section .form-group:last-child {
+    margin-bottom: 0;
+}
+
+/* ボタンを横に並べるエリア */
+.button-row {
+    display: flex;
+    justify-content: center; /* 中央寄せ */
+    gap: 15px;               /* ボタン同士の間隔 */
+    margin-top: 30px;
+    width: 100%;             /* 横幅いっぱいに使う */
+}
+
+/* 3つのボタン共通のスタイル */
+.button-row .btn {
+    flex: 1;                 /* ★これが重要：3つの幅を均等にする */
+    padding: 12px 0;         /* 上下の余白 */
+    background-color: #4a90e2; /* すべて青色にする */
+    color: white;            /* 文字は白 */
+    border: 1px solid #357abd;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+/* マウスを乗せたとき */
+.button-row .btn:hover {
+    background-color: #357abd; /* 少し濃い青 */
+}
