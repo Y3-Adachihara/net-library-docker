@@ -18,7 +18,7 @@
         $db = new db_connect();
         $db->connect(); //データベースへ接続
 
-        $stmt_select = $db->pdo->prepare("SELECT librarian_id, password FROM librarian WHERE school_id = :school_id AND login_id = :login_id");
+        $stmt_select = $db->pdo->prepare("SELECT librarian_id, password, school_id FROM librarian WHERE school_id = :school_id AND login_id = :login_id");
         
         $stmt_select->bindValue(':school_id', $school_id, PDO::PARAM_INT);
         $stmt_select->bindValue(':login_id', $user_id, PDO::PARAM_STR);
@@ -39,6 +39,7 @@
 
                 //ここでのlibrarian_idは先のSELECT文で取得した司書ID
                 $_SESSION['librarian_id'] = $row['librarian_id'];
+                $_SESSION['librarian_school_id'] = $row['school_id'];
                 header("Location: ../html/librarian_myPage.php");
                 exit();
 
