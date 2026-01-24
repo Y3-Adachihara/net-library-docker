@@ -103,14 +103,16 @@
 
 
         //結合するテーブル（書籍テーブル、学生テーブル, 書籍テーブル、書籍状態テーブル、貸出テーブル、学校テーブル）から、過去1年間の貸出情報を取得
-        $sql = "SELECT l.lending_id, b.title, stu.grade, stu.class, stu.number, stu.family_name, stu.first_name, l.lending_date, l.return_date, b_s.status_name";
+        $sql = "SELECT l.lending_id, b_if.title, stu.grade, stu.class, stu.number, stu.family_name, stu.first_name, l.lending_date, l.return_date, b_st.status_name";
         $sql .= " FROM lending AS l";
-        $sql .= " LEFT OUTER JOIN book AS b";
-        $sql .= " ON l.book_id = b.book_id";
+        $sql .= " LEFT OUTER JOIN book_stack AS b_sc";
+        $sql .= " ON l.book_id = b_sc.book_id";
+        $sql .= " LEFT OUTER JOIN book_info AS b_if";
+        $sql .= " ON b_sc.isbn = b_if.isbn";
         $sql .= " LEFT OUTER JOIN student AS stu";
         $sql .= " ON l.student_id = stu.student_id";
-        $sql .= " LEFT OUTER JOIN book_status AS b_s";
-        $sql .= " ON b.status_id = b_s.status_id";
+        $sql .= " LEFT OUTER JOIN book_status AS b_st";
+        $sql .= " ON b_sc.status_id = b_st.status_id";
         $sql .= " WHERE l.lending_date BETWEEN :lastYearDate AND :currentDate";
         $sql .= " AND stu.school_id = :school_id";
         $sql .= " ORDER BY l.lending_date DESC;";
