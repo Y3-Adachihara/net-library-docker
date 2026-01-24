@@ -102,11 +102,11 @@
         ['status_id' => 2, 'status_name' => '貸出中', 'created_at' => '2015-04-01 10:00:00', 'updated_at' => '2015-04-01 10:00:00'],
         ['status_id' => 3, 'status_name' => '予約済み', 'created_at' => '2015-04-01 10:00:00', 'updated_at' => '2015-04-01 10:00:00'],
         ['status_id' => 4, 'status_name' => '予約受取待ち', 'created_at' => '2015-04-01 10:00:00', 'updated_at' => '2015-04-01 10:00:00'],
-        ['status_id' => 5, 'status_name' => '配送待ち（往路）', 'created_at' => '2015-04-01 10:00:00', 'updated_at' => '2015-04-01 10:00:00'],
-        ['status_id' => 6, 'status_name' => '配送中（往路）', 'created_at' => '2015-04-01 10:00:00', 'updated_at' => '2015-04-01 10:00:00'],
+        ['status_id' => 5, 'status_name' => '配送待ち（予約配送）', 'created_at' => '2015-04-01 10:00:00', 'updated_at' => '2015-04-01 10:00:00'],
+        ['status_id' => 6, 'status_name' => '配送中（予約配送）', 'created_at' => '2015-04-01 10:00:00', 'updated_at' => '2015-04-01 10:00:00'],
         ['status_id' => 7, 'status_name' => '配送予約受取待ち', 'created_at' => '2015-04-01 10:00:00', 'updated_at' => '2015-04-01 10:00:00'],
-        ['status_id' => 8, 'status_name' => '配送待ち（復路）', 'created_at' => '2015-04-01 10:00:00', 'updated_at' => '2015-04-01 10:00:00'],
-        ['status_id' => 9, 'status_name' => '配送中（復路）', 'created_at' => '2015-04-01 10:00:00', 'updated_at' => '2015-04-01 10:00:00'],
+        ['status_id' => 8, 'status_name' => '配送待ち（返却配送）', 'created_at' => '2015-04-01 10:00:00', 'updated_at' => '2015-04-01 10:00:00'],
+        ['status_id' => 9, 'status_name' => '配送中（返却配送）', 'created_at' => '2015-04-01 10:00:00', 'updated_at' => '2015-04-01 10:00:00'],
         ['status_id' => 10, 'status_name' => '貸出不可', 'created_at' => '2015-04-01 10:00:00', 'updated_at' => '2015-04-01 10:00:00'],
         ['status_id' => 11, 'status_name' => '紛失', 'created_at' => '2015-04-01 10:00:00', 'updated_at' => '2015-04-01 10:00:00'],
         ['status_id' => 12, 'status_name' => '修繕中', 'created_at' => '2015-04-01 10:00:00', 'updated_at' => '2015-04-01 10:00:00'],
@@ -726,7 +726,7 @@
         $db = new db_connect();
         $db->connect();
 
-        $tables = ['delivery', 'deliverer', 'librarian', 'lending', 'reservation', 'book_stack', 'book_info', 'delivery_type', 'delivery_status', 'reservation_status', 'book_status', 'student', 'user_role', 'school'];
+        $tables = ['delivery', 'librarian', 'lending', 'reservation', 'book_stack', 'student', 'deliverer', 'book_info', 'user_role', 'school', 'delivery_type', 'delivery_status', 'reservation_status', 'book_status'];
 
         try {
             $db->pdo->beginTransaction();
@@ -956,7 +956,7 @@
 
         } catch (PDOException $pe) {
             $db->pdo->rollBack();
-            echo "<p>エラーが発生しました: " . htmlspecialchars($e->getMessage()) . "</p>";
+            echo "<p>エラーが発生しました: " . htmlspecialchars($pe->getMessage()) . "</p>";
         } catch (Exception $e) {
             $db->pdo->rollBack();
             echo "<p>エラーが発生しました: " . htmlspecialchars($e->getMessage()) . "</p>";

@@ -19,48 +19,6 @@
                 $stmt->execute();
             }
 
-            //学校テーブル作成
-            $sql = "CREATE TABLE IF NOT EXISTS school (
-                school_id INT PRIMARY KEY,
-                school_name VARCHAR(100),
-                has_library BOOLEAN,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-            );";
-            $stmt = $db->pdo->prepare($sql);
-            $stmt->execute();
-
-            //ロールテーブル作成
-            $sql = "CREATE TABLE IF NOT EXISTS user_role (
-                role_id INT PRIMARY KEY,
-                role_name VARCHAR(100),
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-            );";
-            $stmt = $db->pdo->prepare($sql);
-            $stmt->execute();
-
-
-            //学生テーブル作成
-            $sql = "CREATE TABLE IF NOT EXISTS student (
-                student_id INT AUTO_INCREMENT PRIMARY KEY,
-                role_id INT DEFAULT 1,
-                school_id INT NOT NULL,
-                grade INT NOT NULL,
-                class VARCHAR(10) NOT NULL,
-                number INT NOT NULL,
-                family_name VARCHAR(50),
-                first_name VARCHAR(50),
-                password VARCHAR(100),
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                FOREIGN KEY (role_id) REFERENCES user_role(role_id),
-                FOREIGN KEY (school_id) REFERENCES school(school_id),
-                UNIQUE (school_id, grade, class, number)
-            );";
-            $stmt = $db->pdo->prepare($sql);
-            $stmt->execute();
-
             //書籍状態テーブル作成
             $sql = "CREATE TABLE IF NOT EXISTS book_status (
                 status_id INT PRIMARY KEY,
@@ -101,6 +59,27 @@
             $stmt = $db->pdo->prepare($sql);
             $stmt->execute();
 
+            //学校テーブル作成
+            $sql = "CREATE TABLE IF NOT EXISTS school (
+                school_id INT PRIMARY KEY,
+                school_name VARCHAR(100),
+                has_library BOOLEAN,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+            );";
+            $stmt = $db->pdo->prepare($sql);
+            $stmt->execute();
+
+            //ロールテーブル作成
+            $sql = "CREATE TABLE IF NOT EXISTS user_role (
+                role_id INT PRIMARY KEY,
+                role_name VARCHAR(100),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+            );";
+            $stmt = $db->pdo->prepare($sql);
+            $stmt->execute();
+
             //書籍情報テーブル作成
             $sql = "CREATE TABLE IF NOT EXISTS book_info (
                 isbn VARCHAR(25) PRIMARY KEY,
@@ -114,6 +93,42 @@
             );";
             $stmt = $db->pdo->prepare($sql);
             $stmt->execute();
+
+            // 配送員テーブル作成
+            $sql = "CREATE TABLE IF NOT EXISTS deliverer (
+                deliverer_id INT AUTO_INCREMENT PRIMARY KEY,
+                login_id VARCHAR(20) NOT NULL,
+                password VARCHAR(100),
+                family_name VARCHAR(50),
+                first_name VARCHAR(50),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                UNIQUE (login_id)
+            );";
+            $stmt = $db->pdo->prepare($sql);
+            $stmt->execute();
+
+
+            //学生テーブル作成
+            $sql = "CREATE TABLE IF NOT EXISTS student (
+                student_id INT AUTO_INCREMENT PRIMARY KEY,
+                role_id INT DEFAULT 1,
+                school_id INT NOT NULL,
+                grade INT NOT NULL,
+                class VARCHAR(10) NOT NULL,
+                number INT NOT NULL,
+                family_name VARCHAR(50),
+                first_name VARCHAR(50),
+                password VARCHAR(100),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                FOREIGN KEY (role_id) REFERENCES user_role(role_id),
+                FOREIGN KEY (school_id) REFERENCES school(school_id),
+                UNIQUE (school_id, grade, class, number)
+            );";
+            $stmt = $db->pdo->prepare($sql);
+            $stmt->execute();
+
 
             //書籍所蔵テーブル
             $sql = "CREATE TABLE IF NOT EXISTS book_stack (
@@ -177,19 +192,7 @@
             $stmt = $db->pdo->prepare($sql);
             $stmt->execute();
 
-            // 配送員テーブル作成
-            $sql = "CREATE TABLE IF NOT EXISTS deliverer (
-                deliverer_id INT AUTO_INCREMENT PRIMARY KEY,
-                login_id VARCHAR(20) NOT NULL,
-                password VARCHAR(100),
-                family_name VARCHAR(50),
-                first_name VARCHAR(50),
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                UNIQUE (login_id)
-            );";
-            $stmt = $db->pdo->prepare($sql);
-            $stmt->execute();
+            
 
             //配送テーブル作成
             $sql = "CREATE TABLE IF NOT EXISTS delivery (
