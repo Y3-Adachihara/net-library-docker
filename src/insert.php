@@ -107,7 +107,7 @@
         ['status_id' => 7, 'status_name' => '配送予約受取待ち', 'created_at' => '2015-04-01 10:00:00', 'updated_at' => '2015-04-01 10:00:00'],
         ['status_id' => 8, 'status_name' => '配送待ち（返却配送）', 'created_at' => '2015-04-01 10:00:00', 'updated_at' => '2015-04-01 10:00:00'],
         ['status_id' => 9, 'status_name' => '配送中（返却配送）', 'created_at' => '2015-04-01 10:00:00', 'updated_at' => '2015-04-01 10:00:00'],
-        ['status_id' => 10, 'status_name' => '貸出不可', 'created_at' => '2015-04-01 10:00:00', 'updated_at' => '2015-04-01 10:00:00'],
+        ['status_id' => 10, 'status_name' => '検品・仕分け中', 'created_at' => '2015-04-01 10:00:00', 'updated_at' => '2015-04-01 10:00:00'],
         ['status_id' => 11, 'status_name' => '紛失', 'created_at' => '2015-04-01 10:00:00', 'updated_at' => '2015-04-01 10:00:00'],
         ['status_id' => 12, 'status_name' => '修繕中', 'created_at' => '2015-04-01 10:00:00', 'updated_at' => '2015-04-01 10:00:00'],
         ['status_id' => 13, 'status_name' => '除籍', 'created_at' => '2015-04-01 10:00:00', 'updated_at' => '2015-04-01 10:00:00']
