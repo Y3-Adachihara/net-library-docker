@@ -1,5 +1,32 @@
 <?php
-session_start();
+    session_start();
+    require_once '../db_connect.php';
+
+    header("Cache-Control:no-cache,no-store,must-revalidate,max-age=0,post-check=0,pre-check=0");
+    header("Pragma:no-cache");
+
+    if (!isset($_SESSION['student_id'])) {
+        // 学生としてログインしていない場合、ログインページへリダイレクト
+        $_SESSION['message'] = "ログインしてください。";
+        header("Location: student_login.php");
+        exit();
+    }
+
+    // CSRFトークン発行関数(発行するだけで、セッション変数への保存は行わないから注意！)
+    function csrf_token_generate(): string {
+        $toke_byte = random_bytes(16);
+        $csrf_token = bin2hex($toke_byte);
+        return $csrf_token;
+    }
+    // CSRFトークンの生成
+    $csrf_token = csrf_token_generate();
+
+    // CSRFトークンセット関数
+    function set_csrf_token(String $csrf_token): void {
+        // CSRF対策用のトークンをセッションに保存
+        $_SESSION['csrf_token'] = $csrf_token;
+        echo '<input type="hidden" name="csrf_token" value="' . htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8') . '">';
+    }
 ?>
 
 <!DOCTYPE html>
@@ -96,6 +123,13 @@ session_start();
 </head>
 <body>
 
+    <form method="POST" action = "../php/logout.php" id = "logout_form">
+        <?php 
+            set_csrf_token($csrf_token);
+        ?>
+        <input type="hidden" name = "page_id" value= "0">
+    </form>
+
     <div class="header">
         <button class="logout-btn" onclick="confirmLogout()">ログアウト</button>
     </div>
@@ -126,7 +160,7 @@ session_start();
          */
         function confirmLogout() {
             if (confirm("ログアウトしますか？")) {
-                location.href = 'login.php'; 
+                document.getElementById('logout_form').submit();
             }
         }
     </script>
