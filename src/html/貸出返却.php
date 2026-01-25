@@ -1,3 +1,36 @@
+<?php
+    session_start();
+
+    // CSRFトークン発行関数(発行するだけで、セッション変数への保存は行わないから注意！)
+    function csrf_token_generate(): string {
+        $toke_byte = random_bytes(16);
+        $csrf_token = bin2hex($toke_byte);
+        return $csrf_token;
+    }
+
+    // CSRFトークンセット関数
+    function set_csrf_token(String $csrf_token): void {
+        // トークンを隠し属性として送るためのhtmlコードを記述
+        echo '<input type="hidden" name="csrf_token" value="' . htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8') . '">';
+    }
+
+    //CSRFトークンがセットされていなかったらセットする
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = csrf_token_generate();
+    }
+
+    // この時点で、セッションにトークンがあっても無くても、$csrf_tokenにトークンが格納されている
+    $csrf_token = $_SESSION['csrf_token'];
+
+    if (isset($_SESSION['lend_result_message'])) {
+        $message = $_SESSION['lend_result_message'];
+        echo "<script>alert('" . htmlspecialchars($message, ENT_QUOTES, 'UTF-8') . "');</script>";
+        unset($_SESSION['lend_result_message']);
+    }
+
+    
+?>
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -10,7 +43,7 @@
 <div class="container">
 
     <h1>貸出・返却</h1>
-    <form>
+    <form method = "POST">
         <div class="form-group">
             <label>学年：</label>
             <select name="school-year" required>
@@ -30,12 +63,12 @@
 
         <div class="form-group">
             <label>クラス:</label>
-            <input type="text" name="calss" placeholder="1">
+            <input type="text" name="class" placeholder="1">
         </div>
 
         <div class="form-group">
     <label>番号：</label>
-    <select name="school-year" id="number-select" required>
+    <select name="number" id="number-select" required>
         <option value="">選択してください</option>
     </select>
 </div>
@@ -54,6 +87,8 @@
     }
 </script>
 
+    <?php set_csrf_token($csrf_token); ?>
+
         <div class="form-group">
             <label>識別番号：</label>
             <input type="text" name="id-number" placeholder="901000101">
@@ -61,8 +96,9 @@
 
         <div class="action-buttons">
             <button type="button" class="btn-blue" onclick="location.href='librarian_myPage.php'">戻る</button>
-            <button type="button" class="btn-blue">貸出</button>
-            <button type="button" class="btn-blue">返却</button>
+
+            <button type="submit" formaction = "../php/lend.php" class="btn-blue">貸出</button>
+            <button type="submit" formaction = "../php/return.php" class="btn-blue">返却</button>
         </div>
     </form>
 </div>

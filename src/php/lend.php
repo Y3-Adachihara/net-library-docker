@@ -7,18 +7,18 @@
     $number = $_POST['number'];
     $book_id = $_POST['id-number'];
 
-    //CSRF対策
-    //トークンが一致しないか（右）、そもそもトークンがlogin.php(ログイン画面)から送られていない（左）時
-    if (!isset($_POST["csrf_token"]) || $_POST["csrf_token"] != $_SESSION["csrf_token"]) {
-        $_SESSION['error'] = "CSFS対策に引っかかりました（開発者向けエラーメッセージ）";    //本番はメッセージの内容を変える
-        header("Location: ../html/librarian_login.php");
-        exit(); 
-    }
-
     // 司書としてログインしていなければ、ログイン画面へリダイレクト
     if (!isset($_SESSION['librarian_id'])) {
         header("Location: librarian_login.php");
         exit();
+    }
+
+    //CSRF対策
+    //トークンが一致しないか（右）、そもそもトークンがlogin.php(ログイン画面)から送られていない（左）時
+    if (!isset($_POST["csrf_token"]) || $_POST["csrf_token"] != $_SESSION["csrf_token"]) {
+        $_SESSION['error'] = "不正なリクエストです";
+        header("Location: ../html/貸出返却.php");
+        exit(); 
     }
 
     $librarian_school_id = intval($_SESSION['librarian_school_id']);
@@ -151,7 +151,8 @@
 
                 case 4:
                 case 7:
-                    // 貸出を申請してきている学生が、予約を取りに来ているか、貸出しに来ているかを判断
+                    // 貸出を申請してきている学生が、予約を取りに来ているか、貸出しに来ているかを判断（予約機能がまだなので、作ってない）
+                    break;
 
 
                 case 2:
