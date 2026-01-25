@@ -4,10 +4,15 @@
     
     $db = new db_connect();
     $db->connect();
-    $error_message = $_SESSION['error'] ?? '';
-    if (isset($_SESSION['error'])) {
-        echo "<script>alert('" . htmlspecialchars($error_message, ENT_QUOTES, 'UTF-8') . "');</script>";
-        unset($_SESSION['error']);
+    $message = $_SESSION['message'] ?? '';
+    if (isset($_SESSION['message'])) {
+        echo "<script>alert('" . htmlspecialchars($message, ENT_QUOTES, 'UTF-8') . "');</script>";
+        unset($_SESSION['message']);
+    }
+
+    $message = "不正にログアウトが行なわたか、タイムアウトしました";    //大体、タイムアウト=セッション有効期限切れらしい
+    if (isset($_GET['error']) && $_GET['error'] == 'csrf_alert') {
+        echo "<script>alert('" . htmlspecialchars($message, ENT_QUOTES, 'UTF-8') . "');</script>";
     }
 
     $sql = "SELECT * FROM school";

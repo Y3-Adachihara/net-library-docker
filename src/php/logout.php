@@ -2,18 +2,16 @@
     require_once '../db_connect.php';
     session_start();
 
-    $index = $_SESSION['index'] ?? 0;
+    $index = $_POST['page_id'] ?? 0;
     $path_array = [
         0 => '../html/student_login.php',
         1 => '../html/librarian_login.php'
     ];
     $redirect_path = $path_array[$index] ?? '../html/student_login.php';
     
-    if(isset($_POST['csrf_token']) && $_POST['csrf_token'] != $_SESSION['csrf_token']){
-        $_SESSION['error_message'] = "CSFS対策に引っかかりました（開発者向けエラーメッセージ)";
-
-        header("Location: ../html/student_login.php");
-        exit();
+    $error_param = "";
+    if(!isset($_POST['csrf_token']) || $_POST['csrf_token'] != $_SESSION['csrf_token']){
+        $error_param = "?error=csrf_alert";
     }
     
     $_SESSION = [];    // セッション変数を全て解除
@@ -26,8 +24,8 @@
             $params["secure"], $params["httponly"]
         );
     }
-    
     session_destroy();  // セッションを破壊
-    header("Location: $redirect_path");
+
+    header("Location: " .$redirect_path .$error_param);
     exit();
 ?>
