@@ -1,38 +1,54 @@
 <?php
-/*
-// --- データベース接続設定 ---
-$host = 'localhost';
-$dbname = 'library_db';
-$user = 'root';
-$pass = ''; 
+    session_start();
+    require_once '../db_connect.php';
 
-try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $user, $pass);
-} catch (PDOException $e) {
-    die("接続エラー: " . $e->getMessage());
-}
+    if (!isset($_SESSION['student_id'])) {
+        // 学生としてログインしていない場合、ログインページへリダイレクト
+        $_SESSION['error'] = "ログインしてください。";
+        header("Location: student_login.php");
+        exit();
+    }
 
-// --- APIモード：JavaScriptからのデータリクエストを処理する ---
-if (isset($_GET['action'])) {
-    header('Content-Type: application/json');
-    
-    // 生徒検索
-    if ($_GET['action'] === 'search_student') {
-        $stmt = $pdo->prepare("SELECT student_name FROM student_info WHERE school_name = ? AND grade = ? AND class_num = ? AND attendance_num = ?");
-        $stmt->execute([$_GET['school'], $_GET['grade'], $_GET['class'], $_GET['num']]);
-        echo json_encode($stmt->fetch(PDO::FETCH_ASSOC));
-        exit;
+    $error_message = $_SESSION['message'] ?? '';
+    if (isset($_SESSION['message'])) {
+        echo "<script>alert('" . htmlspecialchars($error_message, ENT_QUOTES, 'UTF-8') . "');</script>";
+        unset($_SESSION['message']);
     }
-    
-    // 書籍検索
-    if ($_GET['action'] === 'search_book') {
-        $stmt = $pdo->prepare("SELECT title, author, genre_main, genre_sub, publisher FROM book_info WHERE book_id_code = ?");
-        $stmt->execute([$_GET['book_id']]);
-        echo json_encode($stmt->fetch(PDO::FETCH_ASSOC));
-        exit;
+
+    /* いったん、予約確認画面と予約処理が完成するまでコメントアウト 2026/01/25
+    // --- データベース接続設定 ---
+    $host = 'localhost';
+    $dbname = 'library_db';
+    $user = 'root';
+    $pass = ''; 
+
+    try {
+        $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $user, $pass);
+    } catch (PDOException $e) {
+        die("接続エラー: " . $e->getMessage());
     }
-}
-    */
+
+    // --- APIモード：JavaScriptからのデータリクエストを処理する ---
+    if (isset($_GET['action'])) {
+        header('Content-Type: application/json');
+        
+        // 生徒検索
+        if ($_GET['action'] === 'search_student') {
+            $stmt = $pdo->prepare("SELECT student_name FROM student_info WHERE school_name = ? AND grade = ? AND class_num = ? AND attendance_num = ?");
+            $stmt->execute([$_GET['school'], $_GET['grade'], $_GET['class'], $_GET['num']]);
+            echo json_encode($stmt->fetch(PDO::FETCH_ASSOC));
+            exit;
+        }
+        
+        // 書籍検索
+        if ($_GET['action'] === 'search_book') {
+            $stmt = $pdo->prepare("SELECT title, author, genre_main, genre_sub, publisher FROM book_info WHERE book_id_code = ?");
+            $stmt->execute([$_GET['book_id']]);
+            echo json_encode($stmt->fetch(PDO::FETCH_ASSOC));
+            exit;
+        }
+    }
+        */
 ?>
 
 <!DOCTYPE html>
@@ -63,7 +79,7 @@ if (isset($_GET['action'])) {
 <body>
 
 <div class="container">
-    <form id="reservationForm" onsubmit="return false;">
+    <form id="reservationForm" method = "POST" action = "reservation_confirm.php">
         
         <div class="form-row">
             <label>学校名</label>
@@ -122,7 +138,7 @@ if (isset($_GET['action'])) {
         <div class="form-row">
             <label>書籍番号</label>
             <div class="input-group">
-                <input type="text" id="book_id" class="full-width" placeholder="例: B001">
+                <input type="text" id="book_id" name="book_id" class="full-width" placeholder="例: B001">
             </div>
             <span class="note">③</span>
         </div>
@@ -134,13 +150,15 @@ if (isset($_GET['action'])) {
         <div class="form-row"><label>出版社</label><div class="input-group"><input type="text" id="publisher" class="full-width" readonly></div><span class="note">※編集不可</span></div>
 
         <div class="button-area">
-            <button type="button" onclick="location.href='stu_mypage.php'">やめる</button>
-            <button type="button" onclick="submitReservation()">予約する</button>
+            <button type="button" onclick="location.href='stu_myPage.php'">やめる</button>
+            <button type="submit">予約確認画面へ</button>
         </div>
     </form>
 </div>
 
+
 <script>
+/* いったん、予約確認画面と予約処理が完成するまでコメントアウト 2026/01/25
 // 入力監視
 const inputs = ['school_name', 'grade', 'class', 'number'];
 inputs.forEach(id => {
@@ -214,6 +232,7 @@ function submitReservation() {
         alert("情報を正しく入力してください");
     }
 }
+*/
 </script>
 
 </body>

@@ -128,20 +128,25 @@
                         }
                         break;
 
-                    } else {    
-                        // 借りようとしている書籍が他校保有
+
+                    // 借りようとしている書籍が他校保有
+                    } else {
 
                         // 今はとりあえず、何も確認ダイアログを出さずに予約画面へリダイレクト
                         $db->pdo->rollback();
 
+                        /* やろうとしたけど、そもそもこの場合は書籍IDを入力する前提にしない方がいい気がした。検索画面に飛ばして、そこから予約させれば
                         // 再入力が面倒なので、セッションで引き渡し
+                        $_SESSION['librarian_school_id'] = $librarian_school_id;
                         $_SESSION['reservation_grade'] = $grade;
                         $_SESSION['reservation_class'] = $class;
                         $_SESSION['reservation_number'] = $number;
                         $_SESSION['reservation_book_id'] = $book_id;
-
+                        */
+                        
                         header("Location:../html/reservation.php");
                         exit();
+                    
                     }
 
                 case 4:
@@ -157,6 +162,12 @@
                 case 9:
                     // 今は仮で、何も確認ダイアログを出さずにリダイレクト
                     $db->pdo->rollback();
+                    // 再入力が面倒なので、セッションで引き渡し
+                    $_SESSION['librarian_school_id'] = $librarian_school_id;
+                    $_SESSION['reservation_grade'] = $grade;
+                    $_SESSION['reservation_class'] = $class;
+                    $_SESSION['reservation_number'] = $number;
+                    $_SESSION['reservation_book_id'] = $book_id;
                     header("Location:../html/reservation.php");
                     exit();
                 

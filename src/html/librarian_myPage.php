@@ -8,7 +8,7 @@
 
     if (!isset($_SESSION['librarian_id'])) {
         // 司書としてログインしていない場合、ログインページへリダイレクト
-        $_SESSION['error'] = "司書としてログインしてください。";
+        $_SESSION['message'] = "司書としてログインしてください。";
         header("Location: librarian_login.php");
         exit();
     }
@@ -30,6 +30,7 @@
     function set_csrf_token(String $csrf_token): void {
         // CSRF対策用のトークンをセッションに保存
         $_SESSION['csrf_token'] = $csrf_token;
+        //ここでトークンを隠し属性として送るためのhtmlコードを記述
         echo '<input type="hidden" name="csrf_token" value="' . htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8') . '">';
     }
 
@@ -142,6 +143,13 @@
     <title>司書用マイページ(<?php echo h($school_name); ?>)</title>
     <link rel="stylesheet" href="../css/librarian_myPage.css">
 </head>
+<script>
+    function confirmLogout() {
+        if(window.confirm('本当にログアウトしますか？')) {
+            document.link_logoutFORM.submit();
+        }
+    }
+</script>
     <body>
         <header class="main-header">
         <div class="header-logo">
@@ -150,7 +158,7 @@
         <nav class="header-nav">
             <ul>
                 <li><a href="#" onclick="alert('余裕があったら、マイページの使い方やヘルプ等を説明するページを作ってもいいかも？'); return false;">はじめての方へ</a></li>
-                <li><a href="javascript:link_logoutFORM.submit()">ログアウト</a></li>
+                <li><a href="#" onclick = "confirmLogout(); return false;">ログアウト</a></li>
             </ul>
         </nav>
         </header>
@@ -158,14 +166,14 @@
         <!-- ログアウトボタンを押したときのCSFSトークン発行 -->
         <form method="POST" action = "../php/logout.php" name = "link_logoutFORM">
             <?php 
-                csrf_token_generate($csrf_token);
+                set_csrf_token($csrf_token);
             ?>
             <input type="hidden" name = "page_id" value= "1">
         </form>
 
         <form method="POST" class="librarian-menu-form">
             <?php 
-                csrf_token_generate($csrf_token);
+                set_csrf_token($csrf_token);
             ?>
             <button type="submit" formaction="../html/検索画面.html" class="add-book-button">書籍検索</button>
             <button type="submit" formaction="../html/貸出返却.php" class="manage-users-button">貸出・返却</button>

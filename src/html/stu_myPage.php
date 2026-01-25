@@ -139,7 +139,7 @@
         <div class="page-title">生徒用マイページ</div>
 
         <div class="button-row">
-            <button class="menu-btn" onclick="location.href='search.php'">
+            <button class="menu-btn" onclick="location.href='書籍検索.php'">
                 検索する
             </button>
 

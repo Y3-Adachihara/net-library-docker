@@ -4,6 +4,8 @@
     
     $db = new db_connect();
     $db->connect();
+
+    // ログアウトしていなかったときは、まだログインページからセッションが続くため、セッション変数に値を格納
     $message = $_SESSION['message'] ?? '';
     if (isset($_SESSION['message'])) {
         echo "<script>alert('" . htmlspecialchars($message, ENT_QUOTES, 'UTF-8') . "');</script>";

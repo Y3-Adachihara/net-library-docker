@@ -10,8 +10,12 @@
         unset($_SESSION['message']);
     }
 
-    $message = "不正にログアウトが行なわたか、タイムアウトしました";    //大体、タイムアウト=セッション有効期限切れらしい
+    $message_csrf = "不正にログアウトが行なわたか、タイムアウトしました";    //大体、タイムアウト=セッション有効期限切れらしい
+    $message_nomal = "不正なリクエストです。ログアウトしました・";
+
     if (isset($_GET['error']) && $_GET['error'] == 'csrf_alert') {
+        echo "<script>alert('" . htmlspecialchars($message, ENT_QUOTES, 'UTF-8') . "');</script>";
+    } else if (isset($_GET['error']) && $_GET['error'] == 'nomal_alert') {
         echo "<script>alert('" . htmlspecialchars($message, ENT_QUOTES, 'UTF-8') . "');</script>";
     }
 

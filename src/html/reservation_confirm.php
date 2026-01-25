@@ -48,20 +48,28 @@
         $db = new db_connect();
         $db->connect();
 
-        $sql = "SELECT bi.isbn AS bi_isbn, bi.title, bi.author_name, bi.author_kana, bi.publisher FROM book_stack AS bs LEFT OUTER JOIN book_info AS bi ON bs.isbn = bi.isbn WHERE bs.book_id = :book_id";
+        // isbn,タイトル、著者や出版社など、本の情報を取得
+        $sql = "SELECT bi.isbn AS bi_isbn, bi.title, bi.author_name, bi.author_kana, bi.publisher";
+        $sql .= " FROM book_stack AS bs LEFT OUTER JOIN book_info AS bi ON bs.isbn = bi.isbn WHERE bs.book_id = :book_id";
         $stmt = $db->pdo->prepare($sql);
         $stmt->bindValue(':book_id', $book_id, PDO::PARAM_STR);
         $stmt->execute();
 
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
         if ($row) {
             $book_isbn = $row['bi_isbn'];
             $book_title = $row['title'];
             $book_author = $row['author_name'];
             $book_author_kana = $row['author_kana'];
             $book_publisher = $row['publisher'];
+        } else {
+            $_SESSION['message'] = "指定された書籍番号の本は存在しません";
+            header("Location: test.php");
+            exit();
         }
 
+        // ログイン中の学生が所属する学校名を取得
         $sql = "SELECT school_name FROM school WHERE school_id = :school_id";
         $stmt = $db->pdo->prepare($sql);
         $stmt->bindValue(':school_id', $school_id, PDO::PARAM_INT);
@@ -170,6 +178,10 @@
                 <button type="button" class="btn btn-cancel" onclick="history.back()">修正する</button>
 
                 <form action="../php/reservation.php" method="POST" class="confirm-form">
+
+                    <?php
+                        set_csrf_token($csrf_token);
+                    ?>
                     <input type="hidden" name="book_id" value="<?php echo htmlspecialchars($book_id); ?>">
                     <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($token); ?>">
                     

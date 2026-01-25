@@ -20,7 +20,7 @@
         $db = new db_connect();
         $db->connect(); //データベースへ接続
 
-        $stmt_select =$db->pdo->prepare("SELECT table_id, password FROM student WHERE school_id = :school_id AND grade =:grade AND class =:class AND number = :number");
+        $stmt_select =$db->pdo->prepare("SELECT * FROM student WHERE school_id = :school_id AND grade =:grade AND class =:class AND number = :number");
         
         $stmt_select->bindValue(':school_id', $school_id, PDO::PARAM_INT);
         $stmt_select->bindValue(':grade', $grade, PDO::PARAM_INT);
@@ -42,9 +42,16 @@
                 session_regenerate_id(true);
 
                 //ここでのtable_idは先のSELECT文で取得した利用者ID
-                $_SESSION['student_id'] = $row['table_id'];
+                $_SESSION['student_id'] = $row['student_id'];
+                $_SESSION['student_school_id'] = $row['school_id'];
+                $_SESSION['student_role_id'] = $row['role_id'];
+                $_SESSION['student_grade'] = $row['grade'];
+                $_SESSION['student_class'] = $row['class'];
+                $_SESSION['student_number'] = $row['number'];
+                $_SESSION['student_family_name'] = $row['family_name'];
+                $_SESSION['student_first_name'] = $row['first_name'];
                 //まだ学生マイページが用意できていないため、とりあえず司書マイページへリダイレクト
-                header("Location: ../html/myPage_librarian.php");
+                header("Location: ../html/stu_myPage.php");
                 exit();
 
             } else {
