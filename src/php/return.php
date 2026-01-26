@@ -2,16 +2,19 @@
     require_once '../db_connect.php';
     session_start();
 
+    // 学生の情報は貸出返却画面から取得
     $grade = $_POST['school-year'];
     $class = $_POST['class'];
     $number = $_POST['number'];
     $book_id = $_POST['id-number'];
 
+    //created_at
+
     //CSRF対策
     //トークンが一致しないか（右）、そもそもトークンがlogin.php(ログイン画面)から送られていない（左）時
     if (!isset($_POST["csrf_token"]) || $_POST["csrf_token"] != $_SESSION["csrf_token"]) {
-        $_SESSION['error'] = "CSFS対策に引っかかりました（開発者向けエラーメッセージ）";    //本番はメッセージの内容を変える
-        header("Location: ../html/librarian_login.php");
+        $_SESSION['error'] = "不正な返却リクエストです";
+        header("Location: ../html/貸出返却.php");
         exit(); 
     }
 
@@ -31,8 +34,9 @@
         //トランザクション開始
         $db->pdo->beginTransaction();
 
+        // lendingテーブルから、貸出している学生
         $sql = "SELECT l.book_id, b_s.school_id FROM lending AS l LEFT OUTER JOIN student AS s";
-        $sql .= " ON L.student_id = s.student_id";
+        $sql .= " ON l.student_id = s.student_id";
         $sql .= " LEFT OUTER JOIN book_stack AS b_s";
         $sql .= " ON l.book_id = b_s.book_id WHERE";
         $sql .= " s.school_id = :school_id AND";
@@ -46,7 +50,7 @@
 
         $stmt->bindValue(':school_id', $librarian_school_id, PDO::PARAM_INT);
         $stmt->bindValue(':grade', $grade, PDO::PARAM_INT);
-        $stmt->bindValue(':class', $class, PDO::PARAM_INT);
+        $stmt->bindValue(':class', $class, PDO::PARAM_STR);
         $stmt->bindValue(':number', $number, PDO::PARAM_INT);
         $stmt->bindValue(':book_id', $book_id, PDO::PARAM_STR);
         $stmt->execute();
@@ -62,7 +66,7 @@
         $book_id = $is_lended["book_id"];
         $book_belong = intval($is_lended['school_id']);
 
-        $sql = "SELECT * FROM reservation WHERE book_id = :book_id AND status_id = :status_id ORDER BY created_at ASC";
+        $sql = "SELECT * FROM reservation WHERE book_id = :book_id AND status_id = :status_id ORDER BY reservation_date ASC";
         $stmt = $db->pdo->prepare($sql);
         $stmt->bindValue(':book_id', $book_id, PDO::PARAM_STR);
         $stmt->bindValue(':status_id', 1, PDO::PARAM_INT);
@@ -74,19 +78,21 @@
         $current_date_str = $current_date->format('Y-m-d H:i:s');
 
 
-        // 自校所有の本であり、予約が入っていない場合
+        // 自校所有の本であり、予約が入っていない場合は貸出可能にする（返された瞬間から貸出可能となるケースが多いらしい）
         if ($book_belong == $_SESSION['librarian_school_id'] && empty($is_reserved)) {
-            $sql = "UPDATE book_stack SET status_id = :status_id WHERE book_id = :book_id";
+            $sql = "UPDATE book_stack SET status_id = :status_id, position = :current_school WHERE book_id = :book_id";
             $stmt = $db->pdo->prepare($sql);
             $stmt->bindValue(':status_id', 1, PDO::PARAM_INT);
+            $stmt->bindValue(':current_school', $librarian_school_id, PDO::PARAM_INT);
             $stmt->bindValue(':book_id', $book_id, PDO::PARAM_STR);
             $stmt->execute();
 
         // それ以外は、「10:検品・仕分け中」状態を挟む
         } else {
-            $sql = "UPDATE book_stack SET status_id = :status_id WHERE book_id = :book_id";
+            $sql = "UPDATE book_stack SET status_id = :status_id, position = :current_school WHERE book_id = :book_id";
             $stmt = $db->pdo->prepare($sql);
             $stmt->bindValue(':status_id', 10, PDO::PARAM_INT);
+            $stmt->bindValue(':current_school', $librarian_school_id, PDO::PARAM_INT);
             $stmt->bindValue(':book_id', $book_id, PDO::PARAM_STR);
             $stmt->execute();
         }

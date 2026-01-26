@@ -50,4 +50,6 @@
         <button type="button" onclick = "location.href='貸出返却.php'">戻る</button>
         <button type="submit">OK</button>
     </form>
+
+    <p>将来的には、予約リストを一覧表示し、そこから選ばせる（予約番号は検索機能設ける）にしたい</p>
 </body>

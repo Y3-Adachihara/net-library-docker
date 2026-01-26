@@ -132,38 +132,15 @@
 
                 case 4:
                 case 7:
-                    // reserved_book_lend.php（予約番号確認して貸出or戻す）に渡すため
                     $_SESSION['grade'] = $grade;
                     $_SESSION['class'] = $class;
-                    $_SESSION["number"] = $number;
-                    $_SESSION["book_id"] = $book_id;
+                    $_SESSION['number'] = $number;
+                    $_SESSION['book_id'] = $book_id;
 
                     $db->pdo->rollback();
                     $_SESSION['reserved_lend_message'] = "予約番号を入力してください";
                     header("Location: ../html/verify_resCode.php");
                     exit();
-
-                    /*　多分後で使う
-
-                    // 貸出を申請してきている学生が、予約を取りに来ているか、貸出しに来ているかを判断（予約機能がまだなので、作ってない）
-                    $sql = "SELECT reservation_number FROM reservation WHERE student_id = :student_id, book_id = :book_id, status_id = :status_id";
-                    $stmt = $db->pdo->prepare($sql);
-                    $stmt->bindValue(':student_id', $student_id, PDO::PARAM_INT);
-                    $stmt->bindValue(':book_id', $book_id, PDO::PARAM_INT);
-                    $stmt->bindValue(':status_id', $status_id, PDO::PARAM_INT);
-                    $stmt->execute();
-                    $resConfirm_row = $stmt->fetch(PDO::FETCH_ASSOC);
-
-                    if ($resConfirm_row || intval($resConfirm_row, 10) == ) {
-
-                    } else {
-                        $db->pdo->rollback();
-                        $message = "予約が存在しません。";
-                    }
-                    */
-                    
-                    break;
-
 
                 case 2:
                 case 3:
@@ -171,7 +148,6 @@
                 case 6: 
                 case 8:
                 case 9:
-                    // 今は仮で、何も確認ダイアログを出さずにリダイレクト
                     $db->pdo->rollback();
                     // 再入力が面倒なので、セッションで引き渡し
                     $message = "この本は貸出済みです。先に返却するか、予約してください。";
@@ -191,7 +167,6 @@
         // 予約に回すやつ以外
         $_SESSION['lend_result_message'] = $message;
         header("Location: ../html/貸出返却.php");
-
         exit();
 
     } catch (PDOException $e) {
