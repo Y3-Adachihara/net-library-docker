@@ -132,10 +132,16 @@
 
                 case 4:
                 case 7:
+                    // reserved_book_lend.php（予約番号確認して貸出or戻す）に渡すため
+                    $_SESSION['grade'] = $grade;
+                    $_SESSION['class'] = $class;
+                    $_SESSION["number"] = $number;
+                    $_SESSION["book_id"] = $book_id;
+
                     $db->pdo->rollback();
                     $reserved_lend_message = "予約番号を入力してください";
 
-                    /*
+                    /*　多分後で使う
 
                     // 貸出を申請してきている学生が、予約を取りに来ているか、貸出しに来ているかを判断（予約機能がまだなので、作ってない）
                     $sql = "SELECT reservation_number FROM reservation WHERE student_id = :student_id, book_id = :book_id, status_id = :status_id";
