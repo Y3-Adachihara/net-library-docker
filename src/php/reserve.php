@@ -67,6 +67,10 @@
     }
 
     try {
+        $db = new db_connect();
+        $db->connect();
+
+        // トランザクション開始
         $db->pdo->beginTransaction();
 
         // 司書としてログインしていた場合、学生IDをここで取得

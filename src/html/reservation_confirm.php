@@ -177,14 +177,13 @@
             <div class="action-area">
                 <button type="button" class="btn btn-cancel" onclick="history.back()">修正する</button>
 
-                <form action="../php/reservation.php" method="POST" class="confirm-form">
+                <form action="../php/reserve.php" method="POST" class="confirm-form">
 
                     <?php
                         set_csrf_token($csrf_token);
                     ?>
                     <input type="hidden" name="book_id" value="<?php echo htmlspecialchars($book_id); ?>">
-                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($token); ?>">
-                    
+                                        
                     <button type="submit" class="btn btn-confirm">この内容で予約する</button>
                 </form>
             </div>

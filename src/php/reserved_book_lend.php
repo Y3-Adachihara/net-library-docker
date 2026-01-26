@@ -57,7 +57,7 @@
             $student_id = $is_stu_exists['student_id'];
               
             // 予約番号を取得
-            $sql = "SELECT r.reservation_id r.reservation_number, bs.book_id AS bs_book_id, bs.status_id AS bs_status, r.status_id AS res_status, r.student_id";
+            $sql = "SELECT r.reservation_id, r.reservation_number, bs.book_id AS bs_book_id, bs.status_id AS bs_status, r.status_id AS res_status, r.student_id";
             $sql .= " FROM reservation AS r LEFT OUTER JOIN book_stack AS bs ON r.book_id = bs.book_id";
             $sql .= " WHERE r.student_id = :student_id AND r.book_id = :book_id AND bs.status_id IN (:status_id1, :status_id2) FOR UPDATE";
             $get_resNum_stmt = $db->pdo->prepare($sql);

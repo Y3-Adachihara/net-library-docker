@@ -14,7 +14,7 @@
         echo '<input type="hidden" name="csrf_token" value="' . htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8') . '">';
     }
 
-    //CSRFトークンがセットされていなかったらセットする
+    //CSRFトークンがセットされていなかったらセッションにセットする
     if (empty($_SESSION['csrf_token'])) {
         $_SESSION['csrf_token'] = csrf_token_generate();
     }
@@ -22,11 +22,18 @@
     // この時点で、セッションにトークンがあっても無くても、$csrf_tokenにトークンが格納されている
     $csrf_token = $_SESSION['csrf_token'];
 
+    // 予約処理のメッセージ
     if (isset($_SESSION['lend_result_message'])) {
         $message = $_SESSION['lend_result_message'];
         echo "<script>alert('" . htmlspecialchars($message, ENT_QUOTES, 'UTF-8') . "');</script>";
         unset($_SESSION['lend_result_message']);
+        
+    } else if (isset($_SESSION['return_result_message'])) {
+        $message = $_SESSION['return_result_message'];
+        echo "<script>alert('" . htmlspecialchars($message, ENT_QUOTES, 'UTF-8') . "');</script>";
+        unset($_SESSION['return_result_message']);
     }
+
 
     
 ?>

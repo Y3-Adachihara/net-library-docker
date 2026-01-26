@@ -9,7 +9,7 @@
 
     // 司書としてログインしていなければ、ログイン画面へリダイレクト
     if (!isset($_SESSION['librarian_id'])) {
-        header("Location: librarian_login.php");
+        header("Location: ../html/librarian_login.php");
         exit();
     }
 
