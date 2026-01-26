@@ -55,12 +55,12 @@
                 exit();
 
             } else {
-	            $_SESSION['error'] = "IDまたはパスワードが違います。";
+	            $_SESSION['message'] = "IDまたはパスワードが違います。";
                 header("Location: ../html/student_login.php");
                 exit();
             }
         } else {
-            $_SESSION['error'] = "パスワードの取得に失敗しました。";
+            $_SESSION['message'] = "パスワードの取得に失敗しました。";
             header("Location: ../html/student_login.php");
             exit();
         }

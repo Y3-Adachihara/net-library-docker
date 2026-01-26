@@ -14,9 +14,9 @@
     $message_nomal = "不正なリクエストです。ログアウトしました・";
 
     if (isset($_GET['error']) && $_GET['error'] == 'csrf_alert') {
-        echo "<script>alert('" . htmlspecialchars($message, ENT_QUOTES, 'UTF-8') . "');</script>";
+        echo "<script>alert('" . htmlspecialchars($message_csrf, ENT_QUOTES, 'UTF-8') . "');</script>";
     } else if (isset($_GET['error']) && $_GET['error'] == 'nomal_alert') {
-        echo "<script>alert('" . htmlspecialchars($message, ENT_QUOTES, 'UTF-8') . "');</script>";
+        echo "<script>alert('" . htmlspecialchars($message_nomal, ENT_QUOTES, 'UTF-8') . "');</script>";
     }
 
     try {
