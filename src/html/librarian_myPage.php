@@ -16,7 +16,6 @@
     //　ここからは、司書としてログインしていないと実行されない
     $_librarian_id = $_SESSION['librarian_id'];
 
-
     // CSRFトークン発行関数(発行するだけで、セッション変数への保存は行わないから注意！)
     function csrf_token_generate(): string {
         $toke_byte = random_bytes(16);
@@ -48,14 +47,22 @@
         }
 
         foreach($records as $rows) {
-            $lending_id = $rows['lending_id'];
+            $lending_id = $rows['book_id'];
             $title = $rows['title'];
             $belong_id = $rows['grade'] . "年" . $rows['class'] . "組" . $rows['number'] . "番";
             $family_name = $rows['family_name'];
             $first_name = $rows['first_name'];
             $lending_date = $rows['lending_date'];
             $return_date = $rows['return_date'];
+
+            // その生徒が借りた（返した）書籍の書籍状態IDを取得
+            $book_status_id= $rows['status_id'];
             $status_name = $rows['status_name'];
+
+            // 貸出可能の時だけ返却済みとする
+            if ($book_status_id == 1) {
+                $status_name = '返却済み';
+            }
 
             //苗字と名前は別れているため、フルネームを作成
             $full_name = $family_name . " " . $first_name;
@@ -104,7 +111,7 @@
 
 
         //結合するテーブル（書籍テーブル、学生テーブル, 書籍テーブル、書籍状態テーブル、貸出テーブル、学校テーブル）から、過去1年間の貸出情報を取得
-        $sql = "SELECT l.lending_id, b_if.title, stu.grade, stu.class, stu.number, stu.family_name, stu.first_name, l.lending_date, l.return_date, b_st.status_name";
+        $sql = "SELECT b_sc.book_id, b_if.title, stu.grade, stu.class, stu.number, stu.family_name, stu.first_name, l.lending_date, l.return_date, b_st.status_id, b_st.status_name";
         $sql .= " FROM lending AS l";
         $sql .= " LEFT OUTER JOIN book_stack AS b_sc";
         $sql .= " ON l.book_id = b_sc.book_id";
@@ -188,13 +195,13 @@
                 <table class="info-table">
                     <thead>
                         <tr>
-                            <th>貸出ID</th>
+                            <th>書籍ID</th> <!-- 貸出IDから変更 -->
                             <th>タイトル</th>
                             <th>所属</th>
                             <th>貸出者名</th>
                             <th>貸出日</th>
                             <th>返却日</th>
-                            <th>状態</th>
+                            <th>状態</th>   <!-- 貸出した学生の状態を記述するように変更 -->
                         </tr>
                     </thead>
 
