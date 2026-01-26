@@ -139,7 +139,9 @@
                     $_SESSION["book_id"] = $book_id;
 
                     $db->pdo->rollback();
-                    $reserved_lend_message = "予約番号を入力してください";
+                    $_SESSION['reserved_lend_message'] = "予約番号を入力してください";
+                    header("Location: ../html/verify_resCode.php");
+                    exit();
 
                     /*　多分後で使う
 
@@ -187,16 +189,9 @@
 
         // セッションにメッセージを格納
         // 予約に回すやつ以外
-        if (isset($message)) {
-            $_SESSION['lend_result_message'] = $message;
-            header("Location: ../html/貸出返却.php");
-        } else {
-            $_SESSION['reserved_lend_message'] = $reserved_lend_message;
-            header("Location: ../html/verify_resCode.php");
-        }
-        
+        $_SESSION['lend_result_message'] = $message;
+        header("Location: ../html/貸出返却.php");
 
-        
         exit();
 
     } catch (PDOException $e) {

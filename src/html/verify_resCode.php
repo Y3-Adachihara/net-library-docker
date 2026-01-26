@@ -20,6 +20,13 @@
     }
 
     $csrf_token = $_SESSION['csrf_token'];
+
+    // 予約番号の入力を促すメッセージを表示
+    if (isset($_SESSION['reserved_lend_message'])) {
+        $message = $_SESSION['reserved_lend_message'];
+        echo "<script>alert('" . htmlspecialchars($message, ENT_QUOTES, 'UTF-8') . "');</script>";
+        unset($_SESSION['reserved_lend_message']);
+    }
 ?>
 
 <!DOCTYPE html>
