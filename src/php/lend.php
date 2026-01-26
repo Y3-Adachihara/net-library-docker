@@ -16,7 +16,7 @@
     //CSRF対策
     //トークンが一致しないか（右）、そもそもトークンがlogin.php(ログイン画面)から送られていない（左）時
     if (!isset($_POST["csrf_token"]) || $_POST["csrf_token"] != $_SESSION["csrf_token"]) {
-        $_SESSION['error'] = "不正なリクエストです";
+        $_SESSION['error'] = "不正な貸出リクエストです";
         header("Location: ../html/貸出返却.php");
         exit(); 
     }
@@ -51,7 +51,7 @@
         $student = $stmt->fetch(PDO::FETCH_ASSOC);
 
         // 検索条件に指定された書籍が存在するか確認
-        $book_isExists = "SELECT status_id, position FROM book_stack WHERE book_id = :book_id";
+        $book_isExists = "SELECT status_id, position, school_id FROM book_stack WHERE book_id = :book_id";
         $stmt = $db->pdo->prepare($book_isExists);
         $stmt->bindValue(':book_id', $book_id, PDO::PARAM_STR);
         $stmt->execute();
@@ -70,6 +70,7 @@
             //入力された書籍の…
             $book_status = intval($book['status_id'],10);   //現在の状態（貸出可能か、それ以外か）
             $book_position = intval($book['position'],10);  //現在位置（学校ID）
+            $book_owner = intval($book['school_id'],10);    //その本の所有学校
 
             // 学生が現在何冊借りているかどうか確認
             $stu_lend_counts = "SELECT COUNT(*) AS count FROM lending WHERE student_id = :student_id AND return_date IS NULL";
@@ -79,6 +80,7 @@
             $count = $stmt->fetch(PDO::FETCH_ASSOC);
             $lend_counts = intval($count['count']);
 
+            // 
             if ($lend_counts >= 2) {
                 $db->pdo->rollback();
                 $_SESSION['lend_result_message'] = "貸出冊数が制限に達しています！";
@@ -92,15 +94,7 @@
                 case 1: //貸出可能だった場合
 
                     // 借りようとしている書籍が自校所有
-                    if ($student_school == $book_position) {
-
-                        // ログインしている司書の学校が所蔵する本かどうかチェック
-                        if ($book_position != $librarian_school_id) {
-                            $db->pdo->rollback();
-                            $_SESSION['lend_result_message'] = "他校の本を本校の司書貸出することはできません。";
-                            header("Location:../html/貸出返却.php");
-                            exit();
-                        }
+                    if ($student_school == $book_position && $book_owner == $librarian_school_id) {
                          
                         // もし、この段階に来ても書籍状態が1(貸出可能)であれば、書籍状態を更新
                         $update_bookStatus = "UPDATE book_stack SET status_id = :neo_status WHERE book_id = :book_id AND status_id = :old_status";
@@ -131,27 +125,35 @@
 
                     // 借りようとしている書籍が他校保有
                     } else {
-
-                        // 今はとりあえず、何も確認ダイアログを出さずに予約画面へリダイレクト
                         $db->pdo->rollback();
-
-                        /* やろうとしたけど、そもそもこの場合は書籍IDを入力する前提にしない方がいい気がした。検索画面に飛ばして、そこから予約させれば
-                        // 再入力が面倒なので、セッションで引き渡し
-                        $_SESSION['librarian_school_id'] = $librarian_school_id;
-                        $_SESSION['reservation_grade'] = $grade;
-                        $_SESSION['reservation_class'] = $class;
-                        $_SESSION['reservation_number'] = $number;
-                        $_SESSION['reservation_book_id'] = $book_id;
-                        */
-                        
-                        header("Location:../html/reservation.php");
-                        exit();
+                        $message = "他校にある本、もしくは他校所蔵の本になります。予約してください";
                     
                     }
 
                 case 4:
                 case 7:
+                    $db->pdo->rollback();
+                    $reserved_lend_message = "予約番号を入力してください";
+
+                    /*
+
                     // 貸出を申請してきている学生が、予約を取りに来ているか、貸出しに来ているかを判断（予約機能がまだなので、作ってない）
+                    $sql = "SELECT reservation_number FROM reservation WHERE student_id = :student_id, book_id = :book_id, status_id = :status_id";
+                    $stmt = $db->pdo->prepare($sql);
+                    $stmt->bindValue(':student_id', $student_id, PDO::PARAM_INT);
+                    $stmt->bindValue(':book_id', $book_id, PDO::PARAM_INT);
+                    $stmt->bindValue(':status_id', $status_id, PDO::PARAM_INT);
+                    $stmt->execute();
+                    $resConfirm_row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                    if ($resConfirm_row || intval($resConfirm_row, 10) == ) {
+
+                    } else {
+                        $db->pdo->rollback();
+                        $message = "予約が存在しません。";
+                    }
+                    */
+                    
                     break;
 
 
@@ -164,13 +166,8 @@
                     // 今は仮で、何も確認ダイアログを出さずにリダイレクト
                     $db->pdo->rollback();
                     // 再入力が面倒なので、セッションで引き渡し
-                    $_SESSION['librarian_school_id'] = $librarian_school_id;
-                    $_SESSION['reservation_grade'] = $grade;
-                    $_SESSION['reservation_class'] = $class;
-                    $_SESSION['reservation_number'] = $number;
-                    $_SESSION['reservation_book_id'] = $book_id;
-                    header("Location:../html/reservation.php");
-                    exit();
+                    $message = "この本は貸出済みです。先に返却するか、予約してください。";
+                    break;
                 
                 default:
                     $db->pdo->rollback();
@@ -182,8 +179,18 @@
             $message = "指定された本または学生が存在しません";
         }
 
-        $_SESSION['lend_result_message'] = $message;
-        header("Location: ../html/貸出返却.php");
+        // セッションにメッセージを格納
+        // 予約に回すやつ以外
+        if (isset($message)) {
+            $_SESSION['lend_result_message'] = $message;
+            header("Location: ../html/貸出返却.php");
+        } else {
+            $_SESSION['reserved_lend_message'] = $reserved_lend_message;
+            header("Location: ../html/verify_resCode.php");
+        }
+        
+
+        
         exit();
 
     } catch (PDOException $e) {
