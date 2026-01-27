@@ -52,16 +52,46 @@
             $belong_id = $rows['grade'] . "年" . $rows['class'] . "組" . $rows['number'] . "番";
             $family_name = $rows['family_name'];
             $first_name = $rows['first_name'];
+
             $lending_date = $rows['lending_date'];
             $return_date = $rows['return_date'];
 
-            // その生徒が借りた（返した）書籍の書籍状態IDを取得
-            $book_status_id= $rows['status_id'];
-            $status_name = $rows['status_name'];
+            // 貸出日と返却日を日付オブジェクトとして取得(return_dateが空の時に非推奨のエラーが出てきたから、三段演算子で対策)
+            $lending_dt_obj = !empty($lending_date) ? new DateTime($lending_date) :null;
+            $return_dt_obj = !empty($return_date) ? new DateTime($return_date) :null;
 
-            // 貸出可能の時だけ返却済みとする
-            if ($book_status_id == 1) {
-                $status_name = '返却済み';
+            // 今日の日付を取得
+            $today = new DateTime('today');
+            // 貸出日の1週間後の日付オブジェクトを取得
+            $limit_date = new DateTime($lending_date);
+            $limit_date->modify('+1 week');
+            
+
+            // 「貸出日と返却日が両方あるとき」
+            if ((!empty($lending_date) && !empty($return_date))) {
+
+                // 貸出日と返却日の差分を取得
+                $interval = $lending_dt_obj->diff($return_dt_obj);
+
+                // 延滞貸出だった時（1週間）
+                if ($interval->invert == 0 && $interval->days > 7) {
+                    $status_name = '延滞返却（'. $interval->days .'日延滞)';
+                } else {
+                    $status_name = '返却済み';
+                }
+
+            // 「貸出日はあるが、返却日がないとき」
+            } else if (!$return_date) {
+
+                if ($today > $limit_date) {
+                    $status_name = '延滞中';
+                } else {
+                    $status_name = '貸出中';
+                }
+
+            // 貸出日がないのに、返却日があるとき。またはどちらもないのに表示されているとき
+            } else {
+                $status_name = '処理エラー発生中';
             }
 
             //苗字と名前は別れているため、フルネームを作成
@@ -201,7 +231,7 @@
                             <th>貸出者名</th>
                             <th>貸出日</th>
                             <th>返却日</th>
-                            <th>状態</th>   <!-- 貸出した学生の状態を記述するように変更 -->
+                            <th>貸出状態</th>   <!-- 貸出した学生の状態を記述するように変更 -->
                         </tr>
                     </thead>
 
