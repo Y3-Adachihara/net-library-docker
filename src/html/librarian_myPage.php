@@ -216,6 +216,7 @@
             <button type="submit" formaction="../html/貸出返却.php" class="manage-users-button">貸出・返却</button>
             <button type="submit" formaction="../html/librarian_manageUsers.php" class="manage-users-button">予約状況参照</button>
             <button type="submit" formaction="../html/書籍登録.html" class="add-book-button">新規書籍登録</button>
+            <button type="submit" formaction="../html/librarian_bookManagement.php" class="add-book-button">予約された本の管理画面</button>
         </form>
 
         <div class ="info-table-container">
