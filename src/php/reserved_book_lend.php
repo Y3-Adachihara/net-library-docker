@@ -41,7 +41,7 @@
 
         $db->pdo->beginTransaction();
 
-        // reserved_book_lend.php（予約番号確認して貸出or戻す）に渡すためのやつら
+        // 学生IDを取得
         $sql = "SELECT student_id FROM student WHERE school_id = :school_id AND grade = :grade AND class = :class AND number = :number";
         $stmt = $db->pdo->prepare($sql);
         $stmt->bindValue(':school_id', $librarian_school_id, PDO::PARAM_INT);
@@ -53,71 +53,88 @@
 
         // 学生が存在した場合
         if ($is_stu_exists) {
-            // 学生テーブルの主キーを格納
+
+            // 学生IDをセット
             $student_id = $is_stu_exists['student_id'];
               
-            // 予約番号を取得
-            $sql = "SELECT r.reservation_id, r.reservation_number, bs.book_id AS bs_book_id, bs.status_id AS bs_status, r.status_id AS res_status, r.student_id";
-            $sql .= " FROM reservation AS r LEFT OUTER JOIN book_stack AS bs ON r.book_id = bs.book_id";
-            $sql .= " WHERE r.student_id = :student_id AND r.book_id = :book_id AND bs.status_id IN (:status_id1, :status_id2) FOR UPDATE";
-            $get_resNum_stmt = $db->pdo->prepare($sql);
-            $get_resNum_stmt->bindValue(':student_id', $student_id, PDO::PARAM_INT);
-            $get_resNum_stmt->bindValue(':book_id', $book_id, PDO::PARAM_STR);
-            $get_resNum_stmt->bindValue(':status_id1', 4, PDO::PARAM_INT);   //　予約受取俟ち
-            $get_resNum_stmt->bindValue(':status_id2', 7, PDO::PARAM_INT);   //　配送予約受取待ち
-            $get_resNum_stmt->execute();
-            $resConfirm_row = $get_resNum_stmt->fetch(PDO::FETCH_ASSOC);
+            // 有効な予約情報を取得（キャンセル済みだったり受取済みの予約履歴に対して再度予約可否を判断させる必要は無いと考えた）
+            $sql = "SELECT r.reservation_id, r.reservation_number, r.student_id FROM reservation AS r LEFT OUTER JOIN book_stack AS bs ON r.book_id = bs.book_id";
+            $sql .= " WHERE r.book_id = :book_id AND bs.status_id IN (:status_id1, :status_id2) AND r.status_id = :effective_status";
+            $sql .= " ORDER BY r.reservation_date ASC LIMIT 1 FOR UPDATE";
+            // $sql = "SELECT r.reservation_id, r.reservation_number, bs.book_id AS bs_book_id, bs.status_id AS bs_status, r.status_id AS res_status, r.student_id";
+            // $sql .= " FROM reservation AS r LEFT OUTER JOIN book_stack AS bs ON r.book_id = bs.book_id";
+            // $sql .= " WHERE r.student_id = :student_id AND r.book_id = :book_id AND bs.status_id IN (:status_id1, :status_id2) FOR UPDATE";
+            $get_priority_stmt = $db->pdo->prepare($sql);
+            // $get_resNum_stmt->bindValue(':student_id', $student_id, PDO::PARAM_INT);
+            $get_priority_stmt->bindValue(':book_id', $book_id, PDO::PARAM_STR);
+            $get_priority_stmt->bindValue(':status_id1', 4, PDO::PARAM_INT);   //　予約受取俟ち
+            $get_priority_stmt->bindValue(':status_id2', 7, PDO::PARAM_INT);   //　配送予約受取待ち
+            $get_priority_stmt->bindValue(':effective_status', 1, PDO::PARAM_INT);    // 予約済み（生きてる予約状態）
+            $get_priority_stmt->execute();
+            $priority_res_row = $get_priority_stmt->fetch(PDO::FETCH_ASSOC);    // この時点で、有効な予約の中で最も優先される予約レコードが入っている（と思う…）
 
+            // 指定されたbook_idの本に、現在も有効な予約が入っている場合
+            if ($priority_res_row) {
+                
+                // その学生の予約が、最優先されるべき予約だった場合
+                if (intval($priority_res_row['student_id']) == $student_id) {
 
-            // 値が取得できており、かつ入力された予約番号が予約と一緒だった時
-            if ($resConfirm_row && intval($resConfirm_row['reservation_number'], 10) == $user_input_resNumber) {
+                    // 入力された予約番号が一致した場合
+                    if (intval($priority_res_row['reservation_number']) == $user_input_resNumber) {
+                        // 予約状態を更新
+                        $sql = "UPDATE reservation SET status_id = :completed_res_status WHERE reservation_id = :reservation_id AND status_id = :res_old_status";
+                        $res_stmt = $db->pdo->prepare($sql);
+                        $res_stmt->bindValue(':completed_res_status', 3, PDO::PARAM_INT);   // 予約状態を予約完了に
+                        $res_stmt->bindValue(':reservation_id', $priority_res_row['reservation_id'], PDO::PARAM_STR);
+                        $res_stmt->bindValue(':res_old_status', 1, PDO::PARAM_INT); // 予約状態が1:予約完了（予約を受け取ってはいない）
+                        $res_stmt->execute();
 
-                // 予約状態を更新
-                $sql = "UPDATE reservation SET status_id = :completed_res_status WHERE reservation_id = :reservation_id AND status_id = :res_old_status";
-                $res_stmt = $db->pdo->prepare($sql);
-                $res_stmt->bindValue(':completed_res_status', 3, PDO::PARAM_INT);   // 予約状態を予約完了に
-                $res_stmt->bindValue(':reservation_id', $resConfirm_row['reservation_id'], PDO::PARAM_STR);
-                $res_stmt->bindValue(':res_old_status', 1, PDO::PARAM_INT); // 予約状態が1:予約完了（予約を受け取ってはいない）
-                $res_stmt->execute();
+                        // 書籍状態を更新
+                        $sql = "UPDATE book_stack SET status_id  = :received_bk_status WHERE book_id = :reserved_book_id AND status_id IN (:old_status1, :old_status2)";
+                        $bk_stmt = $db->pdo->prepare($sql);
+                        $bk_stmt->bindValue(':received_bk_status', 2, PDO::PARAM_INT); // 借りられた本の状態を貸出中に
+                        $bk_stmt->bindValue(':reserved_book_id', $book_id, PDO::PARAM_STR);
+                        $bk_stmt->bindValue(':old_status1', 4, PDO::PARAM_INT);  // 自校内から予約した本の貸出
+                        $bk_stmt->bindValue(':old_status2', 7, PDO::PARAM_INT); // 他校から予約した本の貸出                
+                        $bk_stmt->execute();
 
-                // 書籍状態を更新
-                $sql = "UPDATE book_stack SET status_id  = :received_bk_status WHERE book_id = :reserved_book_id AND status_id IN (:old_status1, :old_status2)";
-                $bk_stmt = $db->pdo->prepare($sql);
-                $bk_stmt->bindValue(':received_bk_status', 2, PDO::PARAM_INT); // 借りられた本の状態を貸出中に
-                $bk_stmt->bindValue(':reserved_book_id', $book_id, PDO::PARAM_STR);
-                $bk_stmt->bindValue(':old_status1', 4, PDO::PARAM_INT);  // 自校内から予約した本の貸出
-                $bk_stmt->bindValue(':old_status2', 7, PDO::PARAM_INT); // 他校から予約した本の貸出                
-                $bk_stmt->execute();
+                        // 予約テーブルと書籍所蔵テーブルの両方で更新が正常に完了したら
+                        if ($res_stmt->rowCount() == 1 && $bk_stmt->rowCount() == 1) {
 
-                // 予約テーブルと書籍所蔵テーブルの両方で更新が正常に完了したら
-                if ($res_stmt->rowCount() == 1 && $bk_stmt->rowCount()) {
+                            // 貸出レコードを生成
+                            $inset_LendRec = "INSERT INTO lending(student_id, book_id) VALUES(:student_id, :book_id)";
+                            $insert_lenRec = $db->pdo->prepare($inset_LendRec);
+                            $insert_lenRec->bindValue(':student_id', $student_id, PDO::PARAM_INT);
+                            $insert_lenRec->bindValue(':book_id', $book_id, PDO::PARAM_STR);
+                            $insert_lenRec->execute();
 
-                    // 貸出レコードを生成
-                    $inset_LendRec = "INSERT INTO lending(student_id, book_id) VALUES(:student_id, :book_id)";
-                    $insert_lenRec = $db->pdo->prepare($inset_LendRec);
-                    $insert_lenRec->bindValue(':student_id', $student_id, PDO::PARAM_INT);
-                    $insert_lenRec->bindValue(':book_id', $book_id, PDO::PARAM_STR);
-                    $insert_lenRec->execute();
+                            $db->pdo->commit();
+                            $_SESSION['lend_result_message'] = "貸し出し処理が完了しました。";
+                            header("Location: ../html/貸出返却.php");
+                            exit();
+                            
+                        } else if ($res_stmt->rowCount() != 1) {
+                            $db->pdo->rollback();
+                            $message = "予約更新処理が失敗しました。";
+                        } else if ($bk_stmt->rowCount() != 1) {
+                            $db->pdo->rollback();
+                            $message = "書籍状態更新処理が失敗しました。";
+                        } else {
+                            $db->pdo->rollback();
+                            $message = "貸出処理が失敗しました。";
+                        }
+                    } else {
+                        $db->pdo->rollback();
+                        $message = "予約番号が一致しません。";
+                    }
 
-                    $db->pdo->commit();
-                    $_SESSION['lend_result_message'] = "貸し出し処理が完了しました。";
-                    header("Location: ../html/貸出返却.php");
-                    exit();
-                    
-                } else if ($res_stmt->rowCount() != 1) {
-                    $db->pdo->rollback();
-                    $message = "予約更新処理が失敗しました。";
-                } else if ($bk_stmt->rowCount() != 1) {
-                    $db->pdo->rollback();
-                    $message = "書籍状態更新処理が失敗しました。";
                 } else {
                     $db->pdo->rollback();
-                    $message = "貸出処理が失敗しました。";
-                }                
-
+                    $message = "この本は現在、他の予約者が優先権を持っています。";
+                }
             } else {
                 $db->pdo->rollback();
-                $message = "指定された番号の予約が存在しません。";
+                $message = "指定された本の予約は存在しません。";
             }
             
         } else {
