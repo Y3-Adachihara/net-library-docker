@@ -47,7 +47,7 @@
         }
 
         foreach($records as $rows) {
-            $lending_id = $rows['book_id'];
+            $book_id = $rows['book_id'];
             $title = $rows['title'];
             $belong_id = $rows['grade'] . "年" . $rows['class'] . "組" . $rows['number'] . "番";
             $family_name = $rows['family_name'];
@@ -98,7 +98,7 @@
             $full_name = $family_name . " " . $first_name;
                 
             echo "<tr>";
-            echo "<td>" . h($lending_id) . "</td>";
+            echo "<td>" . h($book_id) . "</td>";
             echo "<td>" . h($title) . "</td>";
             echo "<td>" . h($belong_id) . "</td>";
             echo "<td>" . h($full_name) . "</td>";
