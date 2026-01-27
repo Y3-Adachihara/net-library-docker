@@ -25,13 +25,28 @@
         echo '<input type="hidden" name="csrf_token" value="' . htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8') . '">';
     }
 
-    $local_selected_res [] = $_POST['local_res'];   // 自校からの予約リスト
-    $deliver_selected_res [] = $_POST['deliver_res'];   // 他校からの予約リスト
+    $book_id = $_POST['local_res'] ?? $_POST['deliver_res'] ?? [];   // 自校からの予約リスト
+    $next_status = $_POST['next_status'] ?? null;
 
-    function table_data_display(array $records, int $from_where = 0): void {
+    $local_selected_res = null;
+    $deliver_selected_res = null;
+
+    // HTMLエスケープ関数
+    function h($str) {
+        return htmlspecialchars($str, ENT_QUOTES, 'UTF-8');
+    }
+
+    function table_data_display(array $records, int $next_status): void {
+
         if (empty($records)) {
             echo "<tr><td colspan='6'>選択された予約引当リストはありません</td></tr>";
             return;
+        }
+
+        if ($next_status == 4) {
+            echo "<p>以下の予約済みの書籍の状態を「4:予約受取待ち」に変更します。これらの本を予約受取待ち置き場に置いたことを確認してください。</p>";
+        } else if ($next_status == 5) {
+            echo "<p>以下の予約済みの書籍の状態を「5:配送待ち（予約配送）」に変更します。これらの本を配送待ちボックスに置いたことを確認してください。</p>";
         }
 
         echo "<tr>";
@@ -54,13 +69,6 @@
             $reservation_date = $rows['reservation_date'];
 
             echo "<tr>";
-
-            // 自校の予約だった場合
-            if ($from_where == 1) {
-                echo "<td><input type=\"checkbox\" name=\"local_res[]\" value= \"" . h($book_id) . "\"></td>";    // これがチェックボックス
-            } else if ($from_where = 2) {
-                echo "<td><input type=\"checkbox\" name=\"deliver_res[]\" value= \"" . h($book_id) . "\"></td>";    // これがチェックボックス
-            }
             echo "<td>" . h($book_id) . "</td>";
             echo "<td>" . h($book_isbn) . "</td>";
             echo "<td>" . h($book_title) . "</td>";
@@ -71,7 +79,29 @@
         
         }
     }
-
-
-
 ?>
+
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>予約取り置き確認画面(<?php echo h($school_name); ?>)</title>
+    <link rel="stylesheet" href="../css/librarian_myPage.css">
+</head>
+<body>
+    <?php
+        if ($next_status == 4) {
+            table_data_display($local_selected_res, $next_status);
+        } else if ($next_status == 5) {
+            table_data_display($deliver_selected_res, $next_status);
+        } else {
+            $_SESSION['book_manageConfirm_message'] = "不正なリクエストです。";
+            header("Location: librarian_bookManagement.php");
+            exit();
+        }
+    ?>
+    <button onclick="location.href='../html/librarian_bookManagement.php'">戻る</button>
+    <form>
+        <button type="submit">確定</button>
+    </form>
+</body>

@@ -8,8 +8,16 @@
         header("Location: librarian_login.php");
         exit();
     }
-
     //　ここからは、司書としてログインしていないと実行されない
+
+    if (isset($_SESSION['book_manageConfirm_message'])) {
+        $message = $_SESSION['book_manageConfirm_message'];
+        echo "<script>alert('" . htmlspecialchars($message, ENT_QUOTES, 'UTF-8') . "');</script>";
+        unset($_SESSION['book_manageConfirm_message']);
+    }
+
+
+
     $_librarian_id = $_SESSION['librarian_id'];
     $_librarian_school_id = $_SESSION['librarian_school_id'];
 
@@ -141,7 +149,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>司書用マイページ(<?php echo h($school_name); ?>)</title>
+    <title>予約取り置き画面(<?php echo h($school_name); ?>)</title>
     <link rel="stylesheet" href="../css/librarian_myPage.css">
 </head>
 <body>
