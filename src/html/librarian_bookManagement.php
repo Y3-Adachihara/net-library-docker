@@ -14,6 +14,11 @@
         $message = $_SESSION['book_manageConfirm_message'];
         echo "<script>alert('" . htmlspecialchars($message, ENT_QUOTES, 'UTF-8') . "');</script>";
         unset($_SESSION['book_manageConfirm_message']);
+
+    } else if (isset($_SESSION['bookStatus_changeResult_message'])) {
+        $message = $_SESSION['bookStatus_changeResult_message'];
+        echo "<script>alert('" . htmlspecialchars($message, ENT_QUOTES, 'UTF-8') . "');</script>";
+        unset($_SESSION['bookStatus_changeResult_message']);
     }
 
 
