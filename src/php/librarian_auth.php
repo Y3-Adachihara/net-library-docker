@@ -2,17 +2,17 @@
     require_once '../db_connect.php';
     session_start();
 
-    $school_id = $_POST["school"];
-    $user_id = $_POST["login_id"];
-    $password = $_POST['password'];
-
     //CSRF対策
     //トークンが一致しないか（右）、そもそもトークンがlogin.php(ログイン画面)から送られていない（左）時
     if (!isset($_POST["csrf_token"]) || $_POST["csrf_token"] != $_SESSION["csrf_token"]) {
-        $_SESSION['error'] = "CSFS対策に引っかかりました（開発者向けエラーメッセージ）";    //本番はメッセージの内容を変える
+        $_SESSION['error'] = "不正なリクエストです";
         header("Location: ../html/librarian_login.php");
         exit(); 
     }
+
+    $school_id = $_POST["school"];
+    $user_id = $_POST["login_id"];
+    $password = $_POST['password'];
 
     try {
         $db = new db_connect();

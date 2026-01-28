@@ -9,9 +9,9 @@
     $password = $_POST['password'];
 
     //CSRF対策
-    //トークンが一致しない時と、そもそもトークンがlogin.php(ログイン画面)から送られていない時
+    //トークンが一致しない時と、そもそもトークンがstudent_login.php(ログイン画面)から送られていない時
     if (!isset($_POST["csrf_token"]) || $_POST["csrf_token"] != $_SESSION["csrf_token"]) {
-        $_SESSION['error'] = "CSFS対策に引っかかりました（開発者向けエラーメッセージ）";
+        $_SESSION['error'] = "不正なリクエストです。";
         header("Location: ../html/student_login.php");
         exit();
     }

@@ -209,7 +209,7 @@
 
         <!-- ログアウトボタンを押したときのCSFSトークン発行 -->
         <form method="POST" action = "../php/logout.php" name = "link_logoutFORM">
-            <?php 
+            <?php
                 set_csrf_token($csrf_token);
             ?>
             <input type="hidden" name = "page_id" value= "1">
