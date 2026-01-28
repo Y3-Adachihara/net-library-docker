@@ -127,7 +127,7 @@
                     } else {
                         $db->pdo->rollback();
                         $message = "他校にある本、もしくは他校所蔵の本になります。予約してください";
-                    
+                        break;
                     }
 
                 case 4:
