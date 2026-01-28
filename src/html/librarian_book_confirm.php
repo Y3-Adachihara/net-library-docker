@@ -83,6 +83,7 @@
         } else if ($next_status == 5) {
             echo "<p>以下の予約済みの書籍の状態を「5:配送待ち（予約配送）」に変更します。これらの本を配送待ちボックスに置いたことを確認してください。</p>";
         }
+        echo "<table>";
 
         echo "<tr>";
         echo "<th>書籍ID</th>";
@@ -113,6 +114,8 @@
             echo "</tr>";
         
         }
+        echo "<table>";
+        
     }
     
     try {

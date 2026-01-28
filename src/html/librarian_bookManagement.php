@@ -30,38 +30,21 @@
     $deliver_reservations = [];
     $all_reservations = [];
 
-    /* コピペしたけど、これは確認画面でいい気がする
-    // CSRFトークン発行関数(発行するだけで、セッション変数への保存は行わないから注意！)
-    function csrf_token_generate(): string {
-        $toke_byte = random_bytes(16);
-        $csrf_token = bin2hex($toke_byte);
-        return $csrf_token;
-    }
-    // CSRFトークンの生成
-    $csrf_token = csrf_token_generate();
-
-    // CSRFトークンセット関数
-    function set_csrf_token(String $csrf_token): void {
-        // CSRF対策用のトークンをセッションに保存
-        $_SESSION['csrf_token'] = $csrf_token;
-        //ここでトークンを隠し属性として送るためのhtmlコードを記述
-        echo '<input type="hidden" name="csrf_token" value="' . htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8') . '">';
-    }
-        */
-
     // HTMLエスケープ関数
     function h($str) {
         return htmlspecialchars($str, ENT_QUOTES, 'UTF-8');
     }
 
-    function table_data_display(array $records, int $from_where = 0): void {
+    function table_data_display(array $records, int $from_where = 0): void { // $from_where 1:自校からの予約 | 2:他校からの予約
         if (empty($records)) {
             echo "<tr><td colspan='6'>現在、予約取り置きリストはありません。</td></tr>";
             return;
         }
 
         echo "<tr>";
-        echo "<th>チェック</th>";
+        if ($from_where != 0) {
+            echo "<th>チェック</th>";
+        }
         echo "<th>書籍ID</th>";
         echo "<th>ISBN</th>";
         echo "<th>タイトル</th>";
@@ -85,6 +68,8 @@
             // 自校の予約だった場合
             if ($from_where == 1) {
                 echo "<td><input type=\"checkbox\" name=\"local_res[]\" value= \"" . h($book_id) . "\"></td>";    // これがチェックボックス
+
+            // 他校の予約だった場合
             } else if ($from_where == 2) {
                 echo "<td><input type=\"checkbox\" name=\"deliver_res[]\" value= \"" . h($book_id) . "\"></td>";    // これがチェックボックス
             }
