@@ -16,11 +16,9 @@
     //　ここからは、司書としてログインしていないと実行されない
     $_librarian_id = $_SESSION['librarian_id'];
 
-    // 予約参照画面のメッセージ
-    $error_message = $_SESSION['res_refer_error'] ?? '';
-    if (isset($_SESSION['res_refer_error'])) {
-        echo "<script>alert('" . htmlspecialchars($error_message, ENT_QUOTES, 'UTF-8') . "');</script>";
-        unset($_SESSION['res_refer_error']);
+    // HTMLエスケープ関数
+    function h($str) {
+        return htmlspecialchars($str, ENT_QUOTES, 'UTF-8');
     }
 
     // CSRFトークン発行関数(発行するだけで、セッション変数への保存は行わないから注意！)
@@ -40,11 +38,6 @@
         echo '<input type="hidden" name="csrf_token" value="' . htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8') . '">';
     }
 
-    // HTMLエスケープ関数
-    function h($str) {
-        return htmlspecialchars($str, ENT_QUOTES, 'UTF-8');
-    }
-
     // テーブルデータ表示関数
     function table_data_display(array $records): void {
 
@@ -54,77 +47,35 @@
         }
 
         foreach($records as $rows) {
-            $book_id = $rows['book_id'];
-            $title = $rows['title'];
-            $belong_id = $rows['grade'] . "年" . $rows['class'] . "組" . $rows['number'] . "番";
-            $family_name = $rows['family_name'];
-            $first_name = $rows['first_name'];
-
-            $lending_date = $rows['lending_date'];
-            $return_date = $rows['return_date'];
-
-            // 貸出日と返却日を日付オブジェクトとして取得(return_dateが空の時に非推奨のエラーが出てきたから、三段演算子で対策)
-            $lending_dt_obj = !empty($lending_date) ? new DateTime($lending_date) :null;
-            $return_dt_obj = !empty($return_date) ? new DateTime($return_date) :null;
-
-            // 今日の日付を取得
-            $today = new DateTime('today');
-            // 貸出日の1週間後の日付オブジェクトを取得
-            $limit_date = new DateTime($lending_date);
-            $limit_date->modify('+1 week');
-            
-
-            // 「貸出日と返却日が両方あるとき」
-            if ((!empty($lending_date) && !empty($return_date))) {
-
-                // 貸出日と返却日の差分を取得
-                $interval = $lending_dt_obj->diff($return_dt_obj);
-
-                // 延滞貸出だった時（1週間）
-                if ($interval->invert == 0 && $interval->days > 7) {
-                    $status_name = '延滞返却（'. $interval->days .'日延滞)';
-                } else {
-                    $status_name = '返却済み';
-                }
-
-            // 「貸出日はあるが、返却日がないとき」
-            } else if (!$return_date) {
-
-                if ($today > $limit_date) {
-                    $status_name = '延滞中';
-                } else {
-                    $status_name = '貸出中';
-                }
-
-            // 貸出日がないのに、返却日があるとき。またはどちらもないのに表示されているとき
-            } else {
-                $status_name = '処理エラー発生中';
-            }
-
-            //苗字と名前は別れているため、フルネームを作成
+            $book_id = $rows['book_id'] ?? 'Error';
+            $title = $rows['title'] ?? 'Error';
+            $belong_id = $rows['grade'] . "年" . $rows['class'] . "組" . $rows['number'] . "番"  ?? 'Error';
+            $family_name = $rows['family_name'] ?? 'Error';
+            $first_name = $rows['first_name'] ?? 'Error';
+             //苗字と名前は別れているため、フルネームを作成
             $full_name = $family_name . " " . $first_name;
+
+            $reservation_date = $rows['reservation_date'] ?? 'Error';
+            $updated_date = $rows['updated_at'] ?? 'Error';
+            $status_name = $rows['status_name'] ?? 'Error';
                 
             echo "<tr>";
             echo "<td>" . h($book_id) . "</td>";
             echo "<td>" . h($title) . "</td>";
             echo "<td>" . h($belong_id) . "</td>";
             echo "<td>" . h($full_name) . "</td>";
-            echo "<td>" . h($lending_date) . "</td>";
-            if (is_null($return_date)) {
-                echo "<td>未返却</td>";
-            } else {
-                echo "<td>" . h($return_date) . "</td>";
-            }
+            echo "<td>" . h($reservation_date) . "</td>";
             echo "<td>" . h($status_name) . "</td>";
+            echo "<td>" . h($updated_date) . "</td>";
             echo "</tr>";
         }
     }
 
-    //現在の日付を取得
+    //現在の日付を取得(クエリ用)
     $current_date = new DateTimeImmutable();
     $current_date_str = $current_date->format('Y-m-d H:i:s');
         
-    //1年前の日付を取得
+    //1年前の日付を取得（クエリ用）
     $lastYear_date = $current_date->modify('-2 year');
     $lastYear_date_str = $lastYear_date->format('Y-m-d H:i:s');
 
@@ -138,36 +89,41 @@
         $get_librarian_school_sql = "SELECT lib.school_id, sch.school_name FROM librarian AS lib";
         $get_librarian_school_sql .= " LEFT OUTER JOIN school AS sch ON lib.school_id = sch.school_id";
         $get_librarian_school_sql .= " WHERE lib.librarian_id = :librarian_id;";
-
         $stmt = $db->pdo->prepare($get_librarian_school_sql);
         $stmt->bindValue(':librarian_id', $_librarian_id, PDO::PARAM_INT);
         $stmt->execute();
         $librarian_school_id = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$librarian_school_id) {
+            $_SESSION['res_refer_error'] = "司書の学校情報取得に失敗しました。";
+            header("Location: librarian_myPage.php");
+            exit();
+        }
+
         $school_id = intval($librarian_school_id['school_id']);
         $school_name = $librarian_school_id['school_name'];
 
-
-        //結合するテーブル（書籍テーブル、学生テーブル, 書籍テーブル、書籍状態テーブル、貸出テーブル、学校テーブル）から、過去1年間の貸出情報を取得
-        $sql = "SELECT b_sc.book_id, b_if.title, stu.grade, stu.class, stu.number, stu.family_name, stu.first_name, l.lending_date, l.return_date, b_st.status_id, b_st.status_name";
-        $sql .= " FROM lending AS l";
-        $sql .= " LEFT OUTER JOIN book_stack AS b_sc";
-        $sql .= " ON l.book_id = b_sc.book_id";
-        $sql .= " LEFT OUTER JOIN book_info AS b_if";
-        $sql .= " ON b_sc.isbn = b_if.isbn";
-        $sql .= " LEFT OUTER JOIN student AS stu";
-        $sql .= " ON l.student_id = stu.student_id";
-        $sql .= " LEFT OUTER JOIN book_status AS b_st";
-        $sql .= " ON b_sc.status_id = b_st.status_id";
-        $sql .= " WHERE l.lending_date BETWEEN :lastYearDate AND :currentDate";
-        $sql .= " AND stu.school_id = :school_id";
-        $sql .= " ORDER BY l.lending_date DESC;";
-
+        // テーブルデータ取得sql
+        $sql = "SELECT bs.book_id, bi.title, s.grade, s.class, s.number, s.family_name, s.first_name,";
+        $sql .= " r.reservation_date, r.updated_at, rs.status_name";
+        $sql .= " FROM reservation AS r";
+        $sql .= " LEFT OUTER JOIN book_stack AS bs";
+        $sql .= " ON r.book_id = bs.book_id";
+        $sql .= " LEFT OUTER JOIN book_info AS bi";
+        $sql .= " ON bs.isbn = bi.isbn";
+        $sql .= " LEFT OUTER JOIN student AS s";
+        $sql .= " ON r.student_id = s.student_id";
+        $sql .= " LEFT OUTER JOIN reservation_status AS rs";
+        $sql .= " ON r.status_id = rs.status_id";
+        $sql .= " WHERE s.school_id = :school_id";
+        $sql .= " AND r.reservation_date BETWEEN :lastYearDate AND :currentDate";
+        $sql .= " ORDER BY r.reservation_date DESC";
         $stmt = $db->pdo->prepare($sql);
+        $stmt->bindValue(':school_id', $school_id, PDO::PARAM_INT); // 自校以外は予約履歴を表示できないようにする
         $stmt->bindValue(':lastYearDate', $lastYear_date_str, PDO::PARAM_STR);
         $stmt->bindValue(':currentDate', $current_date_str, PDO::PARAM_STR);
-        $stmt->bindValue(':school_id', $school_id, PDO::PARAM_INT);
         $stmt->execute();
-        $fetchAll_record= $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $fetchAll_record = $stmt->fetchAll(PDO::FETCH_ASSOC);
             
     } catch (PDOException $e) {
         $error_message = "データの取得に失敗しました。" . $e->getMessage();
@@ -184,7 +140,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>司書用マイページ(<?php echo h($school_name); ?>)</title>
+    <title>司書用-予約参照ページ(<?php echo h($school_name); ?>)</title>
     <link rel="stylesheet" href="../css/librarian_myPage.css">
 </head>
 <script>
@@ -197,7 +153,7 @@
     <body>
         <header class="main-header">
         <div class="header-logo">
-            <a href="librarian_myPage.php">司書用Myページ(<?php echo h($school_name); ?>)</a>
+            <a href="librarian_reservation_reference.php">司書用-予約参照ページ(<?php echo h($school_name); ?>)</a>
         </div>
         <nav class="header-nav">
             <ul>
@@ -215,28 +171,20 @@
             <input type="hidden" name = "page_id" value= "1">
         </form>
 
-        <form method="POST" class="librarian-menu-form">
-            <button type="submit" formaction="../html/検索画面.html" class="add-book-button">書籍検索</button>
-            <button type="submit" formaction="../html/貸出返却.php" class="manage-users-button">貸出・返却</button>
-            <button type="submit" formaction="../html/librarian_reservation_reference.php" class="manage-users-button">予約状況参照</button>
-            <button type="submit" formaction="../html/書籍登録.html" class="add-book-button">新規書籍登録</button>
-            <button type="submit" formaction="../html/librarian_bookManagement.php" class="add-book-button">予約された本の管理画面</button>
-        </form>
-
         <div class ="info-table-container">
-            <h2 >現在の貸出状況</h2>
+            <h2 >本校の書籍に対する予約状況</h2>
 
             <div class = "scroll-wrapper">
                 <table class="info-table">
                     <thead>
                         <tr>
-                            <th>書籍ID</th> <!-- 貸出IDから変更 -->
+                            <th>書籍ID</th>
                             <th>タイトル</th>
                             <th>所属</th>
-                            <th>貸出者名</th>
-                            <th>貸出日</th>
-                            <th>返却日</th>
-                            <th>貸出状態</th>   <!-- 貸出した学生の状態を記述するように変更 -->
+                            <th>予約者名</th>
+                            <th>予約日</th>
+                            <th>予約ステータス</th>
+                            <th>予約ステータス更新日</th>
                         </tr>
                     </thead>
 
@@ -248,6 +196,10 @@
 
                 </table>
             </div>
+        </div>
+
+        <div class="librarian-menu-form">
+            <button type="button" onclick="location.href='librarian_myPage.php'">戻る</button>
         </div>
 
     </body>
