@@ -6,22 +6,34 @@
     header("Cache-Control:no-cache,no-store,must-revalidate,max-age=0,post-check=0,pre-check=0");
     header("Pragma:no-cache");
 
-    if (!isset($_SESSION['librarian_id'])) {
+    if (!isset($_SESSION['student_id'])) {
         // 司書としてログインしていない場合、ログインページへリダイレクト
-        $_SESSION['message'] = "司書としてログインしてください。";
-        header("Location: librarian_login.php");
+        $_SESSION['message'] = "ログインしてください。";
+        header("Location: student_login.php");
         exit();
     }
 
-    //　ここからは、司書としてログインしていないと実行されない
-    $_librarian_id = $_SESSION['librarian_id'];
+    //　ここからは、生徒としてログインしていないと実行されない
+    $student_id = $_SESSION['student_id'];
+    $school_name = null;
+    $student_fullname;
+
+    $student_fullname = null;
+    if (isset($_SESSION['student_family_name']) && isset($_SESSION['student_family_name'])) {
+        $student_fullname = $_SESSION['student_family_name'] . " " . $_SESSION['student_first_name']; 
+    } else {
+        $_SESSION['to_stu_myPage_message'] = "学生情報を正常に取得できませんでした。";
+        header("Location: stu_myPage.php");
+        exit();
+    }
+
 
     // HTMLエスケープ関数
     function h($str) {
         return htmlspecialchars($str, ENT_QUOTES, 'UTF-8');
     }
 
-    // CSRFトークン発行関数(発行するだけで、セッション変数への保存は行わないから注意！)
+    // CSRFトークン発行関数
     function csrf_token_generate(): string {
         $toke_byte = random_bytes(16);
         $csrf_token = bin2hex($toke_byte);
@@ -42,40 +54,44 @@
     function table_data_display(array $records): void {
 
         if (empty($records)) {
-            echo "<tr><td colspan='6'>該当する予約情報はありません。</td></tr>";
+            echo "<tr><td colspan='6'>予約情報はありません。</td></tr>";
             return;
         }
 
         foreach($records as $rows) {
             $book_id = $rows['book_id'] ?? 'Error';
             $title = $rows['title'] ?? 'Error';
-            $publisher = $rows['publisher'] ?? 'Error';
             $author_name = $rows['author_name'] ?? 'Error';
-            $belong_id = $rows['grade'] . "年" . $rows['class'] . "組" . $rows['number'] . "番"  ?? 'Error';
-            $family_name = $rows['family_name'] ?? 'Error';
-            $first_name = $rows['first_name'] ?? 'Error';
-             //苗字と名前は別れているため、フルネームを作成
-            $full_name = $family_name . " " . $first_name;
-
+            $publisher = $rows['publisher'] ?? 'Error';
             $reservation_date = $rows['reservation_date'] ?? 'Error';
             $updated_date = $rows['updated_at'] ?? 'Error';
-            $status_id = intval($rows['status_id']) ?? null;
-            $status_name = null;
 
-            if ($status_id == 3) {
-                $status_name = "引き渡し済み";
+            $book_statusId = intval($rows['status_id']) ?? 'Error'; // 書籍状態ID
+            $res_statusId = intval($rows['status_id']) ?? 'Error';  // 予約状態ID
+            $res_statusName = $rows['status_name'] ?? 'Error';  // 予約状態名
+            $display_resStatus = null;
+
+            $alert_bkStatus = [4,7];// 4:予約受取待ち か 7:配送予約受取待ち
+
+            if (in_array($book_statusId, $alert_bkStatus) && $res_statusId == 1) {
+                $display_resStatus = "予約した本がカウンターに確保されました！";
             } else {
-                $status_name = $rows['status_name'];
+                $display_resStatus = $res_statusName;
             }
+
+            $res_number = $rows['reservation_number'] ?? 'Error';
+
+            // 予約番号をダイアログ
+            $res_number_message = "alert('予約番号は". $res_number . "です。')";
                 
             echo "<tr>";
             echo "<td>" . h($book_id) . "</td>";
+            echo "<td><button onclick=". h($res_number_message) .">". "番号を表示" ."</button></td>";
             echo "<td>" . h($title) . "</td>";
+            echo "<td>" . h($author_name) . "</td>";
             echo "<td>" . h($publisher) . "</td>";
-            echo "<td>" . h($belong_id) . "</td>";
-            echo "<td>" . h($full_name) . "</td>";
             echo "<td>" . h($reservation_date) . "</td>";
-            echo "<td>" . h($status_name) . "</td>";
+            echo "<td>" . h($display_resStatus) . "</td>";
             echo "<td>" . h($updated_date) . "</td>";
             echo "</tr>";
         }
@@ -95,21 +111,22 @@
         $db = new db_connect();
         $db->connect();
 
-        //司書の学校IDと学校名を取得
-        $get_librarian_school_sql = "SELECT lib.school_id, sch.school_name FROM librarian AS lib";
-        $get_librarian_school_sql .= " LEFT OUTER JOIN school AS sch ON lib.school_id = sch.school_id";
-        $get_librarian_school_sql .= " WHERE lib.librarian_id = :librarian_id;";
-        $stmt = $db->pdo->prepare($get_librarian_school_sql);
-        $stmt->bindValue(':librarian_id', $_librarian_id, PDO::PARAM_INT);
-        $stmt->execute();
-        $librarian_school_id = $stmt->fetch(PDO::FETCH_ASSOC);
+        //生徒の学校名を取得
+        $get_schoolName_sql = "SELECT sc.school_name";
+        $get_schoolName_sql .= " FROM student AS st";
+        $get_schoolName_sql .= " LEFT OUTER JOIN school AS sc";
+        $get_schoolName_sql .= " ON st.school_id = sc.school_id";
+        $get_schoolName_sql .= " WHERE st.student_id = :student_id";
+        $schoolName_stmt = $db->pdo->prepare($get_schoolName_sql);
+        $schoolName_stmt->bindValue(':student_id', $student_id, PDO::PARAM_INT);
+        $schoolName_stmt->execute();
+        $fetch_record = $schoolName_stmt->fetch(PDO::FETCH_ASSOC);
+        // 学校名代入
+        $school_name = $fetch_record['school_name'] ?? 'Error';
 
-        $school_id = intval($librarian_school_id['school_id']) ?? 'Error';
-        $school_name = $librarian_school_id['school_name'] ?? 'Error';
 
         // テーブルデータ取得sql
-        $sql = "SELECT bs.book_id, bi.title, bi.publisher, s.grade, s.class, s.number, s.family_name, s.first_name,";
-        $sql .= " r.reservation_date, r.updated_at,rs.status_id, rs.status_name";
+        $sql = "SELECT bs.book_id, bs.status_id, bi.title, bi.author_name, bi.publisher, r.reservation_date, r.updated_at, rs.status_name, r.reservation_number";
         $sql .= " FROM reservation AS r";
         $sql .= " LEFT OUTER JOIN book_stack AS bs";
         $sql .= " ON r.book_id = bs.book_id";
@@ -119,11 +136,11 @@
         $sql .= " ON r.student_id = s.student_id";
         $sql .= " LEFT OUTER JOIN reservation_status AS rs";
         $sql .= " ON r.status_id = rs.status_id";
-        $sql .= " WHERE s.school_id = :school_id";
+        $sql .= " WHERE s.student_id = :student_id";
         $sql .= " AND r.reservation_date BETWEEN :lastYearDate AND :currentDate";
         $sql .= " ORDER BY r.reservation_date DESC";
         $stmt = $db->pdo->prepare($sql);
-        $stmt->bindValue(':school_id', $school_id, PDO::PARAM_INT); // 自校以外は予約履歴を表示できないようにする
+        $stmt->bindValue(':student_id', $student_id, PDO::PARAM_INT); // 自分のもの以外は予約履歴を表示できないようにする
         $stmt->bindValue(':lastYearDate', $lastYear_date_str, PDO::PARAM_STR);
         $stmt->bindValue(':currentDate', $current_date_str, PDO::PARAM_STR);
         $stmt->execute();
@@ -135,6 +152,8 @@
     } catch (Exception $e) {
         $error_message = "予期せぬエラーが発生しました。" . $e->getMessage();
         echo "<script>alert('" . htmlspecialchars($error_message, ENT_QUOTES, 'UTF-8') . "');</script>";
+    } finally {
+        $db->connect();
     }
 
 ?>
@@ -144,7 +163,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>司書用-予約参照ページ(<?php echo h($school_name); ?>)</title>
+    <title>生徒用-予約参照ページ(<?php echo h($school_name); ?>)</title>
     <link rel="stylesheet" href="../css/librarian_myPage.css">
 </head>
 <script>
@@ -157,7 +176,7 @@
     <body>
         <header class="main-header">
         <div class="header-logo">
-            <a href="librarian_reservation_reference.php">司書用-予約参照ページ(<?php echo h($school_name); ?>)</a>
+            <a href="student_reservation_reference.php">生徒用-予約参照ページ(<?php echo h($school_name); ?>)</a>
         </div>
         <nav class="header-nav">
             <ul>
@@ -176,20 +195,20 @@
         </form>
 
         <div class ="info-table-container">
-            <h2 ><?php echo h($school_name); ?>の予約履歴（過去一年間）</h2>
+            <h2 ><?php echo h($student_fullname); ?>さんの予約履歴（過去一年分）</h2>
 
             <div class = "scroll-wrapper">
                 <table class="info-table">
                     <thead>
                         <tr>
                             <th>書籍ID</th>
+                            <th>予約番号</th>
                             <th>タイトル</th>
+                            <th>著者</th>
                             <th>出版社</th>
-                            <th>所属</th>
-                            <th>予約者名</th>
                             <th>予約日</th>
-                            <th>状態</th>
-                            <th>予約ステータス更新日</th>
+                            <th>予約ステータス</th>
+                            <th>予約ステータス更新日</th>  
                         </tr>
                     </thead>
 
@@ -204,7 +223,7 @@
         </div>
 
         <div class="librarian-menu-form">
-            <button type="button" onclick="location.href='librarian_myPage.php'">戻る</button>
+            <button type="button" onclick="location.href='stu_myPage.php'">戻る</button>
         </div>
 
     </body>

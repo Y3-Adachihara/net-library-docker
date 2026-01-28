@@ -12,6 +12,12 @@
         exit();
     }
 
+    $message = $_SESSION['to_stu_myPage_message'] ?? null;
+    if (isset($_SESSION['to_stu_myPage_message'])) {
+        echo "<script>alert('" . htmlspecialchars($message, ENT_QUOTES, 'UTF-8') . "');</script>";
+        unset($_SESSION['to_stu_myPage_message']);
+    }
+
     // CSRFトークン発行関数(発行するだけで、セッション変数への保存は行わないから注意！)
     function csrf_token_generate(): string {
         $toke_byte = random_bytes(16);
@@ -147,7 +153,7 @@
                 予約する
             </button>
 
-            <button class="menu-btn" onclick="location.href='view_reservations.php'">
+            <button class="menu-btn" onclick="location.href='student_reservation_reference.php'">
                 予約情報参照
             </button>
         </div>

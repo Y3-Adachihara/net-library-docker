@@ -17,7 +17,7 @@
     $_librarian_id = $_SESSION['librarian_id'];
 
     // 予約参照画面のメッセージ
-    $error_message = $_SESSION['res_refer_error'] ?? '';
+    $error_message = $_SESSION['res_refer_error'] ?? null;
     if (isset($_SESSION['res_refer_error'])) {
         echo "<script>alert('" . htmlspecialchars($error_message, ENT_QUOTES, 'UTF-8') . "');</script>";
         unset($_SESSION['res_refer_error']);
@@ -54,11 +54,13 @@
         }
 
         foreach($records as $rows) {
-            $book_id = $rows['book_id'];
-            $title = $rows['title'];
-            $belong_id = $rows['grade'] . "年" . $rows['class'] . "組" . $rows['number'] . "番";
-            $family_name = $rows['family_name'];
-            $first_name = $rows['first_name'];
+            $book_id = $rows['book_id'] ?? 'Error';
+            $title = $rows['title'] ?? 'Error';
+            $publisher = $rows['publisher'] ?? 'Error';
+            $author_name = $rows['author_name'] ?? 'Error';
+            $belong_id = $rows['grade'] . "年" . $rows['class'] . "組" . $rows['number'] . "番" ?? 'Error';
+            $family_name = $rows['family_name'] ?? 'Error';
+            $first_name = $rows['first_name'] ?? 'Error';
 
             $lending_date = $rows['lending_date'];
             $return_date = $rows['return_date'];
@@ -84,7 +86,7 @@
                 if ($interval->invert == 0 && $interval->days > 7) {
                     $status_name = '延滞返却（'. $interval->days .'日延滞)';
                 } else {
-                    $status_name = '返却済み';
+                    $status_name = '返却済';
                 }
 
             // 「貸出日はあるが、返却日がないとき」
@@ -107,6 +109,7 @@
             echo "<tr>";
             echo "<td>" . h($book_id) . "</td>";
             echo "<td>" . h($title) . "</td>";
+            echo "<td>" . h($publisher) . "</td>";
             echo "<td>" . h($belong_id) . "</td>";
             echo "<td>" . h($full_name) . "</td>";
             echo "<td>" . h($lending_date) . "</td>";
@@ -148,7 +151,7 @@
 
 
         //結合するテーブル（書籍テーブル、学生テーブル, 書籍テーブル、書籍状態テーブル、貸出テーブル、学校テーブル）から、過去1年間の貸出情報を取得
-        $sql = "SELECT b_sc.book_id, b_if.title, stu.grade, stu.class, stu.number, stu.family_name, stu.first_name, l.lending_date, l.return_date, b_st.status_id, b_st.status_name";
+        $sql = "SELECT b_sc.book_id, b_if.title, b_if.publisher, stu.grade, stu.class, stu.number, stu.family_name, stu.first_name, l.lending_date, l.return_date, b_st.status_id, b_st.status_name";
         $sql .= " FROM lending AS l";
         $sql .= " LEFT OUTER JOIN book_stack AS b_sc";
         $sql .= " ON l.book_id = b_sc.book_id";
@@ -224,7 +227,7 @@
         </form>
 
         <div class ="info-table-container">
-            <h2 >現在の貸出状況</h2>
+            <h2 ><?php echo h($school_name); ?>の貸出履歴（過去一年間）</h2>
 
             <div class = "scroll-wrapper">
                 <table class="info-table">
@@ -232,6 +235,7 @@
                         <tr>
                             <th>書籍ID</th> <!-- 貸出IDから変更 -->
                             <th>タイトル</th>
+                            <th>出版社</th>
                             <th>所属</th>
                             <th>貸出者名</th>
                             <th>貸出日</th>
