@@ -105,14 +105,14 @@
             // 貸出予約期間に入っている場合はしょっ引く
             if ($is_denied) {
                 $db->pdo->rollback();
-                $deny_start_now = date('Y年m月d日', strtotime($is_denied['start_date']));
-                $deny_end_now = date('Y年m月d日', strtotime($is_denied['end_date']));
+                $deny_start_now = $is_denied['start_date'];
+                $deny_end_now = $is_denied['end_date'];
 
                 // 貸し出せたときのメッセージで使う日付の差分を作成
                 $start = new Datetime($deny_start_now);
                 $end = new Datetime($deny_end_now);
 
-                $_SESSION['lend_result_message'] = "申し訳ございません。\nこの本は現在、貸出禁止期間となります。\n期間は" . $deny_start . "から" . $deny_end . "までです。";
+                $_SESSION['lend_result_message'] = "申し訳ございません。\nこの本は現在、貸出禁止期間となります。\n期間は" . $deny_start_now . "から" . $deny_end_now . "までです。";
                 header("Location:../html/貸出返却.php");
                 exit();
             }
@@ -120,8 +120,8 @@
             // 貸出禁止期間に入っていなかった場合、期間に入るまでの日数を取得するための期間開始日を取得
             $interval_sql = "SELECT start_date FROM lending_deny AS ld 
                             WHERE book_id = :book_id 
-                            AND DATE(NOW) < ld.start_date 
-                            AND ORDER BY ld.start_date ASC 
+                            AND DATE(NOW()) < DATE(ld.start_date) 
+                            ORDER BY ld.start_date ASC 
                             LIMIT 1
                             ";
             $stmt_interval = $db->pdo->prepare($interval_sql);
@@ -130,15 +130,15 @@
             $denyStartAfter_row = $stmt_interval->fetch(PDO::FETCH_ASSOC);
 
             if ($denyStartAfter_row) {
-                $deny_start_now = date('Y年m月d日', strtotime($denyStartAfter_row['start_date']));
-                $start_date = new Datetime($deny_start_now);
+                $start_date = new Datetime($denyStartAfter_row['start_date']);
                 $today = new Datetime();
+
+                $start_date->setTime(0,0,0);
+                $today->setTime(0,0,0);
 
                 $interval = $today->diff($start_date);
                 $remain_date = $interval->days;
             }
-
-
 
             // 学生が現在何冊借りているかどうか確認
             $stu_lend_counts = "SELECT COUNT(*) AS count FROM lending WHERE student_id = :student_id AND return_date IS NULL";
@@ -183,8 +183,8 @@
                             $db->pdo->commit();
 
                             $message = "貸し出し処理が完了しました。";
-                            if (!empty($remain_date) && $remain_date <= 14) {
-                                $message .= "この本は、あと" . $remain_date . "で貸出禁止期間に入ります。";
+                            if ($remain_date != null && $remain_date <= 14) {
+                                $message .= "この本は、あと" . $remain_date . "日で貸出禁止期間に入ります。";
                                 $message .= "\nそれまでに、必ず返却してください。";
                             }
 

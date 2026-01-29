@@ -44,9 +44,11 @@
     // 貸出処理のメッセージ
     if (isset($_SESSION['lend_result_message'])) {
         display_message($_SESSION['lend_result_message'], 'lend_result_message');
+        unset($_SESSION['lend_result_message']);
     // 返却処理のメッセージ
     } else if (isset($_SESSION['return_result_message'])) {
         display_message($_SESSION['return_result_message'], 'return_result_message');
+        unset($_SESSION['return_result_message']);
     // 
     } 
     /*
