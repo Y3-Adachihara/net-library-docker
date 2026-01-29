@@ -251,5 +251,6 @@
         <button type = "submit" name = "reset_table">テーブルを再度作成</button>
     </form>
     <a href="insert.php">挿入ページへ移動</a>
+    <a href="add_table.php">テーブル追加ページへ移動</a>
 </body>
 </html>
