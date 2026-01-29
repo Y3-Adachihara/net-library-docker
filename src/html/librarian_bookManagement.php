@@ -48,7 +48,7 @@
         echo "<th>書籍ID</th>";
         echo "<th>ISBN</th>";
         echo "<th>タイトル</th>";
-        echo "<th>所属学校</th>";
+        echo "<th>予約元</th>";
         echo "<th>予約学生</th>";
         echo "<th>予約日</th>";
         echo "</tr>";
@@ -102,6 +102,18 @@
         $sql_all .= " WHERE bs.school_id = :school_id";
         $sql_all .= " AND r.status_id = :res_status_id";
         $sql_all .= " AND bs.status_id = :bk_status_id";
+        $sql_all .= " AND NOT EXISTS (
+                            SELECT 1 
+                            FROM lending_deny AS ld
+                            WHERE (
+                                ld.book_id = bs.book_id
+                                AND (
+                                    DATE(NOW()) >= DATE_SUB(DATE(ld.start_date), INTERVAL 3 DAY) 
+                                    AND 
+                                    DATE(NOW()) <= DATE(ld.end_date)
+                                )
+                            )
+                        )";
 
         $stmt = $db->pdo->prepare($sql_all);
         $stmt->bindValue(':school_id', $_librarian_school_id, PDO::PARAM_INT);

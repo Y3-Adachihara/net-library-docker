@@ -12,7 +12,9 @@
 
     $error_message = $_SESSION['message'] ?? '';
     if (isset($_SESSION['message'])) {
-        echo "<script>alert('" . htmlspecialchars($error_message, ENT_QUOTES, 'UTF-8') . "');</script>";
+        $safe_message = htmlspecialchars($error_message, ENT_QUOTES, 'UTF-8');
+        $js_message = str_replace(array("\r\n", "\r", "\n"), '\\n', $safe_message);
+        echo "<script>alert('" . $js_message . "');</script>";
         unset($_SESSION['message']);
     }
 

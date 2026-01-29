@@ -1,5 +1,16 @@
 <?php
+    require_once '../db_connect.php';
     session_start();
+
+    if (!isset($_SESSION['librarian_id'])) {
+        // 司書としてログインしていない場合、ログインページへリダイレクト
+        $_SESSION['message'] = "司書としてログインしてください。";
+        header("Location: librarian_login.php");
+        exit();
+    }
+
+    // タイトルから部分一致で検索掛ける時に使う学校ID
+    $librarian_school_id = $_SESSION['librarian_school_id'];
 
     // CSRFトークン発行関数(発行するだけで、セッション変数への保存は行わないから注意！)
     function csrf_token_generate(): string {
@@ -22,20 +33,89 @@
     // この時点で、セッションにトークンがあっても無くても、$csrf_tokenにトークンが格納されている
     $csrf_token = $_SESSION['csrf_token'];
 
-    // 予約処理のメッセージ
-    if (isset($_SESSION['lend_result_message'])) {
-        $message = $_SESSION['lend_result_message'];
-        echo "<script>alert('" . htmlspecialchars($message, ENT_QUOTES, 'UTF-8') . "');</script>";
-        unset($_SESSION['lend_result_message']);
-        
-    } else if (isset($_SESSION['return_result_message'])) {
-        $message = $_SESSION['return_result_message'];
-        echo "<script>alert('" . htmlspecialchars($message, ENT_QUOTES, 'UTF-8') . "');</script>";
-        unset($_SESSION['return_result_message']);
+    function display_message(String $message, String $title): void {
+        $safe_message = htmlspecialchars($message, ENT_QUOTES, 'UTF-8');
+        $js_message = str_replace(array("\r\n", "\r", "\n"), '\\n', $safe_message);
+        echo "<script>alert('" . $js_message . "');</script>";
+        unset($_SESSION['']);
     }
 
+    
+    // 貸出処理のメッセージ
+    if (isset($_SESSION['lend_result_message'])) {
+        display_message($_SESSION['lend_result_message'], 'lend_result_message');
+    // 返却処理のメッセージ
+    } else if (isset($_SESSION['return_result_message'])) {
+        display_message($_SESSION['return_result_message'], 'return_result_message');
+    // 
+    } 
+    /*
+    else if (isset($_SESSION['title_select_message'])) {
+        display_message(($_SESSION['title_select_message']), 'title_select_message');
+    }
+    
+    
+    $this_grade = $_POST['school-year'] ?? null;
+    $this_class = $_POST['class'] ?? null;
+    $this_number = $_POST['number'] ?? null;
+    $this_book_id = $_POST['id_number'] ?? null;
+    $this_book_title = $_POST['title'] ?? null;
+
+    // テーブル型式で表示する際に使う書籍リストを格納する配列
+    $title_selected_books = null;
+
+    // 何も選ばれていなかったらこのページに戻す
+    if (empty($title_selected_books)) {
+        $_SESSION['title_select_message'] = "タイトルを入れてから検索してください。";
+        header("Location: 貸出返却.php");
+        exit();
+    }
 
     
+    function table_data_display (array $records) {
+
+        if (empty($records)) {
+            echo "<tr><td colspan='6'>指定されたタイトルに部分一致する本はありません。</td></tr>";
+            return;
+        }
+
+
+    }
+    
+    try {
+        $db = new db_connect();
+        $db->connect();
+        
+        $sql = "SELECT * FROM book_stack AS bs";
+        $sql .= " LEFT OUTRR JOIN book_info AS bi";
+        $sql .= " ON bs.isbn = bi.isbn";
+        $sql .= " WHERE bi.title LIKE ':title'";
+        $sql .= " AND bs.school_id = :school_id";
+        $stmt = $db->pdo->prepare($sql);
+        $stmt->execute([
+            'title' => '%' . $this_book_title . '%',
+            'school_od' => $librarian_school_id
+        ]);
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        if (!empty($results)) {
+            foreach($results AS $row) {
+                $title_selected_books [] = $row;
+            }
+        }
+
+    } catch (PDOException $e) {
+        $db->pdo->rollback();
+        echo "データベースエラー：" . $e->getMessage(); //デバッグ用。あとで消す！
+        exit;
+    } catch (Exception $e) {
+        $db->pdo->rollback();
+        echo "エラー：" . $e->getMessage(); //デバッグ用。あとで消す！
+        exit;
+    } finally {
+        $db->close();
+    }
+        */
 ?>
 
 <!DOCTYPE html>
@@ -99,6 +179,12 @@
         <div class="form-group">
             <label>識別番号：</label>
             <input type="text" name="id-number" placeholder="901000101">
+        </div>
+        
+        <div>
+            <label>タイトル：</label>
+            <input type="text" name="title" placeholder="例:こころ">
+            <button type="submit" formaction = "貸出返却.php" class="btn-blue">このタイトルで部分検索</button>
         </div>
 
         <div class="action-buttons">
