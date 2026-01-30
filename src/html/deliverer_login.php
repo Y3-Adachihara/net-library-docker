@@ -1,5 +1,11 @@
 <?php
     session_start();
+
+    $error_message = $_SESSION['message'] ?? null;
+    if (isset($_SESSION['message'])) {
+        echo "<script>alert('" . htmlspecialchars($error_message, ENT_QUOTES, 'UTF-8') . "');</script>";
+        unset($_SESSION['message']);
+    }
 ?>
 
 <!DOCTYPE html>

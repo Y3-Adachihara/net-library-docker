@@ -5,7 +5,8 @@
     $index = $_POST['page_id'] ?? 0;
     $path_array = [
         0 => '../html/student_login.php',
-        1 => '../html/librarian_login.php'
+        1 => '../html/librarian_login.php',
+        2 => '../html/deliverer_login.php'
     ];
     $redirect_path = $path_array[$index] ?? '../html/student_login.php';
     
