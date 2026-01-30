@@ -121,10 +121,13 @@
             </div>
             <button type="submit">ログイン</button>
         </form>
+        <p>OR</p>
+        <button onclick="location.href='../html/register.php'">新規登録がお済でない方はこちらから</button>
 
         <div class="sub-actions">
-            <button onclick="location.href='../html/register.php'">新規登録</button>
+            <button onclick="location.href='../html/register.php'">先生はこちら</button>
             <button onclick="location.href='../html/librarian_login.php'">司書の方はこちら</button>
+            <button onclick="location.href='../html/deliverer_book_management.php'">配送員の方はこちら</button>
         </div>
     </div>
 </body>

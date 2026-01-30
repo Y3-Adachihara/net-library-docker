@@ -177,3 +177,34 @@ body {
     margin-top: 100px; /* ヘッダーの高さ分、上に余白を作る */
     margin-bottom: 40px;
 }
+
+/* --- login.cssの末尾に追加（修正版） --- */
+
+/* 「OR」テキストのスタイル */
+.login-container > p {
+    text-align: center;
+    color: #95a5a6;
+    font-weight: bold;
+    margin: 15px 0;
+}
+
+/* 「新規登録がお済でない方はこちらから」ボタンのスタイル */
+.login-container > button {
+    display: block;        /* 中央配置のために必要 */
+    width: 70%;            /* 横幅：100%から70%に縮小 */
+    margin: 0 auto;        /* 左右中央寄せ */
+    padding: 10px;         /* 縦幅：14pxから10pxに縮小 */
+    font-size: 14px;       /* 文字も少し小さくしてバランス調整 */
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+/* 新規登録ボタンのホバー時 */
+.login-container > button:hover {
+    background-color: #2980b9;
+}
