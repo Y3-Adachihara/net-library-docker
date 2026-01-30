@@ -36,7 +36,7 @@
                 $_SESSION['deliverer_id'] = $row['deliverer_id'];
                 $_SESSION['deliverer_family_name'] = $row['family_name'];
                 $_SESSION['deliverer_first_name'] = $row['first_name'];
-                header("Location: ../html/deliverer_deliverer_book_management.php");
+                header("Location: ../html/deliverer_book_management.php");
                 exit();
 
             } else {
