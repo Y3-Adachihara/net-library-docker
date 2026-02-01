@@ -9,6 +9,13 @@
         exit();
     }
 
+    // 確認画面に来た時に何も選択されていないときのメッセージ
+    if (isset($_SESSION['book_manageConfirm_message'])) {
+        $message = $_SESSION['book_manageConfirm_message'];
+        echo "<script>alert('" . h($message) . "');</script>";
+        unset($_SESSION['book_manageConfirm_message']);
+    }
+
     //　ここからは、配送員としてログインしていないと実行されない
     $deliverer_family_name = $_SESSION['deliverer_family_name'] ?? '';
     $deliverer_first_name = $_SESSION['deliverer_first_name'] ?? '';
@@ -16,9 +23,14 @@
 
     $unload_list = [];  // 荷下ろし（配送してきた本）
     $pickup_list = []; // 集荷（これから配送する本）
-    $selected_school_id = $_POST['selected_school_id'] ?? null;
+    $selected_school_id = null;
+    if(isset($_POST['selected_school_id'])) {
+        $selected_school_id = intval($_POST['selected_school_id']);
+    }
 
-    $selected_schools = null;    // 配送で用いる学校リスト
+    $selected_schools = [];    // 現在地の学校リスト
+    $carry_in_list = []; // 搬入リスト
+    $carry_out_list = []; // 搬出リスト
 
     // HTMLエスケープ関数
     function h($str) {
@@ -48,6 +60,59 @@
         echo "<script>alert('" . h($error_message) . "');</script>";
         unset($_SESSION['dbm_school_selected_result']);
     }
+
+    function table_data_display(array $records, int $delivery_type) {   // 1:搬入 2:搬出
+        if (empty($records)) {
+    
+            if ($delivery_type == 1) {
+                echo "<tr><td colspan='6'>現在、搬入リストはありません。</td></tr>";
+                return;
+            } else if ($delivery_type == 2) {
+                echo "<tr><td colspan='6'>現在、搬出リストはありません。</td></tr>";
+                return;
+            }
+            
+        }
+
+        echo "<tr>";
+        echo "<th>チェック</th>";
+        echo "<th>書籍ID</th>";
+        echo "<th>ISBN</th>";
+        echo "<th>タイトル</th>";
+        echo "<th>出版社</th>";
+        echo "<th>送り元</th>";
+        echo "<th>宛先</th>";
+        echo "</tr>";
+
+        foreach ($records as $rows) {
+            $book_id = $rows['book_id'];
+            $book_isbn = $rows['isbn'];
+            $book_title = $rows['title'];
+            $book_publisher = $rows['publisher'];
+            $from_school = $rows['departure_school_name'];
+            $to_school = $rows['destination_school_name'];
+
+            echo "<tr>";
+
+            // 搬入だった場合
+            if ($delivery_type == 1) {
+                echo "<td><input type=\"checkbox\" name=\"carry_in_list[]\" value= \"" . h($book_id) . "\"></td>";    // これがチェックボックス
+
+            // 他校の予約だった場合
+            } else if ($delivery_type == 2) {
+                echo "<td><input type=\"checkbox\" name=\"carry_out_list[]\" value= \"" . h($book_id) . "\"></td>";    // これがチェックボックス
+            }
+
+            echo "<td>" . h($book_id) . "</td>";
+            echo "<td>" . h($book_isbn) . "</td>";
+            echo "<td>" . h($book_title) . "</td>";
+            echo "<td>" . h($book_publisher) . "</td>";
+            echo "<td>" . h($from_school) . "</td>";
+            echo "<td>" . h($to_school) . "</td>";
+            echo "</tr>";
+        }
+
+    }
     
 
     try {
@@ -61,29 +126,80 @@
 
         if ($selected_school_id != null) {
 
-            $get_school_id = intval($selected_school_id);
             $allowed_status = [5,6,8,9];    // 取得する書籍の配送状態（配送中か配送待ち）
+            $waiting_deliverd = [5,8];
+            $in_delivery = [6,9];
             $inClause = substr(str_repeat(',?', count($allowed_status)),1);
 
-            // 選択されている学校で、書籍状態が$allowed_statusに含まれるやつを取得
-            $get_delList = "SELECT * FROM book_stack AS bs 
+            // 書籍状態が$allowed_status↑に含まれるやつを取得
+            $get_delList = "SELECT 
+                                bs.book_id,
+                                bs.status_id,
+                                bi.title,
+                                bi.isbn,
+                                bi.publisher,
+                                CASE
+                                 WHEN bs.status_id IN (6, 9) THEN dt_school.school_id
+                                 ELSE bs.position
+                                END AS departure_school_id,
+
+                                CASE
+                                 WHEN bs.status_id IN (6, 9) THEN dt_school.school_name
+                                 ELSE ps_school.school_name
+                                END AS departure_school_name,
+
+                                CASE
+                                 WHEN bs.status_id IN (6, 9) THEN ds_school.school_id
+                                 WHEN bs.status_id = 5 THEN rs_school.school_id
+                                 WHEN bs.status_id = 8 THEN bs_school.school_id
+                                END AS destination_school_id,
+
+                                CASE
+                                 WHEN bs.status_id IN (6, 9) THEN ds_school.school_name
+                                 WHEN bs.status_id = 5 THEN rs_school.school_name
+                                 WHEN bs.status_id = 8 THEN bs_school.school_name
+                                END AS destination_school_name                           
+                            FROM book_stack AS bs 
                             LEFT OUTER JOIN book_info AS bi 
                             ON bs.isbn = bi.isbn 
-                            LEFT OUTER JOIN reservation AS r 
-                            ON bs.book_id = r.book_id 
+                            LEFT OUTER JOIN reservation AS rs 
+                            ON bs.book_id = rs.book_id AND rs.status_id = 1 
                             LEFT OUTER JOIN student AS st 
-                            ON r.student_id = st.student_id 
-                            WHERE bs.school_id = ? 
-                            AND bs.status_od IN ($inClause)
-                            "
+                            ON rs.student_id = st.student_id 
+                            LEFT OUTER JOIN delivery AS dl 
+                            ON bs.book_id = dl.book_id AND dl.delivery_status <> 3 
+                            LEFT OUTER JOIN school AS ps_school 
+                            ON bs.position = ps_school.school_id 
+                            LEFT OUTER JOIN school AS bs_school 
+                            ON bs.school_id = bs_school.school_id 
+                            LEFT OUTER JOIN school AS dt_school 
+                            ON dl.from_school_id = dt_school.school_id 
+                            LEFT OUTER JOIN school AS ds_school 
+                            ON dl.to_school_id = ds_school.school_id 
+                            LEFT OUTER JOIN school AS rs_school 
+                            ON st.school_id = rs_school.school_id 
+                            WHERE bs.status_id IN ($inClause) 
+                            ";
             $stmt_deList = $db->pdo->prepare($get_delList);
-            $stmt_deList->execute([$selected_school_id],$allowed_status);
-            $display_school_list = $stmt_deList->fetchAll(PDO::FETCH_ASSOC);
+            $stmt_deList->execute($allowed_status);
+            $display_book_list = $stmt_deList->fetchAll(PDO::FETCH_ASSOC);
+
+            if (!empty($display_book_list)) {
+
+                foreach ($display_book_list as $row) {
+                    //　送り先の学校IDが現在地として選ばれた学校IDと同じなら、現在地の学校に搬入されるリストとなる
+                    if (intval($row['destination_school_id']) == $selected_school_id && in_array(intval($row['status_id']), $in_delivery)) {
+                        $carry_in_list [] = $row;
+                    }
+                    
+                    // 送り元の学校IDが現在地として選ばれた学校IDと同じなら、現在地の学校から搬出されるリストとなる
+                    if (intval($row['departure_school_id']) == $selected_school_id && in_array(intval($row['status_id']), $waiting_deliverd)) {
+                        $carry_out_list [] = $row;
+                    }
+                }                
+            }
         }
 
-        
-
-        
 
     } catch (PDOException $e) {
         $error_message = "データの取得に失敗しました。" . $e->getMessage();
@@ -132,16 +248,19 @@
     </header>
 
     <!-- 学校を選択させる -->
-    <label for="school">学校:</label>
-    <select name = "selected_school_id" onchange="this.form.submit()">
-        <option value = "">現在地を選択してください</option>
-        <?php foreach ($selected_schools as $school): ?>
-            <?php if ($school['school_id'] == 0) continue; ?>
-            <option value = "<?php echo htmlspecialchars($school['school_id']); ?>">
-                <?php echo htmlspecialchars($school['school_name']); ?>
-            </option>
-        <?php endforeach; ?>
-    </select>
+    <form action="deliverer_book_management.php" method="POST">
+        <label for="school">現在地の学校:</label>
+        <select name = "selected_school_id" onchange="this.form.submit()">
+            <option value = "">現在地を選択してください</option>
+            <?php foreach ($selected_schools as $school): ?>
+                <?php if ($school['school_id'] == 0) continue; ?>
+                <option value = "<?php echo h($school['school_id']); ?>"
+                    <?php if ($selected_school_id == $school['school_id']) echo 'selected'; ?>>
+                    <?php echo h($school['school_name']); ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+    </form>
 
     <div class="tabs">
         <button onclick="showTab('in')">① 搬入リスト</button>
@@ -150,23 +269,22 @@
 
     <div id="carry-in" class="tab-content" style="display:none;">
         <form action="deliverer_change_confirm.php" method="post">
-            <input type="hidden" name="">
             <p>学校へ搬入するリストです。チェックして確認画面へ進んでください。</p>
             <table>
-                <?php //table_data_display($local_reservations, 1) ?>
+                <?php table_data_display($carry_in_list, 1) ?>
             </table>
-            <input type="hidden" name="next_status" value="4">
+            <input type="hidden" name="next_status" value="15">
             <button type="submit">確認画面へ</button>
         </form>
     </div>
 
     <div id="carry-out" class="tab-content" style="display:none;">
-        <form action="librarian_book_confirm.php" method="post">
+        <form action="deliverer_change_confirm.php" method="post">
             <p>学校から搬出するリストです。チェックして確認画面へ進んでください。</p>
             <table>
-                <?php //table_data_display($deliver_reservations, 2) ?>
+                <?php table_data_display($carry_out_list, 2) ?>
             </table>
-            <input type="hidden" name="next_status" value="5">
+            <input type="hidden" name="next_status" value="13">
             <button type="submit">確認画面へ</button>
         </form>
     </div>
