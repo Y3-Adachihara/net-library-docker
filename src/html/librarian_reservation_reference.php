@@ -90,7 +90,8 @@
     $lastYear_date_str = $lastYear_date->format('Y-m-d H:i:s');
 
     $fetchAll_record = [];  //結果が無かった場合に備えて初期化
-        
+
+    
     try {
         $db = new db_connect();
         $db->connect();

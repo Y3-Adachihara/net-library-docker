@@ -23,10 +23,12 @@
 
     $unload_list = [];  // 荷下ろし（配送してきた本）
     $pickup_list = []; // 集荷（これから配送する本）
-    $selected_school_id = null;
+    //$selected_school_id = null;
     if(isset($_POST['selected_school_id'])) {
-        $selected_school_id = intval($_POST['selected_school_id']);
+        $_SESSION['selected_school_id'] = intval($_POST['selected_school_id']);
     }
+
+    $selected_school_id = $_SESSION['selected_school_id'] ?? null;
 
     $selected_schools = [];    // 現在地の学校リスト
     $carry_in_list = []; // 搬入リスト
@@ -86,13 +88,17 @@
 
         foreach ($records as $rows) {
             $book_id = $rows['book_id'];
+            $book_status = $rows['status_id'];
             $book_isbn = $rows['isbn'];
             $book_title = $rows['title'];
             $book_publisher = $rows['publisher'];
-            $from_school = $rows['departure_school_name'];
-            $to_school = $rows['destination_school_name'];
 
-            $packed_data = h($book_id) . "|" . h($book_isbn) . "|" . h($book_title) . "|" . h($book_publisher) . "|" . h($from_school) . "|" . h($to_school);
+            $from_school_id = $rows['departure_school_id'];
+            $to_school_id = $rows['destination_school_id'];
+            $from_school_name = $rows['departure_school_name'];
+            $to_school_name = $rows['destination_school_name'];
+
+            $packed_data = h($book_id) . "|" . h($book_isbn) . "|" . h($book_title) . "|" . h($book_publisher) . "|" . h($from_school_name) . "|" . h($to_school_name) . "|" . h($book_status) . "|" . h($from_school_id) . "|" . h($to_school_id);
 
             echo "<tr>";
 
@@ -109,8 +115,8 @@
             echo "<td>" . h($book_isbn) . "</td>";
             echo "<td>" . h($book_title) . "</td>";
             echo "<td>" . h($book_publisher) . "</td>";
-            echo "<td>" . h($from_school) . "</td>";
-            echo "<td>" . h($to_school) . "</td>";
+            echo "<td>" . h($from_school_name) . "</td>";
+            echo "<td>" . h($to_school_name) . "</td>";
             echo "</tr>";
         }
 
