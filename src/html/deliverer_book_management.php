@@ -92,15 +92,17 @@
             $from_school = $rows['departure_school_name'];
             $to_school = $rows['destination_school_name'];
 
+            $packed_data = h($book_id) . "|" . h($book_isbn) . "|" . h($book_title) . "|" . h($book_publisher) . "|" . h($from_school) . "|" . h($to_school);
+
             echo "<tr>";
 
             // 搬入だった場合
             if ($delivery_type == 1) {
-                echo "<td><input type=\"checkbox\" name=\"carry_in_list[]\" value= \"" . h($book_id) . "\"></td>";    // これがチェックボックス
+                echo "<td><input type=\"checkbox\" name=\"carry_in_list[]\" value= \"" . $packed_data . "\"></td>";    // これがチェックボックス
 
             // 他校の予約だった場合
             } else if ($delivery_type == 2) {
-                echo "<td><input type=\"checkbox\" name=\"carry_out_list[]\" value= \"" . h($book_id) . "\"></td>";    // これがチェックボックス
+                echo "<td><input type=\"checkbox\" name=\"carry_out_list[]\" value= \"" . $packed_data . "\"></td>";    // これがチェックボックス
             }
 
             echo "<td>" . h($book_id) . "</td>";

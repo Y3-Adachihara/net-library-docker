@@ -31,8 +31,8 @@
     $csrf_token = $_SESSION['csrf_token'];
 
     // ↓これは選択されたbook_idの配列
-    $carry_in_list = $_POST['carry_in_list'] ?? []; // 自校からの予約リスト(書籍IDのリスト)
-    $carry_out_list =  $_POST['carry_out_list'] ?? [];   // 他校からの予約リスト（書籍IDのリスト）
+    $carry_in_list = $_POST['carry_in_list'] ?? []; // 搬入リスト(書籍IDのリスト)
+    $carry_out_list =  $_POST['carry_out_list'] ?? [];   // 搬出リスト（書籍IDのリスト）
     $next_status = $_POST['next_status'] ?? null;
 
     $selected_books = null; // 最終的に送る選択された書籍IDリスト（他校からのみ、もしくは自校からのみのどちらかになる）
@@ -49,6 +49,9 @@
         exit();
     }
 
+    // IN句に指定する選択された本のbook_idの配列
+    $inClause = substr(str_repeat(',?', count($selected_books)), 1);
+
     $carry_in_list_selected = null;
     $carry_out_list_selected = null;
 
@@ -56,6 +59,48 @@
     function h($str) {
         return htmlspecialchars($str, ENT_QUOTES, 'UTF-8');
     }
+
+    function table_data_display(array $records, int $next_status): void {
+        if (empty($records)) {
+            echo "<tr><td colspan='6'>選択された予約引当リストはありません</td></tr>";
+            return;
+        }
+
+        // 搬入だった場合
+        if ($next_status == 15) {
+            echo "<p>これらのリストを搬入します</p>";
+
+        // 他校の予約だった場合
+        } else if ($next_status == 13) {
+            echo "<p>これらのリストを搬出します</p>";
+        }
+
+        echo "<table>";
+
+        echo "<tr>";
+        echo "<th>書籍ID</th>";
+        echo "<th>ISBN</th>";
+        echo "<th>タイトル</th>";
+        echo "<th>出版社</th>";
+        echo "<th>送り元</th>";
+        echo "<th>宛先</th>";
+        echo "</tr>";
+        foreach ($records as $row) {
+            list($book_id, $book_isbn, $book_title, $book_publisher, $from_school, $to_school) = explode('|', $row);
+
+            echo "<tr>";
+            echo "<td>" . h($book_id) . "</td>";
+            echo "<td>" . h($book_isbn) . "</td>";
+            echo "<td>" . h($book_title) . "</td>";
+            echo "<td>" . h($book_publisher) . "</td>";
+            echo "<td>" . h($from_school) . "</td>";
+            echo "<td>" . h($to_school) . "</td>";
+            echo "</tr>";
+        }
+
+    }
+
+
 ?>
 
 <!DOCTYPE html>
@@ -68,17 +113,17 @@
 <body>
     <?php
         if ($next_status == 15) {
-            table_data_display($local_selected_res, $next_status);
+            table_data_display($carry_in_list, $next_status);
         } else if ($next_status == 13) {
-            table_data_display($deliver_selected_res, $next_status);
+            table_data_display($carry_out_list, $next_status);
         } else {
             $_SESSION['book_manageConfirm_message'] = "不正なリクエストです。";
             header("Location: librarian_bookManagement.php");
             exit();
         }
     ?>
-    <button onclick="location.href='../html/librarian_bookManagement.php'">戻る</button>
-    <form action="../php/change_resBook_status.php" method="POST">
+    <button onclick="location.href='../html/deliverer_book_management.php'">戻る</button>
+    <form action="../php/change_delBook_status.php" method="POST">
         <!-- CSRFトークンを隠し属性にセット -->
         <?php set_csrf_token($csrf_token); ?>
 
