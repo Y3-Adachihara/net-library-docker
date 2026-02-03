@@ -50,19 +50,20 @@
                 $_SESSION['student_number'] = $row['number'];
                 $_SESSION['student_family_name'] = $row['family_name'];
                 $_SESSION['student_first_name'] = $row['first_name'];
+                //まだ学生マイページが用意できていないため、とりあえず司書マイページへリダイレクト
                 header("Location: ../html/stu_myPage.php");
                 exit();
 
             } else {
-	            $_SESSION['message'] = "学校、IDまたはパスワードが違います。";
+	            $_SESSION['message'] = "IDまたはパスワードが違います。";
                 header("Location: ../html/student_login.php");
                 exit();
             }
         } else {
-            $_SESSION['message'] = "学校、IDまたはパスワードが違います。";
+            $_SESSION['message'] = "パスワードの取得に失敗しました。";
             header("Location: ../html/student_login.php");
             exit();
-        }   
+        }
         
 
     } catch (PDOException $e) {

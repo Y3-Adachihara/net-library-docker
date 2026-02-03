@@ -1,0 +1,71 @@
+/* --- 全体共通（既存のものがあれば調整） --- */
+body {
+    font-family: sans-serif;
+    padding: 20px;
+    display: flex;
+    flex-direction: column; /* 複数の画面を縦に並べる場合 */
+    align-items: center;    /* 画面全体を中央に */
+    background-color: #f5f5f5; /* 背景を少しグレーにすると白枠が目立ちます */
+}
+
+.container {
+    width: 500px;
+    border: 1px solid #000;
+    padding: 40px;
+    background-color: #fff; /* ボックスの中を白にする */
+    margin-bottom: 50px;    /* 画面ごとの余白 */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1); /* 軽い影をつけるときれいです */
+}
+
+h1 {
+    text-align: center;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 40px;
+    background-color: #fff;
+}
+
+/* --- 入力エリアの調整 --- */
+.form-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    width: 120px;
+    text-align: right;
+    margin-right: 15px;
+    font-weight: bold;
+}
+
+.form-group input, .form-group select {
+    flex: 1;
+    padding: 8px; /* 少し広げて入力しやすく */
+    border: 1px solid #4a90e2;
+    border-radius: 4px;
+}
+
+/* --- ボタンエリアの調整 --- */
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 40px;       /* 60pxから少し詰めるとバランスが良いです */
+    margin-top: 50px; /* 80pxから調整 */
+}
+
+.btn-blue {
+    background-color: #a2c4e9;
+    border: 1px solid #7a9ec7;
+    padding: 12px 40px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+    border-radius: 4px;
+    transition: background-color 0.3s; /* 色の変化を滑らかに */
+}
+
+.btn-blue:hover {
+    background-color: #8fb8e3;
+}
