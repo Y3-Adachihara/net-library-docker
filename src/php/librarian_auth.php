@@ -40,16 +40,17 @@
                 //ここでのlibrarian_idは先のSELECT文で取得した司書ID
                 $_SESSION['librarian_id'] = $row['librarian_id'];
                 $_SESSION['librarian_school_id'] = $row['school_id'];
+                $_SESSION['login_success_message'] = "ログインに成功しました！";
                 header("Location: ../html/librarian_myPage.php");
                 exit();
 
             } else {
-	            $_SESSION['message'] = "IDまたはパスワードが違います。";
+	            $_SESSION['message'] = "学校またはID、またはパスワードが違います。";
                 header("Location: ../html/librarian_login.php");
                 exit();
             }
         } else {
-            $_SESSION['message'] = "パスワードの取得に失敗しました。";
+            $_SESSION['message'] = "学校またはID、またはパスワードが違います。";
             header("Location: ../html/librarian_login.php");
             exit();
         }
