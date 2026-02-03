@@ -1,6 +1,8 @@
 <?php
     session_start();
     require_once '../db_connect.php';
+
+       $received_book_id = isset($_GET['book_id']) ? $_GET['book_id'] : '';
     
 
     if (!isset($_SESSION['student_id'])) {
@@ -12,9 +14,7 @@
 
     $error_message = $_SESSION['message'] ?? '';
     if (isset($_SESSION['message'])) {
-        $safe_message = htmlspecialchars($error_message, ENT_QUOTES, 'UTF-8');
-        $js_message = str_replace(array("\r\n", "\r", "\n"), '\\n', $safe_message);
-        echo "<script>alert('" . $js_message . "');</script>";
+        echo "<script>alert('" . htmlspecialchars($error_message, ENT_QUOTES, 'UTF-8') . "');</script>";
         unset($_SESSION['message']);
     }
 
@@ -141,7 +141,8 @@
         <div class="form-row">
             <label>書籍番号</label>
             <div class="input-group">
-                <input type="text" id="book_id" name="book_id" class="full-width" placeholder="例: B001">
+		<input type="text" id="book_id" name="book_id" class="full-width" placeholder="例: B001" value="<?php echo htmlspecialchars($received_book_id, ENT_QUOTES, 'UTF-8'); ?>">
+                <!--<input type="text" id="book_id" name="book_id" class="full-width" placeholder="例: B001">-->
             </div>
             <span class="note">③</span>
         </div>
