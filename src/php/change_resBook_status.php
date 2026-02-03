@@ -32,7 +32,7 @@
     }
 
     // 更新ステータスの取得とチェック
-    $allowed_status = [4,5];
+    $allowed_status = [4,5,7];
     $next_status = $_POST['next_status'];
 
     if (!in_array($next_status, $allowed_status)) {
@@ -106,6 +106,9 @@
                         break;
                     case 5:
                         $_SESSION['bookStatus_changeResult_message'] = "他校から予約された" . $count . "冊の本の状態を「5:配送待ち（予約配送）」へ変更しました。";
+                        break;
+                    case 7:
+                        $_SESSION['bookStatus_changeResult_message'] = "本校から予約された" . $count . "冊の本の状態を「7:配送予約受取待ち」へ変更しました。";
                         break;
                 }
                 header("Location: ../html/librarian_bookManagement.php");

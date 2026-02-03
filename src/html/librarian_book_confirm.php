@@ -42,15 +42,18 @@
     $librarian_school_id = $_SESSION['librarian_school_id'];
 
     // ↓これは選択されたbook_idの配列
-    $local_res = $_POST['local_res'] ?? []; // 自校からの予約リスト(書籍IDのリスト)
+    $local_noncarry_res = $_POST['local_noncarry_res'] ?? []; // 自校からの予約リスト(書籍IDのリスト)
+    $local_carry_res = $_POST['local_carry_res'] ?? []; // 自校からの予約リスト(書籍IDのリスト)
     $deliver_res =  $_POST['deliver_res'] ?? [];   // 他校からの予約リスト（書籍IDのリスト）
     $next_status = $_POST['next_status'] ?? null;
 
-    $selected_books = null; // 最終的に送る選択された書籍IDリスト（他校からのみ、もしくは自校からのみのどちらかになる）
+    $selected_books = null;
     if ($next_status == 4) {
-        $selected_books = $local_res;
+        $selected_books = $local_carry_res; // 自校からの予約、本は自校所蔵
+    } else if ($next_status == 7) {
+        $selected_books = $local_noncarry_res;  // 自校からの予約、本は他校所蔵
     } else if ($next_status == 5) {
-        $selected_books = $deliver_res;
+        $selected_books = $deliver_res; // 他校からの予約
     }
 
     // IN句に指定する選択された本のbook_idの配列
@@ -79,7 +82,9 @@
         }
 
         if ($next_status == 4) {
-            echo "<p>以下の予約済みの書籍の状態を「4:予約受取待ち」に変更します。これらの本を予約受取待ち置き場に置いたことを確認してください。</p>";
+            echo "<p>以下の予約済みの書籍の状態を「4:予約受取待ち」に変更します。これらの本を予約取り置き場に置いたことを確認してください。</p>";
+        } else if ($next_status == 7) {
+            echo "<p>以下の予約済みの書籍の状態を「7:配送予約受取待ち」に変更します。これらの本を予約取り置き場に置いたことを確認してください。</p>";
         } else if ($next_status == 5) {
             echo "<p>以下の予約済みの書籍の状態を「5:配送待ち（予約配送）」に変更します。これらの本を配送待ちボックスに置いたことを確認してください。</p>";
         }
@@ -134,6 +139,15 @@
         $sql_all .= " LEFT OUTER JOIN school AS sc";
         $sql_all .= " ON s.school_id = sc.school_id";
         $sql_all .= " WHERE bs.book_id IN ($inClause)";
+        $sql_all .= " AND r.status_id = 1";
+        $sql_all .= " AND r.reservation_id = (
+                        SELECT r2.reservation_id
+                        FROM reservation AS r2
+                        WHERE r2.book_id = r.book_id
+                        AND r2.status_id = 1
+                        ORDER BY r2.reservation_date ASC, r2.reservation_id ASC
+                        LIMIT 1
+                      )";
         $stmt = $db->pdo->prepare($sql_all);
         $stmt->execute($selected_books);
         $toMySchoolReservations = $stmt->fetchAll(PDO::FETCH_ASSOC);
