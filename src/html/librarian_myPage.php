@@ -23,6 +23,12 @@
         unset($_SESSION['res_refer_error']);
     }
 
+    if (isset($_SESSION['login_success_message'])) {
+        $error_message = $_SESSION['login_success_message'] ?? null;
+        echo "<script>alert('" . h($error_message) . "');</script>";
+        unset($_SESSION['login_success_message']);
+    }
+
     // CSRFトークン発行関数(発行するだけで、セッション変数への保存は行わないから注意！)
     function csrf_token_generate(): string {
         $toke_byte = random_bytes(16);
@@ -219,11 +225,12 @@
         </form>
 
         <form method="GET" class="librarian-menu-form">
-            <button type="submit" formaction="../html/検索画面.html" class="add-book-button">書籍検索</button>
+            <button type="submit" formaction="../html/検索画面.php" class="add-book-button">書籍検索</button>
             <button type="submit" formaction="../html/貸出返却.php" class="manage-users-button">貸出・返却</button>
             <button type="submit" formaction="../html/librarian_reservation_reference.php" class="manage-users-button">予約状況参照</button>
             <button type="submit" formaction="../html/書籍登録.html" class="add-book-button">新規書籍登録</button>
             <button type="submit" formaction="../html/librarian_bookManagement.php" class="add-book-button">予約された本の管理画面</button>
+            <button type="submit" formaction="../html/librarian_incoming_books.php" class="add-book-button">検品・仕分け画面</button>
         </form>
 
         <div class ="info-table-container">

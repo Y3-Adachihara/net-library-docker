@@ -26,8 +26,10 @@
     $_librarian_id = $_SESSION['librarian_id'];
     $_librarian_school_id = $_SESSION['librarian_school_id'];
 
-    $local_reservations = [];
-    $deliver_reservations = [];
+    $local_nonCarry_reservations = [];  // 予約者は自校、本も自校が所蔵
+    $local_carryIn_reservations = [];   // 予約者は自校、本は他校が所蔵
+    $deliver_reservations = [];         // 予約者は他校、本は自校が所蔵
+
     $all_reservations = [];
 
     // HTMLエスケープ関数
@@ -35,16 +37,14 @@
         return htmlspecialchars($str, ENT_QUOTES, 'UTF-8');
     }
 
-    function table_data_display(array $records, int $from_where = 0): void { // $from_where 1:自校からの予約 | 2:他校からの予約
+    function table_data_display(array $records, int $next_status): void { // $from_where 1:自校からの予約 | 2:他校からの予約
         if (empty($records)) {
             echo "<tr><td colspan='6'>現在、予約取り置きリストはありません。</td></tr>";
             return;
         }
 
         echo "<tr>";
-        if ($from_where != 0) {
-            echo "<th>チェック</th>";
-        }
+        echo "<th>チェック</th>";
         echo "<th>書籍ID</th>";
         echo "<th>ISBN</th>";
         echo "<th>タイトル</th>";
@@ -53,24 +53,28 @@
         echo "<th>予約日</th>";
         echo "</tr>";
 
-        foreach($records as $rows) {
-            $book_id = $rows['book_id'];
-            $book_isbn = $rows['isbn'];
-            $book_title = $rows['title'];
-            $student_school = $rows['school_name'];
-            $family_name = $rows['family_name'];
-            $first_name = $rows['first_name'];
+        foreach($records as $row) {
+            $book_id = $row['book_id'];
+            $book_isbn = $row['isbn'];
+            $book_title = $row['title'];
+            $student_school = $row['school_name'];
+            $family_name = $row['family_name'];
+            $first_name = $row['first_name'];
             $full_name = $family_name . " " . $first_name;
-            $reservation_date = $rows['reservation_date'];
+            $reservation_date = $row['reservation_date'];
 
             echo "<tr>";
 
-            // 自校の予約だった場合
-            if ($from_where == 1) {
-                echo "<td><input type=\"checkbox\" name=\"local_res[]\" value= \"" . h($book_id) . "\"></td>";    // これがチェックボックス
+            // 自校の生徒が自校の本を予約した場合
+            if ($next_status == 4) {
+                echo "<td><input type=\"checkbox\" name=\"local_noncarry_res[]\" value= \"" . h($book_id) . "\"></td>";    // これがチェックボックス
 
-            // 他校の予約だった場合
-            } else if ($from_where == 2) {
+            // 自校の生徒が他校の本を予約した場合
+            } else if ($next_status == 7) {
+                echo "<td><input type=\"checkbox\" name=\"local_carry_res[]\" value= \"" . h($book_id) . "\"></td>";    // これがチェックボックス
+
+            // 他校の生徒が自校の本を予約した場合
+            } else if ($next_status == 5) {
                 echo "<td><input type=\"checkbox\" name=\"deliver_res[]\" value= \"" . h($book_id) . "\"></td>";    // これがチェックボックス
             }
             echo "<td>" . h($book_id) . "</td>";
@@ -88,8 +92,18 @@
         $db = new db_connect();
         $db->connect();
 
+        $sql_school_name = "SELECT * FROM school WHERE school_id = :school_id";
+        $stmt_scName = $db->pdo->prepare($sql_school_name);
+        $stmt_scName->bindValue(':school_id', $_librarian_school_id, PDO::PARAM_INT);
+        $stmt_scName->execute();
+        $school_list = $stmt_scName->fetch(PDO::FETCH_ASSOC);
+
+        if(!empty($row)) {
+            $school_name = $school_list['school_name'];
+        }
+
         // 自校・他校からの予約
-        $sql_all = "SELECT r.book_id, r.reservation_date, bi.title, bi.isbn, s.school_id, sc.school_name, s.family_name, s.first_name";
+        $sql_all = "SELECT r.book_id, bk_sc.school_id AS belong_id, r.reservation_date, bi.title, bi.isbn, s.school_id AS school_id, sc.school_name, s.family_name, s.first_name";
         $sql_all .= " FROM reservation AS r";
         $sql_all .= " LEFT OUTER JOIN book_stack AS bs";
         $sql_all .= " ON r.book_id = bs.book_id";
@@ -99,7 +113,9 @@
         $sql_all .= " ON r.student_id = s.student_id";
         $sql_all .= " LEFT OUTER JOIN school AS sc";
         $sql_all .= " ON s.school_id = sc.school_id";
-        $sql_all .= " WHERE bs.school_id = :school_id";
+        $sql_all .= " LEFT OUTER JOIN school AS bk_sc";
+        $sql_all .= " ON bs.school_id = bk_sc.school_id";
+        $sql_all .= " WHERE bs.position = :school_id";
         $sql_all .= " AND r.status_id = :res_status_id";
         $sql_all .= " AND bs.status_id = :bk_status_id";
         $sql_all .= " AND NOT EXISTS (
@@ -114,6 +130,7 @@
                                 )
                             )
                         )";
+        $sql_all .= " ORDER BY r.reservation_date ASC, r.reservation_id ASC";
 
         $stmt = $db->pdo->prepare($sql_all);
         $stmt->bindValue(':school_id', $_librarian_school_id, PDO::PARAM_INT);
@@ -122,16 +139,35 @@
         $stmt->execute();
         $toMySchoolReservations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        foreach($toMySchoolReservations as $rows) {
-            $all_reservations [] = $rows;   // とりま自校・他校からの予約リストは入れる
+        $processed_book_ids = [];
+
+        foreach($toMySchoolReservations as $row) {
+            if(in_array($row['book_id'], $processed_book_ids)) {
+                continue;
+            }
+
+            $processed_book_ids[] = $row['book_id'];
+
+
+            // $all_reservations [] = $row;   // とりま自校・他校からの予約リストは入れる
 
             // 自校からの予約リストを格納
-            if (intval($rows['school_id']) == $_librarian_school_id) {
-                $local_reservations [] = $rows;
+            if (intval($row['school_id']) == $_librarian_school_id) {
+                $reserver_school_id = intval($row['school_id']) ; // こいつは予約者の学校ID
+                $book_belong = intval($row['belong_id']);   // こいつは書籍を所蔵する学校のID
+
+                // 自校の生徒が自校の本を予約
+                if ($reserver_school_id == $book_belong) {
+                    $local_nonCarry_reservations [] = $row;
+
+                // 自校の生徒が他校の本を予約
+                } else {
+                    $local_carryIn_reservations [] = $row;
+                }
 
             // 他校からの予約リストを格納
             } else {
-                $deliver_reservations [] = $rows;
+                $deliver_reservations [] = $row;
             }
         }
 
@@ -162,17 +198,21 @@
     </div>
 
     <div id="area-all" class="tab-content">
-        <p>棚から以下の本をすべて回収してください。</p>
-        <table>
-            <?php table_data_display($all_reservations) ?>
-        </table>
+        <form action="librarian_book_confirm.php" method="post">
+            <p>自校の生徒から、自校所蔵の本に対する予約です。チェックして確認画面へ進んでください。</p>
+            <table>
+                <?php table_data_display($local_nonCarry_reservations, 4) ?>
+            </table>
+            <input type="hidden" name="next_status" value="7">
+            <button type="submit">確認画面へ</button>
+        </form>
     </div>
 
     <div id="area-local" class="tab-content" style="display:none;">
         <form action="librarian_book_confirm.php" method="post">
-            <p>自校の生徒への予約です。チェックして確認画面へ進んでください。</p>
+            <p>自校の生徒から、他校所蔵の本に対する予約です。チェックして確認画面へ進んでください。</p>
             <table>
-                <?php table_data_display($local_reservations, 1) ?>
+                <?php table_data_display($local_carryIn_reservations, 7) ?>
             </table>
             <input type="hidden" name="next_status" value="4">
             <button type="submit">確認画面へ</button>
@@ -181,9 +221,9 @@
 
     <div id="area-delivery" class="tab-content" style="display:none;">
         <form action="librarian_book_confirm.php" method="post">
-            <p>他校への配送です。チェックして確認画面へ進んでください。</p>
+            <p>他校からの予約です。チェックして確認画面へ進んでください。</p>
             <table>
-                <?php table_data_display($deliver_reservations, 2) ?>
+                <?php table_data_display($deliver_reservations, 5) ?>
             </table>
             <input type="hidden" name="next_status" value="5">
             <button type="submit">確認画面へ</button>
