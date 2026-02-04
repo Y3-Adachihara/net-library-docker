@@ -7,7 +7,7 @@
     header("Pragma:no-cache");
 
     if (!isset($_SESSION['student_id'])) {
-        // 司書としてログインしていない場合、ログインページへリダイレクト
+        // 生徒としてログインしていない場合、ログインページへリダイレクト
         $_SESSION['message'] = "ログインしてください。";
         header("Location: student_login.php");
         exit();

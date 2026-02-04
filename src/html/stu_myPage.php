@@ -383,6 +383,9 @@
 
         <div class="side-panel">
             <div class="ranking-title">👑 人気ランキング</div>
+            <button class="ranking-item" style="font-weight:bold; border-bottom:2px solid #ddd; padding-bottom:8px; margin-bottom:12px; cursor:default;" onclick="location.href='student_ranking.php'">
+                ランキング詳細へ
+            </button>
             
             <?php if (!empty($ranking_list)): ?>
                 <ul class="ranking-list">
