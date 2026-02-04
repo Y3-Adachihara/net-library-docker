@@ -253,13 +253,13 @@ try {
                     </td>
 
                     <td class="action">
-                        <?php if (isset($row['status_id']) && $row['status_id'] == 1): ?>
+                        <?php //if (isset($row['status_id']) && $row['status_id'] == 1): ?>
                             <button type="button" class="borrow-btn" onclick="location.href='貸出返却.php?book_id=<?php echo h($row['book_id']); ?>'">
                                 貸出
                             </button>
-                        <?php else: ?>
-                            <button type="button" disabled style="background:#ccc;">不可</button>
-                        <?php endif; ?>
+                        <?php //else: ?>
+                            <!--<button type="button" disabled style="background:#ccc;">不可</button>-->
+                        <?php //endif; ?>
                     </td>
                 </tr>
                 <?php endforeach; ?>
