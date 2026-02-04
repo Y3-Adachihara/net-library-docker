@@ -143,7 +143,9 @@ try {
 } catch (Exception $e) {
     echo "エラー: " . h($e->getMessage());
     exit;
-}
+}finally {
+        $db->close(); // DB接続解除   
+    }
 ?>
 
 <!DOCTYPE html>
@@ -279,3 +281,10 @@ try {
 
 </body>
 </html>
+<script>
+    function confirmLogout() {
+            if (confirm("ログアウトしますか？")) {
+                document.getElementById('logout_form').submit();
+            }
+        }
+</script>

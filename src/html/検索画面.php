@@ -1,10 +1,80 @@
 <?php
+    require_once '../db_connect.php'; // DB接続ファイル
 	session_start();
+
 	if (isset($_SESSION['search_result_message'])) {
 		$message = $_SESSION['search_result_message'];
 		echo "<script>alert('" . htmlspecialchars($message, ENT_QUOTES, 'UTF-8')."');</script>";
 		unset($_SESSION['search_result_message']);
 	}
+
+    if (!isset($_SESSION['librarian_id'])) {
+        // 司書としてログインしていない場合、ログインページへリダイレクト
+        $_SESSION['message'] = "司書としてログインしてください。";
+        header("Location: librarian_login.php");
+        exit();
+    }
+    $librarian_school_id = isset($_SESSION['librarian_school_id']) ? $_SESSION['librarian_school_id'] : null;
+
+    $librarian_school_name = '';
+    $librarian_fullname = '';
+
+    function csrf_token_generate(): string {
+        $toke_byte = random_bytes(16);
+        $csrf_token = bin2hex($toke_byte);
+        return $csrf_token;
+    }
+    // CSRFトークンの生成
+    $csrf_token = csrf_token_generate();
+
+    // CSRFトークンセット関数
+    function set_csrf_token(String $csrf_token): void {
+        // CSRF対策用のトークンをセッションに保存
+        $_SESSION['csrf_token'] = $csrf_token;
+        echo '<input type="hidden" name="csrf_token" value="' . htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8') . '">';
+    }
+
+    try {
+        $db = new db_connect();
+        $db->connect();
+
+        $sql = "SELECT librarian.family_name, librarian.first_name, school.school_name FROM librarian LEFT JOIN school ON librarian.school_id = school.school_id WHERE librarian_id = ?";
+        $stmt = $db->pdo->prepare($sql);
+        $stmt->execute([$_SESSION['librarian_id']]);
+        $librarian = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($librarian) {
+            $librarian_fullname = $librarian['family_name'] . ' ' . $librarian['first_name'];
+            $librarian_school_name = $librarian['school_name'];
+        }
+
+        $sql = "SELECT * FROM school";
+        $stmt = $db->pdo->prepare($sql);
+        $stmt->execute();
+        $schools = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        if ($schools) {
+            foreach ($schools as $school) {
+                if ($school['school_id'] == $librarian_school_id) {
+                    $librarian_school_name = $school['school_name'];
+                    break;
+                }
+            }
+        }
+
+        $sql = "SELECT * FROM book_status";
+        $stmt = $db->pdo->prepare($sql);
+        $stmt->execute();
+        $status_list = $stmt->fetchAll(PDO::FETCH_ASSOC); // status_id と status_name の連想配列を取得
+    } catch (PDOException $e) {
+        echo "データベースエラー: " . h($e->getMessage());
+        exit;
+    } catch (Exception $e) {
+        echo "エラー: " . h($e->getMessage());
+        exit;
+    } finally {
+        $db->close(); // DB接続解除   
+    }
 ?>
 
 
@@ -24,6 +94,21 @@
     </style>
 </head>
 <body>
+
+<!-- ログアウトボタンを押したときのCSRFトークン発行 -->
+<form method="POST" action = "../php/logout.php" id = "logout_form">
+        <?php 
+            set_csrf_token($csrf_token);
+        ?>
+        <input type="hidden" name = "page_id" value= "0">
+    </form>
+
+
+<header>
+    <a href="#"><?php echo htmlspecialchars($librarian_fullname); ?> さん(<?php echo htmlspecialchars($librarian_school_name); ?>)の検索画面</a>
+    <button class="logout-btn" onclick="confirmLogout()">ログアウト</button>
+</header>
+
 
 <div class="container">
     <h1>司書検索画面</h1>
@@ -78,6 +163,13 @@
 </div>
 
 <script>
+    function confirmLogout() {
+            if (confirm("ログアウトしますか？")) {
+                document.getElementById('logout_form').submit();
+            }
+        }
+
+
     document.getElementById('searchForm').addEventListener('submit', function(e) {
         // .trim() をつけることで、スペースのみの入力を「空文字」として扱います
         const rui = document.getElementById('rui').value.trim();

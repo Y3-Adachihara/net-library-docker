@@ -279,3 +279,10 @@ try {
 
 </body>
 </html>
+<script>
+    function confirmLogout() {
+            if (confirm("ログアウトしますか？")) {
+                document.getElementById('logout_form').submit();
+            }
+        }
+</script>
