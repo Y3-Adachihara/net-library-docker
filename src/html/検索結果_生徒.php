@@ -7,20 +7,6 @@ function h($str) {
     return htmlspecialchars($str, ENT_QUOTES, 'UTF-8');
 }
 
-// 学校IDと学校名の対応リスト
-$school_list = [
-    1 => '第一中学校',
-    2 => '第二中学校',
-    3 => '第三中学校',
-    4 => '第四中学校',
-    5 => '第五中学校',
-    6 => '第六中学校',
-    7 => '第七中学校',
-    8 => '第八中学校',
-    9 => '第九中学校',
-    10 => '第十中学校'
-];
-
 // 1. 検索画面からの入力を受け取る
 $title     = isset($_GET["search-title"]) ? $_GET["search-title"] : '';
 $id        = isset($_GET["search-id"]) ? $_GET["search-id"] : '';
@@ -29,6 +15,10 @@ $mou       = isset($_GET["genre-mou"]) ? $_GET["genre-mou"] : '';
 $me        = isset($_GET["genre-me"]) ? $_GET["genre-me"] : '';
 $publisher = isset($_GET["search-publisher"]) ? $_GET["search-publisher"] : '';
 $author    = isset($_GET["search-author"]) ? $_GET["search-author"] : '';
+$student_school_id = isset($_SESSION['student_school_id']) ? $_SESSION['student_school_id'] : null;
+$student_fullname = $_SESSION['student_family_name'] . ' ' . $_SESSION['student_first_name'] ?? 'ゲスト';
+
+$student_school_name = '';
 //if(empty($rui)){
 	//$_SESSION['search_result_message'] = "類を入れてください";
 	//header("Location: 検索画面_生徒.php");
@@ -37,9 +27,44 @@ $author    = isset($_GET["search-author"]) ? $_GET["search-author"] : '';
 
 $results = [];
 
+// CSRFトークン発行関数(発行するだけで、セッション変数への保存は行わないから注意！)
+    function csrf_token_generate(): string {
+        $toke_byte = random_bytes(16);
+        $csrf_token = bin2hex($toke_byte);
+        return $csrf_token;
+    }
+    // CSRFトークンの生成
+    $csrf_token = csrf_token_generate();
+
+    // CSRFトークンセット関数
+    function set_csrf_token(String $csrf_token): void {
+        // CSRF対策用のトークンをセッションに保存
+        $_SESSION['csrf_token'] = $csrf_token;
+        echo '<input type="hidden" name="csrf_token" value="' . htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8') . '">';
+    }
+
 try {
     $db = new db_connect();
-    $db->connect(); 
+    $db->connect();
+
+    $sql = "SELECT * FROM school";
+        $stmt = $db->pdo->prepare($sql);
+        $stmt->execute();
+        $schools = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        if ($schools) {
+            foreach ($schools as $school) {
+                if ($school['school_id'] == $student_school_id) {
+                    $student_school_name = $school['school_name'];
+                    break;
+                }
+            }
+        }
+
+    $sql = "SELECT * FROM book_status";
+    $stmt = $db->pdo->prepare($sql);
+    $stmt->execute();
+    $status_list = $stmt->fetchAll(PDO::FETCH_ASSOC); // status_id と status_name の連想配列を取得
 
     // 2. 検索用SQLの作成
     $sql = "SELECT * FROM book_stack LEFT OUTER JOIN book_info ON book_stack.isbn = book_info.isbn WHERE 1 = 1";
@@ -86,6 +111,14 @@ try {
         $params[] = $genre_code . "%";
     }
 
+    if (empty($params)) {
+        // 生徒の学校IDで絞り込み
+        if ($student_school_id !== null) {
+            $sql .= " AND book_stack.position = ?";
+            $params[] = $student_school_id;
+        }
+    }
+
     $stmt = $db->pdo->prepare($sql);
     $stmt->execute($params);
     $results = $stmt->fetchAll();
@@ -104,26 +137,52 @@ try {
 <head>
     <meta charset="UTF-8">
     <title>検索結果一覧</title>
-    <link rel="stylesheet" href="検索結果.css">
+    <link rel="stylesheet" href="../css/検索結果.css">
     <style>
         .result-table th, .result-table td { padding: 10px; border: 1px solid #ccc; text-align: left; }
         .book-id { font-weight: bold; }
     </style>
 </head>
 <body>
+<!-- ログアウトボタンを押したときのCSRFトークン発行 -->
+<form method="POST" action = "../php/logout.php" id = "logout_form">
+        <?php 
+            set_csrf_token($csrf_token);
+        ?>
+        <input type="hidden" name = "page_id" value= "0">
+    </form>
+
+
+<header>
+    <a href="#"><?php echo htmlspecialchars($student_fullname); ?> さん(<?php echo htmlspecialchars($student_school_name); ?>)の検索画面</a>
+    <button class="logout-btn" onclick="confirmLogout()">ログアウト</button>
+</header>
 
 <div class="container">
-    <h1>検索結果一覧_生徒</h1>
+    <h1>検索結果一覧_生徒用</h1>
 
     <div class="selected-criteria">
         <div class="criteria-label">選んだ項目</div>
         <div class="criteria-content">
             <ul>
-                <li>・タイトル：<?php echo h($title); ?></li>
-                <li>・識別番号：<?php echo h($id); ?></li>
-                <li>・選択したジャンル：<?php echo h($rui . ' ' . $mou . ' ' . $me); ?></li>
-                <li>・出版社：<?php echo h($publisher); ?></li>
-                <li>・著者名：<?php echo h($author); ?></li>
+                <?php if (!empty($title)): ?>
+                <li>タイトル：<?php echo h($title); ?></li>
+                <?php endif; ?>
+                <?php if (!empty($id)): ?>
+                <li>識別番号：<?php echo h($id); ?></li>
+                <?php endif; ?>
+                <?php if (!empty($rui) || !empty($mou) || !empty($me)): ?>
+                <li>選択したジャンル：<?php echo h($rui . ' ' . $mou . ' ' . $me); ?></li>
+                <?php endif; ?>
+                <?php if (!empty($publisher)): ?>
+                <li>出版社：<?php echo h($publisher); ?></li>
+                <?php endif; ?>
+                <?php if (!empty($author)): ?>
+                <li>著者名：<?php echo h($author); ?></li>
+                <?php endif; ?>
+                <?php if (empty($title) && empty($id) && empty($rui) && empty($mou) && empty($me) && empty($publisher) && empty($author)): ?>
+                <li>検索条件が指定されなかったため、<?php echo h($student_school_name); ?>の全書籍を表示します。</li>
+                <?php endif; ?>
             </ul>
         </div>
     </div>
@@ -135,7 +194,7 @@ try {
                 <th>タイトル</th>
                 <th>出版社</th>
                 <th>場所</th>
-                <th>状況</th>
+                <th>貸出可能？</th>
                 <th>予約</th>
             </tr>
         </thead>
@@ -157,8 +216,13 @@ try {
 
                     <td class="book-location">
                         <?php 
-                            $pos = $row['position']; 
-                            echo h(isset($school_list[$pos]) ? $school_list[$pos] : '不明'); 
+                            $pos = $row['position'];
+                            foreach ($schools as $school) {
+                                if ($school['school_id'] == $pos) {
+                                    echo h($school['school_name']);
+                                    break;
+                                }
+                            }
                         ?>
                     </td>
 

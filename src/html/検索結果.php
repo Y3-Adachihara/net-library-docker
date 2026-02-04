@@ -29,6 +29,8 @@ $mou       = isset($_GET["genre-mou"]) ? $_GET["genre-mou"] : '';
 $me        = isset($_GET["genre-me"]) ? $_GET["genre-me"] : '';
 $publisher = isset($_GET["search-publisher"]) ? $_GET["search-publisher"] : '';
 $author    = isset($_GET["search-author"]) ? $_GET["search-author"] : '';
+
+$librarian_school_id = isset($_SESSION['librarian_school_id']) ? $_SESSION['librarian_school_id'] : null;
 //if(empty($rui)){
 	//$_SESSION['search_result_message'] = "類を入れてください";
 	//header("Location: 検索画面.php");
@@ -83,6 +85,15 @@ try {
     if ($genre_code !== '') {
         $sql .= " AND book_stack.book_id LIKE ?";
         $params[] = $genre_code . "%";
+    }
+
+    // 何も検索条件が指定されていない場合、司書の学校IDで絞り込み
+    if (empty($params)) {
+        // 司書の学校IDで絞り込み
+        if ($librarian_school_id !== null) {
+            $sql .= " AND book_stack.position = ?";
+            $params[] = $librarian_school_id;
+        }
     }
 
     $stmt = $db->pdo->prepare($sql);

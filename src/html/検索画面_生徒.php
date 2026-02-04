@@ -24,8 +24,8 @@
         echo '<input type="hidden" name="csrf_token" value="' . htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8') . '">';
     }
 
-    $student_fullname = $_SESSION['student_family_name'] . ' ' . $_SESSION['student_first_name'];
-    $student_school_id = $_SESSION['student_school_id'];
+    $student_fullname = $_SESSION['student_family_name'] . ' ' . $_SESSION['student_first_name'] ?? 'ゲスト';
+    $student_school_id = $_SESSION['student_school_id'] ?? '学校名不明';
 
     $student_school_name = '';
 
