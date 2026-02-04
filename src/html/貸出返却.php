@@ -175,11 +175,8 @@
 -->
 
         <div class="action-buttons">
-            <?php if (empty($received_book_id)): ?>
-            <button type="button" class="btn-blue" onclick="location.href='librarian_myPage.php'">戻る</button>
-            <?php else: ?>
-            <button type="button" class="btn-blue" onclick="location.href='検索画面.php'">戻る</button>
-            <?php endif; ?>
+            <button type="button" class="btn-blue" onclick="location.href='librarian_myPage.php'">司書用マイページへ戻る</button>
+            <button type="button" class="btn-blue" onclick="location.href='検索画面.php'">検索画面へ戻る</button>
 
             <button type="submit" formaction = "../php/lend.php" class="btn-blue">貸出</button>
             <button type="submit" formaction = "../php/return.php" class="btn-blue">返却</button>

@@ -16,10 +16,11 @@
     //　ここからは、生徒としてログインしていないと実行されない
     $student_id = $_SESSION['student_id'];
     $school_name = null;
-    $student_fullname;
+    $student_belong = $_SESSION['student_grade'] . "年" . $_SESSION['student_class'] . "組" . $_SESSION['student_number'] . "番" ?? '';
+    
 
     $student_fullname = null;
-    if (isset($_SESSION['student_family_name']) && isset($_SESSION['student_family_name'])) {
+    if (isset($_SESSION['student_family_name']) && isset($_SESSION['student_first_name'])) {
         $student_fullname = $_SESSION['student_family_name'] . " " . $_SESSION['student_first_name']; 
     } else {
         $_SESSION['to_stu_myPage_message'] = "学生情報を正常に取得できませんでした。";
@@ -176,7 +177,7 @@
     <body>
         <header class="main-header">
         <div class="header-logo">
-            <a href="student_reservation_reference.php"><?php echo h($student_fullname); ?>さん-予約参照ページ(<?php echo h($school_name); ?>)</a>
+            <a href="student_reservation_reference.php"><?php echo h($student_fullname); ?>さん-予約参照ページ(<?php echo h($school_name) . h($student_belong); ?>)</a>
         </div>
         <nav class="header-nav">
             <ul>
