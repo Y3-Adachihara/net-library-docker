@@ -1,71 +1,168 @@
-/* --- 全体共通（既存のものがあれば調整） --- */
+/* --- 全体レイアウト --- */
 body {
-    font-family: sans-serif;
-    padding: 20px;
+    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+    background-color: #f0f2f5;
+    margin: 0;
+    padding: 100px 0 60px 0; /* ヘッダー固定用の余白 */
     display: flex;
-    flex-direction: column; /* 複数の画面を縦に並べる場合 */
-    align-items: center;    /* 画面全体を中央に */
-    background-color: #f5f5f5; /* 背景を少しグレーにすると白枠が目立ちます */
+    flex-direction: column;
+    align-items: center;
+    color: #333;
 }
 
+/* --- ヘッダー（統一デザイン） --- */
+header {
+    width: 100%;
+    height: 60px;
+    background-color: #ffffff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 5%;
+    box-sizing: border-box;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+header a {
+    text-decoration: none;
+    color: #333;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.logout-btn {
+    background-color: #ff4d4f;
+    color: #fff;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.logout-btn:hover {
+    background-color: #ff7875;
+    box-shadow: 0 2px 5px rgba(255, 77, 79, 0.3);
+}
+
+/* --- メインコンテナ --- */
 .container {
-    width: 500px;
-    border: 1px solid #000;
-    padding: 40px;
-    background-color: #fff; /* ボックスの中を白にする */
-    margin-bottom: 50px;    /* 画面ごとの余白 */
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1); /* 軽い影をつけるときれいです */
+    width: 90%;
+    max-width: 550px;
+    background-color: #ffffff;
+    padding: 40px 50px;
+    border-radius: 12px;
+    box-shadow: 0 4px 25px rgba(0,0,0,0.06);
+    box-sizing: border-box;
 }
 
 h1 {
+    font-size: 24px;
+    color: #2c3e50;
     text-align: center;
-    border: 1px solid #ccc;
-    padding: 10px;
     margin-bottom: 40px;
-    background-color: #fff;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f0f2f5;
 }
 
-/* --- 入力エリアの調整 --- */
+/* --- フォーム入力エリア --- */
 .form-group {
     display: flex;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
 }
 
 .form-group label {
-    width: 120px;
-    text-align: right;
-    margin-right: 15px;
+    width: 100px;
     font-weight: bold;
+    color: #5d6d7e;
+    font-size: 15px;
+    text-align: left;
 }
 
-.form-group input, .form-group select {
+.form-group input, 
+.form-group select {
     flex: 1;
-    padding: 8px; /* 少し広げて入力しやすく */
-    border: 1px solid #4a90e2;
-    border-radius: 4px;
+    padding: 12px 15px;
+    border: 1px solid #dcdde1;
+    border-radius: 8px;
+    font-size: 16px;
+    color: #2f3640;
+    background-color: #fcfcfc;
+    transition: all 0.3s;
 }
 
-/* --- ボタンエリアの調整 --- */
+.form-group input:focus, 
+.form-group select:focus {
+    border-color: #4a90e2;
+    background-color: #fff;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+
+/* プレースホルダー */
+input::placeholder {
+    color: #bdc3c7;
+    font-size: 0.9em;
+}
+
+/* --- ボタンエリア --- */
 .action-buttons {
     display: flex;
-    justify-content: center;
-    gap: 40px;       /* 60pxから少し詰めるとバランスが良いです */
-    margin-top: 50px; /* 80pxから調整 */
+    flex-direction: column; /* 戻るボタンと、貸出・返却ボタンを分ける */
+    gap: 15px;
+    margin-top: 40px;
 }
 
+/* 下側の貸出・返却ボタンを横並びにするエリア */
+.action-buttons .main-actions {
+    display: flex;
+    gap: 15px;
+}
+
+/* 共通ボタンボタン */
 .btn-blue {
-    background-color: #a2c4e9;
-    border: 1px solid #7a9ec7;
-    padding: 12px 40px;
-    font-size: 18px;
+    flex: 1;
+    padding: 14px 0;
+    font-size: 16px;
     font-weight: bold;
     cursor: pointer;
-    box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
-    border-radius: 4px;
-    transition: background-color 0.3s; /* 色の変化を滑らかに */
+    border-radius: 8px;
+    border: none;
+    transition: all 0.3s;
+    text-align: center;
 }
 
-.btn-blue:hover {
-    background-color: #8fb8e3;
+/* 貸出・返却ボタン（メインアクション） */
+button[formaction*="lend.php"],
+button[formaction*="return.php"] {
+    background-color: #4a90e2;
+    color: white;
+}
+
+button[formaction*="lend.php"]:hover,
+button[formaction*="return.php"]:hover {
+    background-color: #357abd;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(74, 144, 226, 0.2);
+}
+
+/* 戻るボタン（控えめなグレー） */
+.btn-blue[onclick*="location.href"] {
+    background-color: #f1f2f6;
+    color: #7f8c8d;
+    border: 1px solid #dcdde1;
+    margin-bottom: 10px;
+}
+
+.btn-back:hover,
+.btn-blue[onclick*="location.href"]:hover {
+    background-color: #e1e2e6;
+    color: #2c3e50;
 }

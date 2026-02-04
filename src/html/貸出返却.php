@@ -51,75 +51,53 @@
     } else if (isset($_SESSION['return_result_message'])) {
         display_message($_SESSION['return_result_message'], 'return_result_message');
         unset($_SESSION['return_result_message']);
-    // 
-    } 
-    /*
-    else if (isset($_SESSION['title_select_message'])) {
-        display_message(($_SESSION['title_select_message']), 'title_select_message');
     }
-    
-    
-    $this_grade = $_POST['school-year'] ?? null;
-    $this_class = $_POST['class'] ?? null;
-    $this_number = $_POST['number'] ?? null;
-    $this_book_id = $_POST['id_number'] ?? null;
-    $this_book_title = $_POST['title'] ?? null;
+    $librarian_school_id = isset($_SESSION['librarian_school_id']) ? $_SESSION['librarian_school_id'] : null;
 
-    // テーブル型式で表示する際に使う書籍リストを格納する配列
-    $title_selected_books = null;
+    $librarian_school_name = '';
+    $librarian_fullname = '';
 
-    // 何も選ばれていなかったらこのページに戻す
-    if (empty($title_selected_books)) {
-        $_SESSION['title_select_message'] = "タイトルを入れてから検索してください。";
-        header("Location: 貸出返却.php");
-        exit();
-    }
-
-    
-    function table_data_display (array $records) {
-
-        if (empty($records)) {
-            echo "<tr><td colspan='6'>指定されたタイトルに部分一致する本はありません。</td></tr>";
-            return;
-        }
-
-
-    }
-    
     try {
         $db = new db_connect();
         $db->connect();
-        
-        $sql = "SELECT * FROM book_stack AS bs";
-        $sql .= " LEFT OUTRR JOIN book_info AS bi";
-        $sql .= " ON bs.isbn = bi.isbn";
-        $sql .= " WHERE bi.title LIKE ':title'";
-        $sql .= " AND bs.school_id = :school_id";
-        $stmt = $db->pdo->prepare($sql);
-        $stmt->execute([
-            'title' => '%' . $this_book_title . '%',
-            'school_od' => $librarian_school_id
-        ]);
-        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        if (!empty($results)) {
-            foreach($results AS $row) {
-                $title_selected_books [] = $row;
+        $sql = "SELECT librarian.family_name, librarian.first_name, school.school_name FROM librarian LEFT JOIN school ON librarian.school_id = school.school_id WHERE librarian_id = ?";
+        $stmt = $db->pdo->prepare($sql);
+        $stmt->execute([$_SESSION['librarian_id']]);
+        $librarian = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($librarian) {
+            $librarian_fullname = $librarian['family_name'] . ' ' . $librarian['first_name'];
+            $librarian_school_name = $librarian['school_name'];
+        }
+
+        $sql = "SELECT * FROM school";
+        $stmt = $db->pdo->prepare($sql);
+        $stmt->execute();
+        $schools = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        if ($schools) {
+            foreach ($schools as $school) {
+                if ($school['school_id'] == $librarian_school_id) {
+                    $librarian_school_name = $school['school_name'];
+                    break;
+                }
             }
         }
 
+        $sql = "SELECT * FROM book_status";
+        $stmt = $db->pdo->prepare($sql);
+        $stmt->execute();
+        $status_list = $stmt->fetchAll(PDO::FETCH_ASSOC); // status_id と status_name の連想配列を取得
     } catch (PDOException $e) {
-        $db->pdo->rollback();
-        echo "データベースエラー：" . $e->getMessage(); //デバッグ用。あとで消す！
+        echo "データベースエラー: " . h($e->getMessage());
         exit;
     } catch (Exception $e) {
-        $db->pdo->rollback();
-        echo "エラー：" . $e->getMessage(); //デバッグ用。あとで消す！
+        echo "エラー: " . h($e->getMessage());
         exit;
     } finally {
-        $db->close();
+        $db->close(); // DB接続解除   
     }
-        */
 ?>
 
 <!DOCTYPE html>
@@ -131,6 +109,10 @@
     <link rel = "stylesheet" href="../css/貸出返却.css">
 </head>
 <body>
+<header>
+    <a href="#"><?php echo htmlspecialchars($librarian_fullname); ?> さん(<?php echo htmlspecialchars($librarian_school_name); ?>)の検索画面</a>
+    <button class="logout-btn" onclick="confirmLogout()">ログアウト</button>
+</header>
 <div class="container">
 
     <h1>貸出・返却</h1>
@@ -206,3 +188,10 @@
 </div>
 </body>
 </html>
+<script>
+    function confirmLogout() {
+            if (confirm("ログアウトしますか？")) {
+                document.getElementById('logout_form').submit();
+            }
+        }
+</script>
