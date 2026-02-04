@@ -238,14 +238,125 @@
         </form>
 
         <form method="GET" class="librarian-menu-form">
-            <button type="submit" formaction="../html/検索画面.php" class="add-book-button">書籍検索</button>
-            <button type="submit" formaction="../html/貸出返却.php" class="manage-users-button">貸出・返却</button>
-            <button type="submit" formaction="../html/librarian_reservation_reference.php" class="manage-users-button">予約状況参照</button>
-	    <button type="submit" formaction="../html/announcements_register.php" class="add-book-button">お知らせ登録</button>
-            <button type="submit" formaction="../html/書籍登録.html" class="add-book-button">新規書籍登録</button>
-            <button type="submit" formaction="../html/librarian_bookManagement.php" class="add-book-button">予約された本の管理画面</button>
-            <button type="submit" formaction="../html/librarian_incoming_books.php" class="add-book-button">検品・仕分け画面</button>
-        </form>
+<style>
+    /* メニュー全体のコンテナ */
+    .menu-container {
+        width: 100%;             /* 横幅を100%使う */
+        margin: 20px 0;          
+        display: flex;
+        flex-direction: column;  /* グループを縦（上・下）に積む */
+        gap: 30px;               /* グループ間の余白 */
+    }
+
+    /* 各セクション（白い背景の箱） */
+    .menu-section {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        width: 100%;             /* 箱自体の幅も100% */
+        box-sizing: border-box;  /* パディングを含めて幅計算 */
+    }
+
+    .section-title {
+        font-size: 18px;
+        font-weight: bold;
+        color: #555;
+        margin-bottom: 15px;
+        border-left: 5px solid #1a73e8;
+        padding-left: 15px;
+    }
+
+    /* ★ここがポイント：ボタンを横に4つ並べる設定 */
+    .menu-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr); /* 1行に4つ均等配置 */
+        gap: 20px;                             /* ボタン同士の間隔 */
+    }
+
+    /* ボタンのデザイン調整 */
+    .action-btn {
+        border: none;
+        border-radius: 8px;
+        padding: 10px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        text-align: center;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 8px;
+        height: 100px; /* ボタンの高さを統一して見やすく */
+        width: 100%;
+    }
+    
+    .action-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        opacity: 0.95;
+    }
+
+    /* ボタンの色（グラデーションでリッチに） */
+    .btn-primary { background: linear-gradient(135deg, #1a73e8, #1557b0); }
+    .btn-success { background: linear-gradient(135deg, #2e8b57, #246b43); }
+    .btn-warning { background: linear-gradient(135deg, #f39c12, #d68910); }
+    .btn-info    { background: linear-gradient(135deg, #17a2b8, #138496); }
+    
+    .btn-icon { font-size: 24px; margin-bottom: 5px; }
+
+    /* 画面が狭くなった時の対応（スマホ・タブレット用） */
+    @media (max-width: 900px) {
+        .menu-grid { grid-template-columns: repeat(2, 1fr); } /* 2列にする */
+    }
+    @media (max-width: 600px) {
+        .menu-grid { grid-template-columns: 1fr; } /* 1列にする */
+    }
+</style>
+
+<form method="GET" class="menu-container">
+    
+    <div class="menu-section">
+        <div class="section-title">カウンター業務（メイン）</div>
+        <div class="menu-grid">
+            <button type="submit" formaction="../html/貸出返却.php" class="action-btn btn-primary">
+                <span class="btn-icon">📖</span> 貸出・返却
+            </button>
+            <button type="submit" formaction="../html/検索画面.php" class="action-btn btn-primary">
+                <span class="btn-icon">🔍</span> 書籍検索
+            </button>
+            <button type="submit" formaction="../html/librarian_bookManagement.php" class="action-btn btn-primary">
+                <span class="btn-icon">📋</span> 予約本取り置き
+            </button>
+             <button type="submit" formaction="../html/librarian_incoming_books.php" class="action-btn btn-primary">
+                <span class="btn-icon">📦</span> 検品・仕分け
+            </button>
+        </div>
+    </div>
+
+    <div class="menu-section">
+        <div class="section-title">管理・データ</div>
+        <div class="menu-grid">
+            <button type="submit" formaction="../html/librarian_reservation_reference.php" class="action-btn btn-warning">
+                <span class="btn-icon">📅</span> 予約状況参照
+            </button>
+            <button type="submit" formaction="../html/書籍登録.html" class="action-btn btn-success">
+                <span class="btn-icon">➕</span> 新規書籍登録
+            </button>
+            <button type="submit" formaction="../html/announcements_register.php" class="action-btn btn-info">
+                <span class="btn-icon">📢</span> お知らせ登録
+            </button>
+            <button type="submit" formaction="../html/ranking.php" class="action-btn btn-info">
+                <span class="btn-icon">👑</span> ランキング
+            </button>
+        </div>
+    </div>
+
+</form>
+</form>
 
         <div class ="info-table-container">
             <h2 ><?php echo h($school_name); ?>の貸出履歴（過去一年間）</h2>
