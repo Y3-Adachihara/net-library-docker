@@ -231,7 +231,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>予約取り置き画面(<?php echo h($school_name); ?>)</title>
+    <title>予約取り置き画面(<?php echo h($librarian_school_name); ?>)</title>
     <link rel="stylesheet" href="../css/librarian_book_management.css">
 </head>
 <body>
@@ -258,7 +258,7 @@
             <table>
                 <?php table_data_display($local_nonCarry_reservations, 4) ?>
             </table>
-            <input type="hidden" name="next_status" value="7">
+            <input type="hidden" name="next_status" value="4">
             <button type="submit">確認画面へ</button>
         </form>
     </div>
@@ -269,7 +269,7 @@
             <table>
                 <?php table_data_display($local_carryIn_reservations, 7) ?>
             </table>
-            <input type="hidden" name="next_status" value="4">
+            <input type="hidden" name="next_status" value="7">
             <button type="submit">確認画面へ</button>
         </form>
     </div>

@@ -51,9 +51,9 @@
 
     $selected_books = null;
     if ($next_status == 4) {
-        $selected_books = $local_carry_res; // 自校からの予約、本は自校所蔵
+        $selected_books = $local_noncarry_res; // 自校からの予約、本は自校所蔵
     } else if ($next_status == 7) {
-        $selected_books = $local_noncarry_res;  // 自校からの予約、本は他校所蔵
+        $selected_books = $local_carry_res;  // 自校からの予約、本は他校所蔵
     } else if ($next_status == 5) {
         $selected_books = $deliver_res; // 他校からの予約
     }

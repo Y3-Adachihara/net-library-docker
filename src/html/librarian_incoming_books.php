@@ -54,6 +54,14 @@ try {
             LEFT JOIN reservation AS r 
                 ON bs.book_id = r.book_id 
                 AND r.status_id = 1
+                AND r.reservation_id = (
+                    SELECT r2.reservation_id
+                    FROM reservation AS r2
+                    WHERE r2.book_id = bs.book_id   -- 同じ本の中で
+                    AND r2.status_id = 1            -- 有効な予約で
+                    ORDER BY r2.reservation_date ASC, r2.reservation_id ASC -- 一番早いもの
+                    LIMIT 1
+                )
             LEFT JOIN student AS st 
                 ON r.student_id = st.student_id
             LEFT JOIN school AS sc            -- ★追加：学校名の取得用
@@ -192,7 +200,7 @@ function renderTable($list, $type) {
         <form action="librarian_incoming_confirm.php" method="POST">
             <?php renderTable($reserved_list, 'reserved'); ?>
             <?php if (!empty($reserved_list)): ?>
-                <button type="submit">チェックした本を「予約受取待ち(3)」にする</button>
+                <button type="submit">チェックした本のステータスを変更する</button>
             <?php endif; ?>
         </form>
     </div>
