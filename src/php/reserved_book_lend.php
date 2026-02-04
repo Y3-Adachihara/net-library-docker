@@ -25,7 +25,7 @@
     //CSRF対策
     //トークンが一致しないか（右）、そもそもトークンがlogin.php(ログイン画面)から送られていない（左）時
     if (!isset($_POST["csrf_token"]) || $_POST["csrf_token"] != $_SESSION["csrf_token"]) {
-        $_SESSION['error'] = "不正な貸出リクエストです";
+        $_SESSION['lend_result_message'] = "不正な貸出リクエストです";
         header("Location: ../html/貸出返却.php");
         exit(); 
     }

@@ -27,6 +27,11 @@
         echo "<script>alert('" . htmlspecialchars($message, ENT_QUOTES, 'UTF-8') . "');</script>";
         unset($_SESSION['reserved_lend_message']);
     }
+    if (isset($_SESSION['reserved_book_lend_message'])) {
+        $error_message = $_SESSION['reserved_book_lend_message'];
+        echo "<script>alert('" . htmlspecialchars($error_message, ENT_QUOTES, 'UTF-8') . "');</script>";
+        unset($_SESSION['reserved_book_lend_message']);
+    }
 ?>
 
 <!DOCTYPE html>
