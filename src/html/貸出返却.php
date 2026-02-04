@@ -11,6 +11,8 @@
 
     // タイトルから部分一致で検索掛ける時に使う学校ID
     $librarian_school_id = $_SESSION['librarian_school_id'];
+    // 検索結果画面（司書用）から貸出・返却画面に遷移した場合の書籍ID受け取り
+    $received_book_id = isset($_GET['book_id']) ? $_GET['book_id'] : '';
 
     // CSRFトークン発行関数(発行するだけで、セッション変数への保存は行わないから注意！)
     function csrf_token_generate(): string {
@@ -179,18 +181,23 @@
     <?php set_csrf_token($csrf_token); ?>
 
         <div class="form-group">
-            <label>識別番号：</label>
-            <input type="text" name="id-number" placeholder="901000101">
+            <label>書籍番号：</label>
+            <input type="text" name="id-number" placeholder="901000101" value="<?php echo htmlspecialchars($received_book_id); ?>">
         </div>
-        
+        <!--
         <div>
             <label>タイトル：</label>
             <input type="text" name="title" placeholder="例:こころ">
             <button type="submit" formaction = "貸出返却.php" class="btn-blue">このタイトルで部分検索</button>
         </div>
+-->
 
         <div class="action-buttons">
+            <?php if (empty($received_book_id)): ?>
             <button type="button" class="btn-blue" onclick="location.href='librarian_myPage.php'">戻る</button>
+            <?php else: ?>
+            <button type="button" class="btn-blue" onclick="location.href='検索画面.php'">戻る</button>
+            <?php endif; ?>
 
             <button type="submit" formaction = "../php/lend.php" class="btn-blue">貸出</button>
             <button type="submit" formaction = "../php/return.php" class="btn-blue">返却</button>
