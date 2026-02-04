@@ -9,6 +9,10 @@ if (!isset($_SESSION['librarian_id'])) {
     exit();
 }
 
+$librarian_school_id = $_SESSION['librarian_school_id'] ?? null;
+$librarian_fullname = '';
+$librarian_school_name = '';
+
 // メッセージ表示処理
 if (isset($_SESSION['bookStatus_changeResult_message'])) {
     $msg = $_SESSION['bookStatus_changeResult_message'];
@@ -20,11 +24,26 @@ if (isset($_SESSION['message'])) {
     unset($_SESSION['message']);
 }
 
-$librarian_school_id = $_SESSION['librarian_school_id']; 
-
+// HTMLエスケープ関数
 function h($str) {
     return htmlspecialchars($str, ENT_QUOTES, 'UTF-8');
 }
+
+// CSRFトークン発行関数(発行するだけで、セッション変数への保存は行わないから注意！)
+    function csrf_token_generate(): string {
+        $toke_byte = random_bytes(16);
+        $csrf_token = bin2hex($toke_byte);
+        return $csrf_token;
+    }
+    // CSRFトークンの生成
+    $csrf_token = csrf_token_generate();
+
+    // CSRFトークンセット関数
+    function set_csrf_token(String $csrf_token): void {
+        // CSRF対策用のトークンをセッションに保存
+        $_SESSION['csrf_token'] = $csrf_token;
+        echo '<input type="hidden" name="csrf_token" value="' . htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8') . '">';
+    }
 
 // リスト初期化
 $reserved_list = []; // 予約あり（取り置き棚へ）
@@ -36,13 +55,38 @@ try {
     $db->connect();
     $pdo = $db->pdo;
 
+    $sql = "SELECT librarian.family_name, librarian.first_name, school.school_name FROM librarian LEFT JOIN school ON librarian.school_id = school.school_id WHERE librarian_id = ?";
+        $stmt = $db->pdo->prepare($sql);
+        $stmt->execute([$_SESSION['librarian_id']]);
+        $librarian = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($librarian) {
+            $librarian_fullname = $librarian['family_name'] . ' ' . $librarian['first_name'];
+            $librarian_school_name = $librarian['school_name'];
+        }
+
+        $sql = "SELECT * FROM school";
+        $stmt = $db->pdo->prepare($sql);
+        $stmt->execute();
+        $schools = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        if ($schools) {
+            foreach ($schools as $school) {
+                if ($school['school_id'] == $librarian_school_id) {
+                    $librarian_school_name = $school['school_name'];
+                    break;
+                }
+            }
+        }
+
     // ★SQL修正ポイント
     // 1. bs.school_id (持ち主) を取得
     // 2. schoolテーブルを結合して持ち主の学校名を取得
     $sql = "SELECT 
                 bs.book_id,
-                bs.school_id AS owner_school_id, -- 持ち主の学校ID
-                sc.school_name AS owner_school_name, -- 持ち主の学校名
+                bs.school_id AS owner_school_id, -- 本の持ち主の学校ID
+                sc.school_name AS owner_school_name, -- 書籍を所蔵する学校名
+                stu_sc.school_name AS reserver_school_name, -- 予約者の学校名（必要に応じて）
                 bi.title,
                 bi.isbn,
                 r.reservation_id,
@@ -66,6 +110,8 @@ try {
                 ON r.student_id = st.student_id
             LEFT JOIN school AS sc            -- ★追加：学校名の取得用
                 ON bs.school_id = sc.school_id
+            LEFT JOIN school AS stu_sc       -- ★追加：予約者の学校名取得用（必要に応じて）
+                ON st.school_id = stu_sc.school_id
             WHERE bs.position = :school_id  -- 現在位置が自分の学校
               AND bs.status_id = 10         -- 状態が「検品・仕分け中」
             ORDER BY bs.book_id ASC";
@@ -82,7 +128,7 @@ try {
         if (!empty($row['reservation_id'])) {
             // ■ パターン1：予約あり -> ステータス3 (予約受取待ち)
             $row['next_status'] = 3;
-            $row['student_name'] = $row['family_name'] . " " . $row['first_name'];
+            $row['student_name'] = $row['family_name'] . " " . $row['first_name'] . " (" . $row['reserver_school_name'] . ")";
             $reserved_list[] = $row;
             
         } else {
@@ -113,12 +159,12 @@ function renderTable($list, $type) {
         return;
     }
     echo "<table>";
-    echo "<tr><th>選択</th><th>書籍ID</th><th>タイトル</th><th>備考(予約者/返却先)</th><th>次の状態</th></tr>";
+    echo "<tr><th>選択</th><th>書籍ID</th><th>タイトル</th><th>所蔵学校</th><th>備考(予約者/返却先)</th><th>次の状態</th></tr>";
     
     foreach ($list as $row) {
         // 表示用テキストと色の設定
         if ($type === 'reserved') {
-            $status_text = "予約棚へ (受取待ち)";
+            $status_text = "予約取り置き画面の手続きへ";
             $status_color = "red";
         } elseif ($type === 'return') {
             $status_text = "配送箱へ (返却配送)";
@@ -140,6 +186,7 @@ function renderTable($list, $type) {
 
         echo "<td>" . h($row['book_id']) . "</td>";
         echo "<td>" . h($row['title']) . "</td>";
+        echo "<td>" . h($row['owner_school_name']) . "</td>";
         echo "<td>" . h($row['student_name']) . "</td>";
         echo "<td style='color:{$status_color}; font-weight:bold;'>" . h($status_text) . "</td>";
         echo "</tr>";
@@ -153,7 +200,7 @@ function renderTable($list, $type) {
 <head>
     <meta charset="UTF-8">
     <title>検品・仕分け処理</title>
-    <link rel="stylesheet" href="../css/librarian_myPage.css">
+    <link rel="stylesheet" href="../css/librarian_incoming_books.css">
     <style>
         .tabs { margin-bottom: 20px; }
         .tabs button {
@@ -185,6 +232,19 @@ function renderTable($list, $type) {
     </style>
 </head>
 <body>
+    <header>
+        <a href="librarian_incoming_books.php"><?php echo htmlspecialchars($librarian_fullname); ?> さん(<?php echo htmlspecialchars($librarian_school_name); ?>)の検品・仕分け画面</a>
+        <button class="logout-btn" onclick="confirmLogout()">ログアウト</button>
+    </header>
+    <!-- ログアウトボタンを押したときのCSFSトークン発行 -->
+        <form method="POST" action = "../php/logout.php" name = "link_logoutFORM">
+            <?php
+                set_csrf_token($csrf_token);
+            ?>
+            <input type="hidden" name = "page_id" value= "1">
+        </form>
+
+
     <h2>検品・仕分け処理</h2>
     <p>返却や配送により到着した図書（ステータス10）を仕分けます。</p>
 
@@ -200,7 +260,7 @@ function renderTable($list, $type) {
         <form action="librarian_incoming_confirm.php" method="POST">
             <?php renderTable($reserved_list, 'reserved'); ?>
             <?php if (!empty($reserved_list)): ?>
-                <button type="submit">チェックした本のステータスを変更する</button>
+                <button type="submit">チェックした本のステータスを変更する確認画面へ</button>
             <?php endif; ?>
         </form>
     </div>
@@ -211,7 +271,7 @@ function renderTable($list, $type) {
         <form action="librarian_incoming_confirm.php" method="POST">
             <?php renderTable($return_list, 'return'); ?>
             <?php if (!empty($return_list)): ?>
-                <button type="submit">チェックした本を「返却配送待ち(8)」にする</button>
+                <button type="submit">チェックした本を「返却配送待ち(8)」にする確認画面へ</button>
             <?php endif; ?>
         </form>
     </div>
@@ -222,15 +282,23 @@ function renderTable($list, $type) {
         <form action="librarian_incoming_confirm.php" method="POST">
             <?php renderTable($shelf_list, 'shelf'); ?>
             <?php if (!empty($shelf_list)): ?>
-                <button type="submit">チェックした本を「貸出可能(1)」にする</button>
+                <button type="submit">チェックした本を「貸出可能(1)」にする確認画面へ</button>
             <?php endif; ?>
         </form>
     </div>
 
     <br>
-    <button type="button" onclick="location.href='librarian_myPage.php'">マイページへ戻る</button>
-
+    <div class="bottom-container">
+        <button type="button" class="btn-back" onclick="location.href='librarian_myPage.php'">マイページへ戻る</button>
+    </div>
+    
     <script>
+        function confirmLogout() {
+            if (confirm("ログアウトしますか？")) {
+                document.getElementById('logout_form').submit();
+            }
+        }
+
         function openTab(evt, tabName) {
             var i, tabcontent, tablinks;
 
