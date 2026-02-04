@@ -342,6 +342,9 @@
                 <button class="menu-btn" onclick="location.href='student_reservation_reference.php'">
                     予約情報参照
                 </button>
+                <button class="menu-btn" onclick="location.href='student_lending_history.php'">
+                    貸出履歴
+                </button>
             </div>
             
             <div class="news-section">
