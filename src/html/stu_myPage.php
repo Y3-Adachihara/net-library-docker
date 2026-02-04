@@ -40,10 +40,7 @@
     }
 
     // --- レベル判定ロジック ---
-    // 戻り値: ['current_lv', 'current_name', 'next_name', 'remaining']
     function getStudentLevelStatus($count) {
-        // レベル定義 (必要冊数 => [レベル表記, 名前])
-        // 判定しやすいよう降順で定義
         $levels = [
             50 => ['MAX', 'マスター'],
             30 => ['5',   'エキスパート'],
@@ -55,7 +52,7 @@
 
         $current_lv = '1';
         $current_name = 'ゲスト';
-        $next_threshold = 5; // 次の目標（初期値）
+        $next_threshold = 5;
         $next_name = 'スタンダード';
         $is_max = false;
 
@@ -64,7 +61,7 @@
                 $current_lv = $info[0];
                 $current_name = $info[1];
                 
-                // 次のレベルを探す（現在の閾値より大きい最小のキーを探す）
+                // 次のレベルを探す
                 $prev_threshold = null;
                 $prev_name = null;
                 foreach (array_reverse($levels, true) as $th => $val) {
@@ -73,7 +70,7 @@
                         $next_name = $val[1];
                         break;
                     }
-                    if ($th == 50) { // MAXの場合
+                    if ($th == 50) {
                          $is_max = true;
                     }
                 }
@@ -99,13 +96,13 @@
         $db = new db_connect();
         $db->connect();
 
-        // 1. お知らせを取得
+        // 1. お知らせ
         $sql_news = "SELECT * FROM announcements WHERE is_active = 1 ORDER BY announcements_date DESC LIMIT 5";
         $stmt_news = $db->pdo->prepare($sql_news);
         $stmt_news->execute();
         $news_list = $stmt_news->fetchAll(PDO::FETCH_ASSOC);
 
-        // 2. ランキングを取得（TOP10）
+        // 2. ランキング
         $sql_rank = "SELECT 
                         bi.title, 
                         COUNT(l.lending_id) AS rental_count
@@ -119,15 +116,13 @@
         $stmt_rank->execute();
         $ranking_list = $stmt_rank->fetchAll(PDO::FETCH_ASSOC);
 
-        // 3. 自分の読了数を取得（レベル計算用）
-        // 返却済み(return_date IS NOT NULL)の数をカウント
+        // 3. 自分の読了数
         $sql_count = "SELECT COUNT(*) FROM lending WHERE student_id = :sid AND return_date IS NOT NULL";
         $stmt_count = $db->pdo->prepare($sql_count);
         $stmt_count->bindValue(':sid', $student_id, PDO::PARAM_INT);
         $stmt_count->execute();
         $my_read_count = $stmt_count->fetchColumn();
 
-        // レベル情報を生成
         $level_info = getStudentLevelStatus($my_read_count);
 
     } catch (Exception $e) {
@@ -174,7 +169,13 @@
         .header-left {
             display: flex;
             align-items: baseline;
-            gap: 15px; /* 名前とレベルの間隔 */
+            gap: 15px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px; /* ボタン間の隙間 */
         }
 
         .welcome-text {
@@ -189,7 +190,6 @@
             font-size: 16px;
         }
 
-        /* レベル表示用スタイル */
         .level-display {
             font-size: 14px;
             color: #555;
@@ -199,7 +199,7 @@
             border: 1px solid #e9ecef;
         }
         .level-up-alert {
-            color: #e67e22; /* オレンジ色で強調 */
+            color: #e67e22;
             font-weight: bold;
             font-size: 13px;
             animation: flash 2s infinite;
@@ -207,6 +207,22 @@
         @keyframes flash {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.6; }
+        }
+
+        /* ランク一覧ボタン */
+        .rank-list-btn {
+            background-color: #fff;
+            color: #1a73e8;
+            border: 1px solid #1a73e8;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        .rank-list-btn:hover {
+            background-color: #f0f8ff;
         }
 
         .logout-btn {
@@ -224,6 +240,74 @@
             background-color: #ff7875;
             box-shadow: 0 2px 5px rgba(255, 77, 79, 0.3);
         }
+
+        /* --- モーダルウィンドウのスタイル --- */
+        .modal {
+            display: none; /* 初期状態は非表示 */
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5); /* 半透明の黒背景 */
+            animation: fadeIn 0.3s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 10% auto; /* 画面中央少し上 */
+            padding: 25px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .close-btn {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 20px;
+        }
+        .close-btn:hover { color: #000; }
+
+        .modal-title {
+            margin-top: 0;
+            color: #333;
+            text-align: center;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        /* ランク表 */
+        .rank-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        .rank-table th, .rank-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        .rank-table th { background-color: #f9f9f9; color: #555; }
+        
+        /* ランクバッジ色 */
+        .badge-lv-max { color: #e67e22; font-weight: bold; } /* マスター */
+        .badge-lv-5 { color: #9b59b6; font-weight: bold; }   /* エキスパート */
+        .badge-lv-4 { color: #3498db; font-weight: bold; }   /* スペシャリスト */
+        .badge-lv-3 { color: #2ecc71; font-weight: bold; }   /* アドバンスド */
+        .badge-lv-2 { color: #f1c40f; font-weight: bold; }   /* スタンダード */
+        .badge-lv-1 { color: #95a5a6; font-weight: bold; }   /* ゲスト */
 
         /* --- レイアウト用ラッパー --- */
         .content-wrapper {
@@ -262,13 +346,16 @@
                 width: 100%;
                 box-sizing: border-box;
             }
-            /* スマホ時はヘッダーのレベル表示を調整 */
             .header-left {
                 flex-direction: column;
                 gap: 2px;
             }
+            /* スマホでヘッダーボタンが窮屈にならないように調整 */
+            .header-right { gap: 10px; }
+            .rank-list-btn, .logout-btn { padding: 6px 12px; font-size: 11px; }
         }
 
+        /* 既存スタイル省略部 */
         .page-title {
             font-size: 22px;
             font-weight: bold;
@@ -278,14 +365,12 @@
             border-left: 5px solid #1a73e8;
             padding-left: 15px;
         }
-
         .button-row {
             display: flex;
             justify-content: space-between;
             margin-bottom: 40px;
             gap: 20px;
         }
-
         .menu-btn {
             width: 32%;
             height: 110px;
@@ -308,8 +393,6 @@
             transform: translateY(-3px);
             box-shadow: 0 5px 15px rgba(26, 115, 232, 0.1);
         }
-
-        /* お知らせ */
         .news-section {
             margin-top: 10px;
             text-align: left;
@@ -329,13 +412,11 @@
             align-items: flex-start;
         }
         .news-item:last-child { border-bottom: none; }
-        
         .news-meta { min-width: 120px; flex-shrink: 0; }
         .news-date { color: #999; font-size: 0.85em; margin-bottom: 5px; display: block; }
         .news-title-wrap { flex-grow: 1; }
         .news-title { font-weight: bold; color: #333; margin: 0 0 5px 0; font-size: 1em; }
         .news-content { color: #666; font-size: 0.9em; line-height: 1.6; white-space: pre-wrap; margin: 0; }
-        
         .category-badge {
             display: inline-block; padding: 2px 10px; border-radius: 4px; 
             font-size: 0.7em; color: white; font-weight: bold; text-align: center;
@@ -344,8 +425,6 @@
         .cat-event { background-color: #4caf50; }
         .cat-new { background-color: #2196f3; }
         .cat-other { background-color: #9e9e9e; }
-
-        /* --- ランキング用スタイル --- */
         .ranking-title {
             font-size: 18px;
             font-weight: bold;
@@ -353,14 +432,10 @@
             margin-bottom: 20px;
             padding-bottom: 10px;
             border-bottom: 2px solid #f0f0f0;
-            
-            /* Flexboxで左右配置に変更 */
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-
-        /* ランキング詳細ボタン（小さなリンク風に） */
         .ranking-more-link {
             font-size: 13px;
             color: #1a73e8;
@@ -375,7 +450,6 @@
             background-color: #1a73e8;
             color: #fff;
         }
-
         .ranking-list {
             list-style: none;
             padding: 0;
@@ -389,7 +463,6 @@
             font-size: 14px;
         }
         .ranking-item:last-child { border-bottom: none; }
-        
         .rank-num {
             width: 24px;
             height: 24px;
@@ -406,7 +479,6 @@
         .rank-1 .rank-num { background: #ffd700; color: #fff; }
         .rank-2 .rank-num { background: #c0c0c0; color: #fff; }
         .rank-3 .rank-num { background: #cd7f32; color: #fff; }
-
         .rank-book-title {
             flex-grow: 1;
             line-height: 1.4;
@@ -427,9 +499,7 @@
 <body>
 
     <form method="POST" action = "../php/logout.php" id = "logout_form">
-        <?php 
-            set_csrf_token($csrf_token);
-        ?>
+        <?php set_csrf_token($csrf_token); ?>
         <input type="hidden" name = "page_id" value= "0">
     </form>
 
@@ -447,7 +517,10 @@
             <?php endif; ?>
         </div>
 
-        <button class="logout-btn" onclick="confirmLogout()">ログアウト</button>
+        <div class="header-right">
+            <button class="rank-list-btn" onclick="openRankModal()">ランク一覧</button>
+            <button class="logout-btn" onclick="confirmLogout()">ログアウト</button>
+        </div>
     </div>
 
     <div class="content-wrapper">
@@ -480,7 +553,6 @@
                             if ($news['announcements_category'] === '重要') $badge_class = 'cat-important';
                             elseif ($news['announcements_category'] === 'イベント') $badge_class = 'cat-event';
                             elseif ($news['announcements_category'] === '新着') $badge_class = 'cat-new';
-                            
                             $date = date('Y/m/d', strtotime($news['announcements_date']));
                         ?>
                         <div class="news-item">
@@ -491,9 +563,7 @@
                                 </span>
                             </div>
                             <div class="news-title-wrap">
-                                <p class="news-title">
-                                    <?php echo h($news['announcements_title']); ?>
-                                </p>
+                                <p class="news-title"><?php echo h($news['announcements_title']); ?></p>
                                 <p class="news-content"><?php echo h($news['announcements_content']); ?></p>
                             </div>
                         </div>
@@ -525,10 +595,7 @@
                         <span class="rank-book-title"><?php echo h($book['title']); ?></span>
                         <span class="rank-count"><?php echo $book['rental_count']; ?>回</span>
                     </li>
-                <?php 
-                $r++;
-                endforeach; 
-                ?>
+                <?php $r++; endforeach; ?>
                 </ul>
             <?php else: ?>
                 <p style="font-size:0.9em; color:#888; text-align:center;">まだデータがありません。</p>
@@ -536,11 +603,76 @@
         </div>
 
     </div>
+
+    <div id="rankModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeRankModal()">&times;</span>
+            <h3 class="modal-title">🏆 読破王ランク一覧</h3>
+            <table class="rank-table">
+                <tr>
+                    <th>レベル</th>
+                    <th>ランク名</th>
+                    <th>必要な読了数</th>
+                </tr>
+                <tr>
+                    <td>MAX</td>
+                    <td class="badge-lv-max">マスター</td>
+                    <td>50冊以上</td>
+                </tr>
+                <tr>
+                    <td>Lv.5</td>
+                    <td class="badge-lv-5">エキスパート</td>
+                    <td>30冊以上</td>
+                </tr>
+                <tr>
+                    <td>Lv.4</td>
+                    <td class="badge-lv-4">スペシャリスト</td>
+                    <td>20冊以上</td>
+                </tr>
+                <tr>
+                    <td>Lv.3</td>
+                    <td class="badge-lv-3">アドバンスド</td>
+                    <td>10冊以上</td>
+                </tr>
+                <tr>
+                    <td>Lv.2</td>
+                    <td class="badge-lv-2">スタンダード</td>
+                    <td>5冊以上</td>
+                </tr>
+                <tr>
+                    <td>Lv.1</td>
+                    <td class="badge-lv-1">ゲスト</td>
+                    <td>0冊〜</td>
+                </tr>
+            </table>
+            <p style="text-align:center; font-size:12px; color:#666; margin-top:15px;">
+                ※返却済みの本がカウントされます。
+            </p>
+        </div>
+    </div>
     
     <script>
         function confirmLogout() {
             if (confirm("ログアウトしますか？")) {
                 document.getElementById('logout_form').submit();
+            }
+        }
+
+        // モーダル操作用スクリプト
+        var modal = document.getElementById("rankModal");
+
+        function openRankModal() {
+            modal.style.display = "block";
+        }
+
+        function closeRankModal() {
+            modal.style.display = "none";
+        }
+
+        // モーダルの外側をクリックしたら閉じる
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
             }
         }
     </script>
