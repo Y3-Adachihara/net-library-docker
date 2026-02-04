@@ -171,7 +171,14 @@
                             LEFT OUTER JOIN book_info AS bi 
                             ON bs.isbn = bi.isbn 
                             LEFT OUTER JOIN reservation AS rs 
-                            ON bs.book_id = rs.book_id AND rs.status_id = 1 
+                            ON rs.reservation_id = (
+                                SELECT r2.reservation_id
+                                FROM reservation AS r2
+                                WHERE r2.book_id = bs.book_id
+                                AND r2.status_id = 1
+                                ORDER BY r2.reservation_date ASC, r2.reservation_id ASC
+                                LIMIT 1
+                            )
                             LEFT OUTER JOIN student AS st 
                             ON rs.student_id = st.student_id 
                             LEFT OUTER JOIN delivery AS dl 
