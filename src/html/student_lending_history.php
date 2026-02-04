@@ -145,6 +145,7 @@ try {
             <thead>
                 <tr>
 			<th style="width: 20%;">書籍名</th>
+                <th style="width: 15%;">書籍ID</th>
         		<th style="width: 15%;">著者</th>
         		<th style="width: 15%;">出版社</th>
         		<th class="text-center" style="width: 20%;">貸出日</th>
@@ -202,6 +203,7 @@ try {
                 ?>
                 <tr>
                     <td><?php echo htmlspecialchars($row['title']); ?></td>
+                    <td><?php echo htmlspecialchars($row['book_id']); ?></td>
                     <td><?php echo htmlspecialchars($row['author_name']); ?></td>
                     <td><?php echo htmlspecialchars($row['publisher']); ?></td>
                     <td class="text-center"><?php echo htmlspecialchars($row['lending_date']); ?></td>
