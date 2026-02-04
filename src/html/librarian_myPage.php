@@ -186,6 +186,19 @@
         echo "<script>alert('" . htmlspecialchars($error_message, ENT_QUOTES, 'UTF-8') . "');</script>";
     }
 
+    $news_list = []; // 初期化
+    try {
+      // お知らせを取得（公開中のもの、最新5件）
+      $sql_news = "SELECT * FROM announcements WHERE is_active = 1 ORDER BY announcements_date DESC LIMIT 5";
+      $stmt_news = $db->pdo->prepare($sql_news);
+      $stmt_news->execute();
+      $news_list = $stmt_news->fetchAll(PDO::FETCH_ASSOC);
+
+    } catch (Exception $e) {
+    // エラーが出ても画面全体が止まらないように静かに処理、またはログに残す
+    // echo "お知らせ取得エラー: " . h($e->getMessage()); 
+    }
+
 ?>
 
 <!DOCTYPE html>
@@ -228,6 +241,7 @@
             <button type="submit" formaction="../html/検索画面.php" class="add-book-button">書籍検索</button>
             <button type="submit" formaction="../html/貸出返却.php" class="manage-users-button">貸出・返却</button>
             <button type="submit" formaction="../html/librarian_reservation_reference.php" class="manage-users-button">予約状況参照</button>
+	    <button type="submit" formaction="../html/announcements_register.php" class="add-book-button">お知らせ登録</button>
             <button type="submit" formaction="../html/書籍登録.html" class="add-book-button">新規書籍登録</button>
             <button type="submit" formaction="../html/librarian_bookManagement.php" class="add-book-button">予約された本の管理画面</button>
             <button type="submit" formaction="../html/librarian_incoming_books.php" class="add-book-button">検品・仕分け画面</button>
@@ -260,6 +274,93 @@
                 </table>
             </div>
         </div>
+	
+	<style>
+            .news-list-wrapper { padding: 10px 20px; }
+            .news-item {
+                border-bottom: 1px solid #eee;
+                padding: 12px 0;
+                display: flex;
+                align-items: flex-start;
+                flex-wrap: wrap;
+            }
+            .news-item:last-child { border-bottom: none; }
+            .news-meta {
+                min-width: 150px;
+                flex-shrink: 0;
+            }
+            .news-date {
+                color: #888;
+                font-size: 0.9em;
+                margin-right: 8px;
+            }
+            .news-title-wrap { flex-grow: 1; }
+            .news-title {
+                font-weight: bold;
+                color: #333;
+                margin: 0 0 5px 0;
+                font-size: 1em;
+            }
+            .news-content {
+                color: #666;
+                font-size: 0.9em;
+                white-space: pre-wrap;
+                margin: 0;
+            }
+            /* バッジの色設定 */
+            .category-badge {
+                display: inline-block;
+                padding: 2px 8px;
+                border-radius: 4px;
+                font-size: 0.75em;
+                color: white;
+                font-weight: bold;
+                text-align: center;
+                min-width: 60px;
+            }
+            .cat-important { background-color: #ff5252; }
+            .cat-event { background-color: #4caf50; }
+            .cat-new { background-color: #2196f3; }
+            .cat-other { background-color: #9e9e9e; }
+        </style>
 
+        <div class="info-table-container" style="margin-top: 30px; margin-bottom: 50px;">
+            <h2>📢 図書館からのお知らせ</h2>
+
+            <div class="news-list-wrapper">
+                <?php if (!empty($news_list)): ?>
+                    <?php foreach ($news_list as $news): ?>
+                        <?php 
+                            // バッジの色判定
+                            $badge_class = 'cat-other';
+                            if ($news['announcements_category'] === '重要') $badge_class = 'cat-important';
+                            elseif ($news['announcements_category'] === 'イベント') $badge_class = 'cat-event';
+                            elseif ($news['announcements_category'] === '新着') $badge_class = 'cat-new';
+                            
+                            // 日付フォーマット
+                            $date = date('Y/m/d', strtotime($news['announcements_date']));
+                        ?>
+
+                        <div class="news-item">
+                            <div class="news-meta">
+                                <span class="news-date"><?php echo h($date); ?></span>
+                                <span class="category-badge <?php echo $badge_class; ?>">
+                                    <?php echo h($news['announcements_category']); ?>
+                                </span>
+                            </div>
+                            <div class="news-title-wrap">
+                                <p class="news-title">
+                                    <?php echo h($news['announcements_title']); ?>
+                                </p>
+                                <p class="news-content"><?php echo h($news['announcements_content']); ?></p>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <p style="padding: 20px; text-align: center; color: #666;">現在、お知らせはありません。</p>
+                <?php endif; ?>
+            </div>
+        </div>
+	
     </body>
 </html>

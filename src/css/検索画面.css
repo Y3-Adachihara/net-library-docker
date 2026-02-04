@@ -1,72 +1,199 @@
-/* 検索画面専用の青枠（手書き図の再現） */
-.search-section {
-    border: 1px solid #4a90e2;
-    padding: 25px;
-    margin-bottom: 20px;
-    border-radius: 4px;
-    background-color: #fff;
+/* 共通設定 */
+body {
+    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
+    background-color: #f0f2f5;
+    margin: 0;
+    padding: 80px 0 40px 0; /* ヘッダー固定用の余白 */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #333;
 }
 
-/* ラベルと入力スタックの横並び */
+/* --- ヘッダー（マイページと共通のデザイン） --- */
+header {
+    width: 100%;
+    height: 60px;
+    background-color: #ffffff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 5%;
+    box-sizing: border-box;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+header a {
+    text-decoration: none;
+    color: #333;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.logout-btn {
+    background-color: #ff4d4f;
+    color: #fff;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.logout-btn:hover {
+    background-color: #ff7875;
+    box-shadow: 0 2px 5px rgba(255, 77, 79, 0.3);
+}
+
+/* --- コンテナ --- */
+.container {
+    background-color: #fff;
+    width: 90%;
+    max-width: 800px;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    box-sizing: border-box;
+}
+
+h1 {
+    font-size: 22px;
+    color: #2c3e50;
+    border-left: 5px solid #4a90e2;
+    padding-left: 15px;
+    margin-bottom: 30px;
+}
+
+/* --- 検索セクション --- */
+.search-section {
+    border: 1px solid #e1e8ed;
+    padding: 25px;
+    margin-bottom: 25px;
+    border-radius: 8px;
+    background-color: #fcfdfe;
+}
+
+/* タイトルor識別番号のグループ */
 .title-or-id-group {
     display: flex;
     align-items: center;
+    gap: 20px;
 }
 
 .label-box {
     width: 100px;
     display: flex;
     flex-direction: column;
-    text-align: right;
-    margin-right: 20px;
+    align-items: center;
     font-weight: bold;
+    color: #4a90e2;
 }
 
 .or-text {
-    font-size: 0.8em;
-    color: #666;
-    text-align: center;
-    padding: 2px 0;
+    font-size: 0.75em;
+    color: #999;
+    background: #eee;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin: 4px 0;
 }
 
-/* 入力欄を縦に2つ並べるスタック */
 .input-stack {
     flex: 1;
-    max-width: 300px;
     display: flex;
     flex-direction: column;
-    gap: 12px; /* 2つの入力欄の間の隙間 */
+    gap: 10px;
 }
 
-/* 詳細セクション内の余白調整 */
-.detailed-section .form-group:last-child {
-    margin-bottom: 0;
+/* フォーム共通入力欄 */
+input[type="text"], select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 15px;
+    box-sizing: border-box;
+    transition: border-color 0.3s;
 }
 
-/* ボタンを横に並べるエリア */
+input[type="text"]:focus, select:focus {
+    border-color: #4a90e2;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+
+/* 詳細設定のグリッド表示 */
+.detailed-section {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-group {
+    display: flex;
+    align-items: center;
+}
+
+.form-group label {
+    width: 140px;
+    font-weight: bold;
+    font-size: 14px;
+    color: #555;
+}
+
+/* プレースホルダーの色 */
+input::placeholder {
+    color: #ccc;
+    font-size: 0.85em;
+}
+
+/* --- ボタンエリア --- */
 .button-row {
     display: flex;
-    justify-content: center; /* 中央寄せ */
-    gap: 15px;               /* ボタン同士の間隔 */
-    margin-top: 30px;
-    width: 100%;             /* 横幅いっぱいに使う */
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
 }
 
-/* 3つのボタン共通のスタイル */
-.button-row .btn {
-    flex: 1;                 /* ★これが重要：3つの幅を均等にする */
-    padding: 12px 0;         /* 上下の余白 */
-    background-color: #4a90e2; /* すべて青色にする */
-    color: white;            /* 文字は白 */
-    border: 1px solid #357abd;
-    border-radius: 4px;
+.btn {
+    flex: 1;
+    padding: 14px 0;
+    border: none;
+    border-radius: 8px;
     font-size: 16px;
     font-weight: bold;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: all 0.3s ease;
 }
 
-/* マウスを乗せたとき */
-.button-row .btn:hover {
-    background-color: #357abd; /* 少し濃い青 */
+/* 戻るボタン */
+.btn {
+    background-color: #95a5a6;
+    color: white;
+}
+.btn:hover {
+    background-color: #7f8c8d;
+}
+
+/* 検索・取消ボタン（青系） */
+.btn-blue {
+    background-color: #4a90e2;
+    color: white;
+}
+
+.btn-blue:hover {
+    background-color: #357abd;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(74, 144, 226, 0.2);
+}
+
+/* 取消ボタンだけ少し色を変える場合 */
+button[type="reset"] {
+    background-color: #6c86a3;
 }

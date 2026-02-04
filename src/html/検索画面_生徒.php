@@ -2,14 +2,32 @@
 	session_start();
     require_once('../db_connect.php');
 
-
 	if (isset($_SESSION['search_result_message'])) {
 		$message = $_SESSION['search_result_message'];
 		echo "<script>alert('" . htmlspecialchars($message, ENT_QUOTES, 'UTF-8')."');</script>";
 		unset($_SESSION['search_result_message']);
 	}
 
+    // CSRFトークン発行関数(発行するだけで、セッション変数への保存は行わないから注意！)
+    function csrf_token_generate(): string {
+        $toke_byte = random_bytes(16);
+        $csrf_token = bin2hex($toke_byte);
+        return $csrf_token;
+    }
+    // CSRFトークンの生成
+    $csrf_token = csrf_token_generate();
+
+    // CSRFトークンセット関数
+    function set_csrf_token(String $csrf_token): void {
+        // CSRF対策用のトークンをセッションに保存
+        $_SESSION['csrf_token'] = $csrf_token;
+        echo '<input type="hidden" name="csrf_token" value="' . htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8') . '">';
+    }
+
+    $student_fullname = $_SESSION['student_family_name'] . ' ' . $_SESSION['student_first_name'];
     $student_school_id = $_SESSION['student_school_id'];
+
+    $student_school_name = '';
 
     try {
         $db = new db_connect();
@@ -20,6 +38,15 @@
         $stmt->execute();
 
         $schools = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        if ($schools) {
+            foreach ($schools as $school) {
+                if ($school['school_id'] == $student_school_id) {
+                    $student_school_name = $school['school_name'];
+                    break;
+                }
+            }
+        }
 
     } catch (PDOException $e) {
         echo "データベースエラー：" . $e->getMessage(); //デバッグ用。あとで消す！
@@ -49,7 +76,19 @@
 </head>
 <body>
 
-</html>
+<form method="POST" action = "../php/logout.php" id = "logout_form">
+        <?php 
+            set_csrf_token($csrf_token);
+        ?>
+        <input type="hidden" name = "page_id" value= "0">
+    </form>
+
+
+<header>
+    <a href="#"><?php echo htmlspecialchars($student_fullname); ?> さん(<?php echo htmlspecialchars($student_school_name); ?>)の検索画面</a>
+    <button class="logout-btn" onclick="confirmLogout()">ログアウト</button>
+</header>
+
 <div class="container">
     <h1>生徒検索画面</h1>
 
@@ -113,7 +152,6 @@
                         </option>
                     <?php endforeach; ?>
                 </select>
-                <input type="hidden" name="student-school-id" value="<?php echo htmlspecialchars($student_school_id); ?>">
             </div>
         </div>
 
@@ -154,6 +192,13 @@
         }
             */
     });
+
+        function confirmLogout() {
+            if (confirm("ログアウトしますか？")) {
+                document.getElementById('logout_form').submit();
+            }
+        }
 </script>
 
 </body>
+</html>
