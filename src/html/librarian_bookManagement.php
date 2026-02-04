@@ -9,7 +9,6 @@
         exit();
     }
     //　ここからは、司書としてログインしていないと実行されない
-
     if (isset($_SESSION['book_manageConfirm_message'])) {
         $message = $_SESSION['book_manageConfirm_message'];
         echo "<script>alert('" . htmlspecialchars($message, ENT_QUOTES, 'UTF-8') . "');</script>";
@@ -21,10 +20,31 @@
         unset($_SESSION['bookStatus_changeResult_message']);
     }
 
+    // CSRFトークン発行関数(発行するだけで、セッション変数への保存は行わないから注意！)
+    function csrf_token_generate(): string {
+        $toke_byte = random_bytes(16);
+        $csrf_token = bin2hex($toke_byte);
+        return $csrf_token;
+    }
+    // CSRFトークンの生成
+    $csrf_token = csrf_token_generate();
+
+    // CSRFトークンセット関数
+    function set_csrf_token(String $csrf_token): void {
+        // トークンを隠し属性として送るためのhtmlコードを記述
+        echo '<input type="hidden" name="csrf_token" value="' . htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8') . '">';
+    }
+
+    //CSRFトークンがセットされていなかったらセッションにセットする
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = csrf_token_generate();
+    }
 
 
-    $_librarian_id = $_SESSION['librarian_id'];
-    $_librarian_school_id = $_SESSION['librarian_school_id'];
+    $librarian_id = $_SESSION['librarian_id'] ?? null;
+    $librarian_school_id = $_SESSION['librarian_school_id'] ?? null;
+    $librarian_fullname = '';
+    $librarian_school_name = '';
 
     $local_nonCarry_reservations = [];  // 予約者は自校、本も自校が所蔵
     $local_carryIn_reservations = [];   // 予約者は自校、本は他校が所蔵
@@ -92,9 +112,33 @@
         $db = new db_connect();
         $db->connect();
 
+        $sql = "SELECT librarian.family_name, librarian.first_name, school.school_name FROM librarian LEFT JOIN school ON librarian.school_id = school.school_id WHERE librarian_id = ?";
+        $stmt = $db->pdo->prepare($sql);
+        $stmt->execute([$_SESSION['librarian_id']]);
+        $librarian = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($librarian) {
+            $librarian_fullname = $librarian['family_name'] . ' ' . $librarian['first_name'];
+            $librarian_school_name = $librarian['school_name'];
+        }
+
+        $sql = "SELECT * FROM school";
+        $stmt = $db->pdo->prepare($sql);
+        $stmt->execute();
+        $schools = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        if ($schools) {
+            foreach ($schools as $school) {
+                if ($school['school_id'] == $librarian_school_id) {
+                    $librarian_school_name = $school['school_name'];
+                    break;
+                }
+            }
+        }
+
         $sql_school_name = "SELECT * FROM school WHERE school_id = :school_id";
         $stmt_scName = $db->pdo->prepare($sql_school_name);
-        $stmt_scName->bindValue(':school_id', $_librarian_school_id, PDO::PARAM_INT);
+        $stmt_scName->bindValue(':school_id', $librarian_school_id, PDO::PARAM_INT);
         $stmt_scName->execute();
         $school_list = $stmt_scName->fetch(PDO::FETCH_ASSOC);
 
@@ -133,7 +177,7 @@
         $sql_all .= " ORDER BY r.reservation_date ASC, r.reservation_id ASC";
 
         $stmt = $db->pdo->prepare($sql_all);
-        $stmt->bindValue(':school_id', $_librarian_school_id, PDO::PARAM_INT);
+        $stmt->bindValue(':school_id', $librarian_school_id, PDO::PARAM_INT);
         $stmt->bindValue(':res_status_id', 1, PDO::PARAM_INT);
         $stmt->bindValue(':bk_status_id', 3, PDO::PARAM_INT);
         $stmt->execute();
@@ -152,7 +196,7 @@
             // $all_reservations [] = $row;   // とりま自校・他校からの予約リストは入れる
 
             // 自校からの予約リストを格納
-            if (intval($row['school_id']) == $_librarian_school_id) {
+            if (intval($row['school_id']) == $librarian_school_id) {
                 $reserver_school_id = intval($row['school_id']) ; // こいつは予約者の学校ID
                 $book_belong = intval($row['belong_id']);   // こいつは書籍を所蔵する学校のID
 
@@ -188,13 +232,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>予約取り置き画面(<?php echo h($school_name); ?>)</title>
-    <link rel="stylesheet" href="../css/librarian_myPage.css">
+    <link rel="stylesheet" href="../css/librarian_book_management.css">
 </head>
 <body>
+    <!-- ログアウトボタンを押したときのCSFSトークン発行 -->
+        <form method="POST" action = "../php/logout.php" name = "link_logoutFORM">
+            <?php
+                set_csrf_token($csrf_token);
+            ?>
+            <input type="hidden" name = "page_id" value= "1">
+        </form>
+    <header>
+        <a href="#"><?php echo htmlspecialchars($librarian_fullname); ?> さん(<?php echo htmlspecialchars($librarian_school_name); ?>)の検索画面</a>
+        <button class="logout-btn" onclick="confirmLogout()">ログアウト</button>
+    </header>
     <div class="tabs">
-        <button onclick="showTab('all')">① 全リスト (回収用)</button>
-        <button onclick="showTab('local')">② 自校予約 (棚へ)</button>
-        <button onclick="showTab('delivery')">③ 他校配送 (箱へ)</button>
+        <button onclick="showTab('all')">① 自校予約（自校所蔵本）- 予約取り置きBOXへ</button>
+        <button onclick="showTab('local')">② 自校予約 (他校所蔵本) - 配送待ちBOXへ</button>
+        <button onclick="showTab('delivery')">③ 他校からの予約（自校所蔵本） - 配送待ちBOXへ</button>
     </div>
 
     <div id="area-all" class="tab-content">
@@ -247,3 +302,10 @@
     </div>
 </body>
 </html>
+<script>
+    function confirmLogout() {
+            if (confirm("ログアウトしますか？")) {
+                document.getElementById('logout_form').submit();
+            }
+        }
+</script>

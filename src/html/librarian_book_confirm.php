@@ -38,8 +38,10 @@
     }
     $csrf_token = $_SESSION['csrf_token'];
     
-    // 
-    $librarian_school_id = $_SESSION['librarian_school_id'];
+    $librarian_id = $_SESSION['librarian_id'] ?? null;
+    $librarian_school_id = $_SESSION['librarian_school_id'] ?? null;
+    $librarian_fullname = '';
+    $librarian_school_name = '';
 
     // ↓これは選択されたbook_idの配列
     $local_noncarry_res = $_POST['local_noncarry_res'] ?? []; // 自校からの予約リスト(書籍IDのリスト)
@@ -62,10 +64,11 @@
     // 何も選ばれていなかったら戻す
     if (empty($selected_books)) {
         $_SESSION['book_manageConfirm_message'] = "書籍リストを選択してください。";
-        header("Location: librarian_bookManage.php");
+        header("Location: librarian_bookManagement.php");
         exit();
     }
 
+    //book_manageConfirm_message
     $local_selected_res = null;
     $deliver_selected_res = null;
 
@@ -127,6 +130,30 @@
         $db = new db_connect();
         $db->connect();
 
+        $sql = "SELECT librarian.family_name, librarian.first_name, school.school_name FROM librarian LEFT JOIN school ON librarian.school_id = school.school_id WHERE librarian_id = ?";
+        $stmt = $db->pdo->prepare($sql);
+        $stmt->execute([$_SESSION['librarian_id']]);
+        $librarian = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($librarian) {
+            $librarian_fullname = $librarian['family_name'] . ' ' . $librarian['first_name'];
+            $librarian_school_name = $librarian['school_name'];
+        }
+
+        $sql = "SELECT * FROM school";
+        $stmt = $db->pdo->prepare($sql);
+        $stmt->execute();
+        $schools = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        if ($schools) {
+            foreach ($schools as $school) {
+                if ($school['school_id'] == $librarian_school_id) {
+                    $librarian_school_name = $school['school_name'];
+                    break;
+                }
+            }
+        }
+
         // 自校・他校からの予約
         $sql_all = "SELECT r.book_id, r.reservation_date, bi.title, bi.isbn, s.school_id, sc.school_name, s.family_name, s.first_name";
         $sql_all .= " FROM reservation AS r";
@@ -173,20 +200,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>予約取り置き確認画面(<?php echo h($school_name); ?>)</title>
-    <link rel="stylesheet" href="../css/librarian_myPage.css">
+    <link rel="stylesheet" href="../css/librarian_book_confirm.css">
 </head>
 <body>
+    <header>
+        <a href="#"><?php echo htmlspecialchars($librarian_fullname); ?> さん(<?php echo htmlspecialchars($librarian_school_name); ?>)の検索画面</a>
+        <button class="logout-btn" onclick="confirmLogout()">ログアウト</button>
+    </header>
+    <!-- ログアウトボタンを押したときのCSFSトークン発行 -->
+        <form method="POST" action = "../php/logout.php" name = "link_logoutFORM">
+            <?php
+                set_csrf_token($csrf_token);
+            ?>
+            <input type="hidden" name = "page_id" value= "1">
+        </form>
     <?php
         if ($next_status == 4) {
             table_data_display($local_selected_res, $next_status);
         } else if ($next_status == 5) {
             table_data_display($deliver_selected_res, $next_status);
-        } else {
-            $_SESSION['book_manageConfirm_message'] = "不正なリクエストです。";
-            header("Location: librarian_bookManagement.php");
-            exit();
+        } else if ($next_status == 7) {
+            table_data_display($local_selected_res, $next_status);
         }
     ?>
+    <div class="button-group">
     <button onclick="location.href='../html/librarian_bookManagement.php'">戻る</button>
     <form action="../php/change_resBook_status.php" method="POST">
         <!-- CSRFトークンを隠し属性にセット -->
@@ -199,4 +236,12 @@
         <input type="hidden" name="next_status" value="<?php echo h($next_status); ?>">
         <button type="submit">確定</button>
     </form>
+    </div>
 </body>
+<script>
+    function confirmLogout() {
+            if (confirm("ログアウトしますか？")) {
+                document.getElementById('logout_form').submit();
+            }
+        }
+</script>
