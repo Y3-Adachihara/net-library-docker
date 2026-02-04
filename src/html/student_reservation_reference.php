@@ -67,7 +67,7 @@
             $updated_date = $rows['updated_at'] ?? 'Error';
 
             $book_statusId = intval($rows['status_id']) ?? 'Error'; // 書籍状態ID
-            $res_statusId = intval($rows['status_id']) ?? 'Error';  // 予約状態ID
+            $res_statusId = intval($rows['reservation_status_id']) ?? 'Error';  // 予約状態ID
             $res_statusName = $rows['status_name'] ?? 'Error';  // 予約状態名
             $display_resStatus = null;
 
@@ -126,7 +126,7 @@
 
 
         // テーブルデータ取得sql
-        $sql = "SELECT bs.book_id, bs.status_id, bi.title, bi.author_name, bi.publisher, r.reservation_date, r.updated_at, rs.status_name, r.reservation_number";
+        $sql = "SELECT bs.book_id, bs.status_id, bi.title, bi.author_name, bi.publisher, r.reservation_date, r.status_id AS reservation_status_id, r.updated_at, rs.status_name, r.reservation_number";
         $sql .= " FROM reservation AS r";
         $sql .= " LEFT OUTER JOIN book_stack AS bs";
         $sql .= " ON r.book_id = bs.book_id";
