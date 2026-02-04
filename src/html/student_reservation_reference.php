@@ -176,7 +176,7 @@
     <body>
         <header class="main-header">
         <div class="header-logo">
-            <a href="student_reservation_reference.php">生徒用-予約参照ページ(<?php echo h($school_name); ?>)</a>
+            <a href="student_reservation_reference.php"><?php echo h($student_fullname); ?>さん-予約参照ページ(<?php echo h($school_name); ?>)</a>
         </div>
         <nav class="header-nav">
             <ul>
