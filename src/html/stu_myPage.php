@@ -11,6 +11,7 @@
         exit();
     }
 
+    $student_id = $_SESSION['student_id'];
     $family_name = $_SESSION['student_family_name'];
     $first_name = $_SESSION['student_first_name'];
     $student_name = $family_name . " " . $first_name;
@@ -33,8 +34,66 @@
         echo '<input type="hidden" name="csrf_token" value="' . htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8') . '">';
     }
     
+    // HTMLエスケープ関数
+    function h($str) {
+        return htmlspecialchars($str, ENT_QUOTES, 'UTF-8');
+    }
+
+    // --- レベル判定ロジック ---
+    // 戻り値: ['current_lv', 'current_name', 'next_name', 'remaining']
+    function getStudentLevelStatus($count) {
+        // レベル定義 (必要冊数 => [レベル表記, 名前])
+        // 判定しやすいよう降順で定義
+        $levels = [
+            50 => ['MAX', 'マスター'],
+            30 => ['5',   'エキスパート'],
+            20 => ['4',   'スペシャリスト'],
+            10 => ['3',   'アドバンスド'],
+            5  => ['2',   'スタンダード'],
+            0  => ['1',   'ゲスト']
+        ];
+
+        $current_lv = '1';
+        $current_name = 'ゲスト';
+        $next_threshold = 5; // 次の目標（初期値）
+        $next_name = 'スタンダード';
+        $is_max = false;
+
+        foreach ($levels as $threshold => $info) {
+            if ($count >= $threshold) {
+                $current_lv = $info[0];
+                $current_name = $info[1];
+                
+                // 次のレベルを探す（現在の閾値より大きい最小のキーを探す）
+                $prev_threshold = null;
+                $prev_name = null;
+                foreach (array_reverse($levels, true) as $th => $val) {
+                    if ($th > $threshold) {
+                        $next_threshold = $th;
+                        $next_name = $val[1];
+                        break;
+                    }
+                    if ($th == 50) { // MAXの場合
+                         $is_max = true;
+                    }
+                }
+                break;
+            }
+        }
+
+        $remaining = $is_max ? 0 : ($next_threshold - $count);
+
+        return [
+            'level_text' => "Lv{$current_lv}：{$current_name}",
+            'is_max' => $is_max,
+            'next_name' => $next_name,
+            'remaining' => $remaining
+        ];
+    }
+    
     $news_list = []; 
     $ranking_list = []; 
+    $level_info = [];
 
     try {
         $db = new db_connect();
@@ -46,7 +105,7 @@
         $stmt_news->execute();
         $news_list = $stmt_news->fetchAll(PDO::FETCH_ASSOC);
 
-        // 2. ランキングを取得（TOP10に変更）
+        // 2. ランキングを取得（TOP10）
         $sql_rank = "SELECT 
                         bi.title, 
                         COUNT(l.lending_id) AS rental_count
@@ -55,10 +114,21 @@
                      LEFT OUTER JOIN book_info bi ON bs.isbn = bi.isbn
                      GROUP BY bi.title
                      ORDER BY rental_count DESC
-                     LIMIT 10"; // ここを10に変更しました
+                     LIMIT 10"; 
         $stmt_rank = $db->pdo->prepare($sql_rank);
         $stmt_rank->execute();
         $ranking_list = $stmt_rank->fetchAll(PDO::FETCH_ASSOC);
+
+        // 3. 自分の読了数を取得（レベル計算用）
+        // 返却済み(return_date IS NOT NULL)の数をカウント
+        $sql_count = "SELECT COUNT(*) FROM lending WHERE student_id = :sid AND return_date IS NOT NULL";
+        $stmt_count = $db->pdo->prepare($sql_count);
+        $stmt_count->bindValue(':sid', $student_id, PDO::PARAM_INT);
+        $stmt_count->execute();
+        $my_read_count = $stmt_count->fetchColumn();
+
+        // レベル情報を生成
+        $level_info = getStudentLevelStatus($my_read_count);
 
     } catch (Exception $e) {
         // エラー時は何もしない
@@ -101,6 +171,12 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
+        .header-left {
+            display: flex;
+            align-items: baseline;
+            gap: 15px; /* 名前とレベルの間隔 */
+        }
+
         .welcome-text {
             text-decoration: none;
             color: #333;
@@ -110,6 +186,27 @@
         .user-name {
             font-weight: bold;
             color: #1a73e8;
+            font-size: 16px;
+        }
+
+        /* レベル表示用スタイル */
+        .level-display {
+            font-size: 14px;
+            color: #555;
+            background-color: #f8f9fa;
+            padding: 4px 10px;
+            border-radius: 15px;
+            border: 1px solid #e9ecef;
+        }
+        .level-up-alert {
+            color: #e67e22; /* オレンジ色で強調 */
+            font-weight: bold;
+            font-size: 13px;
+            animation: flash 2s infinite;
+        }
+        @keyframes flash {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
         }
 
         .logout-btn {
@@ -129,20 +226,18 @@
         }
 
         /* --- レイアウト用ラッパー --- */
-        /* 左右の白い箱を横並びにするための透明なコンテナ */
         .content-wrapper {
             display: flex;
             justify-content: center;
-            align-items: flex-start; /* 上揃え */
-            gap: 30px; /* 箱と箱の間隔 */
+            align-items: flex-start;
+            gap: 30px;
             width: 90%;
-            max-width: 1200px; /* 全体の最大幅を広めに */
+            max-width: 1200px;
             margin-bottom: 40px;
         }
 
-        /* --- 左側のメインパネル --- */
         .main-panel {
-            flex: 1; /* 余った幅をすべて使う */
+            flex: 1;
             background-color: #fff;
             border-radius: 12px;
             padding: 40px;
@@ -150,33 +245,30 @@
             min-height: 500px;
         }
 
-        /* --- 右側のランキングパネル --- */
         .side-panel {
-            width: 320px; /* 幅固定 */
-            background-color: #fff; /* 背景を白に */
+            width: 320px;
+            background-color: #fff;
             border-radius: 12px;
-            padding: 25px; /* 少し余白を狭めに */
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05); /* 左側と同じ影 */
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
         }
 
-        /* レスポンシブ対応（スマホなどは縦並び） */
         @media (max-width: 900px) {
             .content-wrapper {
                 flex-direction: column;
                 align-items: center;
             }
-            .main-panel {
+            .main-panel, .side-panel {
                 width: 100%;
                 box-sizing: border-box;
             }
-            .side-panel {
-                width: 100%;
-                box-sizing: border-box;
-                margin-top: 0;
+            /* スマホ時はヘッダーのレベル表示を調整 */
+            .header-left {
+                flex-direction: column;
+                gap: 2px;
             }
         }
 
-        /* --- コンテンツスタイル --- */
         .page-title {
             font-size: 22px;
             font-weight: bold;
@@ -255,15 +347,35 @@
 
         /* --- ランキング用スタイル --- */
         .ranking-title {
-            font-size: 18px; /* 少し大きく */
+            font-size: 18px;
             font-weight: bold;
             color: #333;
             margin-bottom: 20px;
             padding-bottom: 10px;
             border-bottom: 2px solid #f0f0f0;
+            
+            /* Flexboxで左右配置に変更 */
             display: flex;
+            justify-content: space-between;
             align-items: center;
         }
+
+        /* ランキング詳細ボタン（小さなリンク風に） */
+        .ranking-more-link {
+            font-size: 13px;
+            color: #1a73e8;
+            text-decoration: none;
+            border: 1px solid #1a73e8;
+            padding: 4px 10px;
+            border-radius: 15px;
+            transition: all 0.2s;
+            font-weight: normal;
+        }
+        .ranking-more-link:hover {
+            background-color: #1a73e8;
+            color: #fff;
+        }
+
         .ranking-list {
             list-style: none;
             padding: 0;
@@ -284,14 +396,13 @@
             line-height: 24px;
             text-align: center;
             background: #eee;
-            border-radius: 4px; /* 丸から四角っぽい角丸へ変更 */
+            border-radius: 4px;
             font-weight: bold;
             color: #555;
             margin-right: 12px;
             flex-shrink: 0;
             font-size: 12px;
         }
-        /* 1~3位の色 */
         .rank-1 .rank-num { background: #ffd700; color: #fff; }
         .rank-2 .rank-num { background: #c0c0c0; color: #fff; }
         .rank-3 .rank-num { background: #cd7f32; color: #fff; }
@@ -323,7 +434,19 @@
     </form>
 
     <div class="header">
-        <a href="#" class="welcome-text">こんにちは、<span class="user-name"><?php echo htmlspecialchars($student_name, ENT_QUOTES, 'UTF-8'); ?></span> さん</a>
+        <div class="header-left">
+            <span class="welcome-text">こんにちは、<span class="user-name"><?php echo h($student_name); ?></span> さん</span>
+            
+            <?php if (!empty($level_info)): ?>
+                <span class="level-display">
+                    あなたは現在 <?php echo h($level_info['level_text']); ?> です
+                    <?php if (!$level_info['is_max'] && $level_info['remaining'] <= 2): ?>
+                         <span class="level-up-alert">あと<?php echo $level_info['remaining']; ?>冊で<?php echo h($level_info['next_name']); ?>！！</span>
+                    <?php endif; ?>
+                </span>
+            <?php endif; ?>
+        </div>
+
         <button class="logout-btn" onclick="confirmLogout()">ログアウト</button>
     </div>
 
@@ -362,16 +485,16 @@
                         ?>
                         <div class="news-item">
                             <div class="news-meta">
-                                <span class="news-date"><?php echo htmlspecialchars($date, ENT_QUOTES, 'UTF-8'); ?></span>
+                                <span class="news-date"><?php echo h($date); ?></span>
                                 <span class="category-badge <?php echo $badge_class; ?>">
-                                    <?php echo htmlspecialchars($news['announcements_category'], ENT_QUOTES, 'UTF-8'); ?>
+                                    <?php echo h($news['announcements_category']); ?>
                                 </span>
                             </div>
                             <div class="news-title-wrap">
                                 <p class="news-title">
-                                    <?php echo htmlspecialchars($news['announcements_title'], ENT_QUOTES, 'UTF-8'); ?>
+                                    <?php echo h($news['announcements_title']); ?>
                                 </p>
-                                <p class="news-content"><?php echo htmlspecialchars($news['announcements_content'], ENT_QUOTES, 'UTF-8'); ?></p>
+                                <p class="news-content"><?php echo h($news['announcements_content']); ?></p>
                             </div>
                         </div>
                     <?php endforeach; ?>
@@ -382,10 +505,10 @@
         </div>
 
         <div class="side-panel">
-            <div class="ranking-title">👑 人気ランキング</div>
-            <button class="ranking-item" style="font-weight:bold; border-bottom:2px solid #ddd; padding-bottom:8px; margin-bottom:12px; cursor:default;" onclick="location.href='student_ranking.php'">
-                ランキング詳細へ
-            </button>
+            <div class="ranking-title">
+                <span>👑 人気ランキング</span>
+                <a href="student_ranking.php" class="ranking-more-link">詳細へ</a>
+            </div>
             
             <?php if (!empty($ranking_list)): ?>
                 <ul class="ranking-list">
@@ -399,7 +522,7 @@
                 ?>
                     <li class="ranking-item <?php echo $rank_css; ?>">
                         <span class="rank-num"><?php echo $r; ?></span>
-                        <span class="rank-book-title"><?php echo htmlspecialchars($book['title'], ENT_QUOTES, 'UTF-8'); ?></span>
+                        <span class="rank-book-title"><?php echo h($book['title']); ?></span>
                         <span class="rank-count"><?php echo $book['rental_count']; ?>回</span>
                     </li>
                 <?php 
@@ -412,7 +535,9 @@
             <?php endif; ?>
         </div>
 
-    </div><script>
+    </div>
+    
+    <script>
         function confirmLogout() {
             if (confirm("ログアウトしますか？")) {
                 document.getElementById('logout_form').submit();
