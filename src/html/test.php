@@ -2,7 +2,8 @@
     session_start();
     require_once '../db_connect.php';
 
-       $received_book_id = isset($_GET['book_id']) ? $_GET['book_id'] : '';
+    // 検索画面から受け取った書籍ID
+    $received_book_id = isset($_GET['book_id']) ? $_GET['book_id'] : '';
     
 
     if (!isset($_SESSION['student_id'])) {
@@ -141,7 +142,7 @@
         <div class="form-row">
             <label>書籍番号</label>
             <div class="input-group">
-		<input type="text" id="book_id" name="book_id" class="full-width" placeholder="例: B001" value="<?php echo htmlspecialchars($received_book_id, ENT_QUOTES, 'UTF-8'); ?>">
+		    <input type="text" id="book_id" name="book_id" class="full-width" placeholder="例: B001" value="<?php echo htmlspecialchars($received_book_id, ENT_QUOTES, 'UTF-8'); ?>">
                 <!--<input type="text" id="book_id" name="book_id" class="full-width" placeholder="例: B001">-->
             </div>
             <span class="note">③</span>
