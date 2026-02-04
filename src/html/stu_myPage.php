@@ -541,6 +541,9 @@
                 <button class="menu-btn" onclick="location.href='student_lending_history.php'">
                     貸出履歴
                 </button>
+                 <button class="menu-btn" onclick="location.href='student_lending_deny_list.php'">
+                    貸出禁止本一覧
+                </button>
             </div>
             
             <div class="news-section">

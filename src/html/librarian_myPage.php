@@ -352,6 +352,9 @@
             <button type="submit" formaction="../html/ranking.php" class="action-btn btn-info">
                 <span class="btn-icon">👑</span> ランキング
             </button>
+            <button type="submit" formaction="../html/librarian_lending_deny_list.php" class="action-btn btn-info">
+                <span class="btn-icon">👑</span> 貸出禁止本リスト
+            </button>
         </div>
     </div>
 

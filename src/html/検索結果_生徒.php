@@ -236,7 +236,7 @@ try {
 
                     <td class="status">
                         <?php 
-                        if (isset($row['status_id']) && $row['status_id'] == 1) {
+                        if (isset($row['status_id']) && $row['status_id'] == 1 && $row['school_id'] == $student_school_id) {
                             echo '<span style="color:blue;">〇</span>';
                         } else {
                             echo '<span style="color:red;">×</span>';

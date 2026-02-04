@@ -81,7 +81,7 @@ try {
     $status_list = $stmt->fetchAll(PDO::FETCH_ASSOC); // status_id と status_name の連想配列を取得
 
     // 2. 検索用SQLの作成
-    $sql = "SELECT * FROM book_stack LEFT OUTER JOIN book_info ON book_stack.isbn = book_info.isbn WHERE 1 = 1";
+    $sql = "SELECT * FROM book_stack LEFT OUTER JOIN book_info ON book_stack.isbn = book_info.isbn LEFT OUTER JOIN book_status ON book_stack.status_id = book_status.status_id WHERE 1 = 1";
     $params = [];
 
     if (!empty($title)) {
@@ -210,7 +210,8 @@ try {
                 <th>タイトル</th>
                 <th>出版社</th>
                 <th>場所</th>
-                <th>貸出可能？</th>
+                <th>予約しない貸出</th>
+                <th>書籍状態</th>
                 <th>貸出</th>
             </tr>
         </thead>
@@ -244,7 +245,7 @@ try {
 
                     <td class="status">
                         <?php 
-                        if (isset($row['status_id']) && $row['status_id'] == 1) {
+                        if (isset($row['status_id']) && $row['status_id'] == 1 && $row['school_id'] == $librarian_school_id) {
                             echo '<span style="color:blue;">〇</span>';
                         } else {
                             echo '<span style="color:red;">×</span>';
@@ -252,10 +253,23 @@ try {
                         ?>
                     </td>
 
+                    <td class="book-status">
+                        <?php 
+                            // status_id に基づいて status_name を表示
+                            $status_name = '';
+                            foreach ($status_list as $status) {
+                                if ($status['status_id'] == $row['status_id']) {
+                                    $status_name = $status['status_name'];
+                                    break;
+                                }
+                            }
+                            echo h($status_name);
+                        ?>
+
                     <td class="action">
                         <?php //if (isset($row['status_id']) && $row['status_id'] == 1): ?>
                             <button type="button" class="borrow-btn" onclick="location.href='貸出返却.php?book_id=<?php echo h($row['book_id']); ?>'">
-                                貸出
+                                貸出・返却
                             </button>
                         <?php //else: ?>
                             <!--<button type="button" disabled style="background:#ccc;">不可</button>-->
