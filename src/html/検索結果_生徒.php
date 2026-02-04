@@ -2,6 +2,13 @@
 require_once '../db_connect.php'; // DB接続ファイル
 session_start();
 
+// 生徒ログインチェック
+if (!isset($_SESSION['student_id'])) {
+        $_SESSION['message'] = "ログインしてください。";
+        header("Location: student_login.php");
+        exit();
+    }
+
 // セキュリティ対策
 function h($str) {
     return htmlspecialchars($str, ENT_QUOTES, 'UTF-8');
@@ -195,6 +202,7 @@ try {
                 <th>出版社</th>
                 <th>場所</th>
                 <th>貸出可能？</th>
+                <th>貸出</th>
                 <th>予約</th>
             </tr>
         </thead>
@@ -238,12 +246,18 @@ try {
 
                     <td class="action">
                         <?php if (isset($row['status_id']) && $row['status_id'] == 1): ?>
-                            <button type="button" class="reserve-btn" onclick="location.href='test.php?book_id=<?php echo h($row['book_id']); ?>'">
-                                予約
+                            <button type="button" class="borrow-btn" onclick="location.href='borrow.php?book_id=<?php echo h($row['book_id']); ?>'">
+                                貸出
                             </button>
                         <?php else: ?>
                             <button type="button" disabled style="background:#ccc;">不可</button>
                         <?php endif; ?>
+                    </td>
+
+                    <td class="action">
+                        <button type="button" class="reserve-btn" onclick="location.href='test.php?book_id=<?php echo h($row['book_id']); ?>'">
+                            予約
+                        </button>
                     </td>
                 </tr>
                 <?php endforeach; ?>

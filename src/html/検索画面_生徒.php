@@ -2,6 +2,13 @@
 	session_start();
     require_once('../db_connect.php');
 
+    // 生徒ログインチェック
+if (!isset($_SESSION['student_id'])) {
+        $_SESSION['message'] = "ログインしてください。";
+        header("Location: student_login.php");
+        exit();
+    }
+
 	if (isset($_SESSION['search_result_message'])) {
 		$message = $_SESSION['search_result_message'];
 		echo "<script>alert('" . htmlspecialchars($message, ENT_QUOTES, 'UTF-8')."');</script>";
