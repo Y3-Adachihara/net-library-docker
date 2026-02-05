@@ -355,6 +355,9 @@
             <button type="submit" formaction="../html/librarian_lending_deny_list.php" class="action-btn btn-info">
                 <span class="btn-icon">👑</span> 貸出禁止本リスト
             </button>
+            <button type="submit" formaction="../html/librarian_lending_deny_input.php" class="action-btn btn-info">
+                <span class="btn-icon">👑</span> 貸出禁止本登録画面
+            </button>
         </div>
     </div>
 

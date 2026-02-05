@@ -51,6 +51,13 @@
     </style>
 </head>
 <body>
+    <?php
+        if (isset($_SESSION['message'])) {
+            // h関数はファイル上部で定義済みと想定
+            echo "<script>alert('" . h($_SESSION['message']) . "');</script>";
+            unset($_SESSION['message']);
+        }
+    ?>
     <header class="main-header">
         <div class="header-logo">司書管理画面 - 貸出拒否設定</div>
         <nav class="header-nav">
@@ -121,7 +128,7 @@
         </div>
         
         <div class="librarian-menu-form">
-            <button type="button" onclick="alert('新規登録画面へ遷移（未実装）')">新規設定追加</button>
+            <button type="button" onclick="location.href='../html/librarian_lending_deny_input.php'">新規設定追加</button>
         </div>
     </div>
 </body>
