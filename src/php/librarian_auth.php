@@ -2,23 +2,23 @@
     require_once '../db_connect.php';
     session_start();
 
-    $school_id = $_POST["school"];
-    $user_id = $_POST["login_id"];
-    $password = $_POST['password'];
-
     //CSRF対策
     //トークンが一致しないか（右）、そもそもトークンがlogin.php(ログイン画面)から送られていない（左）時
     if (!isset($_POST["csrf_token"]) || $_POST["csrf_token"] != $_SESSION["csrf_token"]) {
-        $_SESSION['error'] = "CSFS対策に引っかかりました（開発者向けエラーメッセージ）";    //本番はメッセージの内容を変える
+        $_SESSION['error'] = "不正なリクエストです";
         header("Location: ../html/librarian_login.php");
         exit(); 
     }
+
+    $school_id = $_POST["school"];
+    $user_id = $_POST["login_id"];
+    $password = $_POST['password'];
 
     try {
         $db = new db_connect();
         $db->connect(); //データベースへ接続
 
-        $stmt_select = $db->pdo->prepare("SELECT librarian_id, password FROM librarian WHERE school_id = :school_id AND login_id = :login_id");
+        $stmt_select = $db->pdo->prepare("SELECT librarian_id, password, school_id FROM librarian WHERE school_id = :school_id AND login_id = :login_id");
         
         $stmt_select->bindValue(':school_id', $school_id, PDO::PARAM_INT);
         $stmt_select->bindValue(':login_id', $user_id, PDO::PARAM_STR);
@@ -39,16 +39,18 @@
 
                 //ここでのlibrarian_idは先のSELECT文で取得した司書ID
                 $_SESSION['librarian_id'] = $row['librarian_id'];
+                $_SESSION['librarian_school_id'] = $row['school_id'];
+                $_SESSION['login_success_message'] = "ログインに成功しました！";
                 header("Location: ../html/librarian_myPage.php");
                 exit();
 
             } else {
-	            $_SESSION['error'] = "IDまたはパスワードが違います。";
+	            $_SESSION['message'] = "学校またはID、またはパスワードが違います。";
                 header("Location: ../html/librarian_login.php");
                 exit();
             }
         } else {
-            $_SESSION['error'] = "パスワードの取得に失敗しました。";
+            $_SESSION['message'] = "学校またはID、またはパスワードが違います。";
             header("Location: ../html/librarian_login.php");
             exit();
         }

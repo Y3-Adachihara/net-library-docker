@@ -1,0 +1,229 @@
+<?php
+    require_once '../db_connect.php';
+    session_start();
+
+    if (!isset($_SESSION['librarian_id'])) {
+        // 司書としてログインしていない場合、ログインページへリダイレクト
+        $_SESSION['message'] = "司書としてログインしてください。";
+        header("Location: librarian_login.php");
+        exit();
+    }
+    //　ここからは、司書としてログインしていないと実行されない
+
+    if (isset($_SESSION['book_manageConfirm_message'])) {
+        $message = $_SESSION['book_manageConfirm_message'];
+        echo "<script>alert('" . htmlspecialchars($message, ENT_QUOTES, 'UTF-8') . "');</script>";
+        unset($_SESSION['book_manageConfirm_message']);
+
+    } else if (isset($_SESSION['bookStatus_changeResult_message'])) {
+        $message = $_SESSION['bookStatus_changeResult_message'];
+        echo "<script>alert('" . htmlspecialchars($message, ENT_QUOTES, 'UTF-8') . "');</script>";
+        unset($_SESSION['bookStatus_changeResult_message']);
+    }
+
+
+
+    $_librarian_id = $_SESSION['librarian_id'];
+    $_librarian_school_id = $_SESSION['librarian_school_id'];
+
+    $local_reservations = [];
+    $deliver_reservations = [];
+    $all_reservations = [];
+
+    // HTMLエスケープ関数
+    function h($str) {
+        return htmlspecialchars($str, ENT_QUOTES, 'UTF-8');
+    }
+
+    function table_data_display(array $records, int $from_where = 0): void { // $from_where 1:自校からの予約 | 2:他校からの予約
+        if (empty($records)) {
+            echo "<tr><td colspan='6'>現在、予約取り置きリストはありません。</td></tr>";
+            return;
+        }
+
+        echo "<tr>";
+        if ($from_where != 0) {
+            echo "<th>チェック</th>";
+        }
+        echo "<th>書籍ID</th>";
+        echo "<th>ISBN</th>";
+        echo "<th>タイトル</th>";
+        echo "<th>予約元</th>";
+        echo "<th>予約学生</th>";
+        echo "<th>予約日</th>";
+        echo "</tr>";
+
+        foreach($records as $rows) {
+            $book_id = $rows['book_id'];
+            $book_isbn = $rows['isbn'];
+            $book_title = $rows['title'];
+            $student_school = $rows['school_name'];
+            $family_name = $rows['family_name'];
+            $first_name = $rows['first_name'];
+            $full_name = $family_name . " " . $first_name;
+            $reservation_date = $rows['reservation_date'];
+
+            echo "<tr>";
+
+            // 自校の予約だった場合
+            if ($from_where == 1) {
+                echo "<td><input type=\"checkbox\" name=\"local_res[]\" value= \"" . h($book_id) . "\"></td>";    // これがチェックボックス
+
+            // 他校の予約だった場合
+            } else if ($from_where == 2) {
+                echo "<td><input type=\"checkbox\" name=\"deliver_res[]\" value= \"" . h($book_id) . "\"></td>";    // これがチェックボックス
+            }
+            echo "<td>" . h($book_id) . "</td>";
+            echo "<td>" . h($book_isbn) . "</td>";
+            echo "<td>" . h($book_title) . "</td>";
+            echo "<td>" . h($student_school) . "</td>";
+            echo "<td>" . h($full_name) . "</td>";
+            echo "<td>" . h($reservation_date) . "</td>";
+            echo "</tr>";
+        
+        }
+    }
+
+    try {
+        $db = new db_connect();
+        $db->connect();
+
+        $sql_school_name = "SELECT * FROM school WHERE school_id = :school_id";
+        $stmt_scName = $db->pdo->prepare($sql_school_name);
+        $stmt_scName->bindValue(':school_id', $_librarian_school_id, PDO::PARAM_INT);
+        $stmt_scName->execute();
+        $row = $stmt_scName->fetch(PDO::FETCH_ASSOC);
+
+        if(!empty($row)) {
+            $school_name = $row['school_name'];
+        }
+
+        // 自校・他校からの予約
+        $sql_all = "SELECT r.book_id, r.reservation_date, bi.title, bi.isbn, s.school_id, sc.school_name, s.family_name, s.first_name";
+        $sql_all .= " FROM reservation AS r";
+        $sql_all .= " LEFT OUTER JOIN book_stack AS bs";
+        $sql_all .= " ON r.book_id = bs.book_id";
+        $sql_all .= " LEFT OUTER JOIN book_info AS bi";
+        $sql_all .= " ON bs.isbn = bi.isbn";
+        $sql_all .= " LEFT OUTER JOIN student AS s";
+        $sql_all .= " ON r.student_id = s.student_id";
+        $sql_all .= " LEFT OUTER JOIN school AS sc";
+        $sql_all .= " ON s.school_id = sc.school_id";
+        $sql_all .= " WHERE bs.position = :school_id";
+        $sql_all .= " AND r.status_id = :res_status_id";
+        $sql_all .= " AND bs.status_id = :bk_status_id";
+        $sql_all .= " AND NOT EXISTS (
+                            SELECT 1 
+                            FROM lending_deny AS ld
+                            WHERE (
+                                ld.book_id = bs.book_id
+                                AND (
+                                    DATE(NOW()) >= DATE_SUB(DATE(ld.start_date), INTERVAL 3 DAY) 
+                                    AND 
+                                    DATE(NOW()) <= DATE(ld.end_date)
+                                )
+                            )
+                        )";
+        $sql_all .= " ORDER BY r.reservation_date ASC, r.reservation_id ASC";
+
+        $stmt = $db->pdo->prepare($sql_all);
+        $stmt->bindValue(':school_id', $_librarian_school_id, PDO::PARAM_INT);
+        $stmt->bindValue(':res_status_id', 1, PDO::PARAM_INT);
+        $stmt->bindValue(':bk_status_id', 3, PDO::PARAM_INT);
+        $stmt->execute();
+        $toMySchoolReservations = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $processed_book_ids = [];
+
+        foreach($toMySchoolReservations as $rows) {
+            if(in_array($rows['book_id'], $processed_book_ids)) {
+                continue;
+            }
+
+            $processed_book_ids[] = $rows['book_id'];
+
+
+            $all_reservations [] = $rows;   // とりま自校・他校からの予約リストは入れる
+
+            // 自校からの予約リストを格納
+            if (intval($rows['school_id']) == $_librarian_school_id) {
+                $local_reservations [] = $rows;
+
+            // 他校からの予約リストを格納
+            } else {
+                $deliver_reservations [] = $rows;
+            }
+        }
+
+    } catch (PDOException $e) {
+        $error_message = "データの取得に失敗しました。" . $e->getMessage();
+        echo "<script>alert('" . htmlspecialchars($error_message, ENT_QUOTES, 'UTF-8') . "');</script>";
+    } catch (Exception $e) {
+        $error_message = "予期せぬエラーが発生しました。" . $e->getMessage();
+        echo "<script>alert('" . htmlspecialchars($error_message, ENT_QUOTES, 'UTF-8') . "');</script>";
+    }
+        
+
+?>
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>予約取り置き画面(<?php echo h($school_name); ?>)</title>
+    <link rel="stylesheet" href="../css/librarian_myPage.css">
+</head>
+<body>
+    <div class="tabs">
+        <button onclick="showTab('all')">① 全リスト (回収用)</button>
+        <button onclick="showTab('local')">② 自校予約 (棚へ)</button>
+        <button onclick="showTab('delivery')">③ 他校配送 (箱へ)</button>
+    </div>
+
+    <div id="area-all" class="tab-content">
+        <p>棚から以下の本をすべて回収してください。</p>
+        <table>
+            <?php table_data_display($all_reservations) ?>
+        </table>
+    </div>
+
+    <div id="area-local" class="tab-content" style="display:none;">
+        <form action="librarian_book_confirm.php" method="post">
+            <p>自校の生徒への予約です。チェックして確認画面へ進んでください。</p>
+            <table>
+                <?php table_data_display($local_reservations, 1) ?>
+            </table>
+            <input type="hidden" name="next_status" value="4">
+            <button type="submit">確認画面へ</button>
+        </form>
+    </div>
+
+    <div id="area-delivery" class="tab-content" style="display:none;">
+        <form action="librarian_book_confirm.php" method="post">
+            <p>他校への配送です。チェックして確認画面へ進んでください。</p>
+            <table>
+                <?php table_data_display($deliver_reservations, 2) ?>
+            </table>
+            <input type="hidden" name="next_status" value="5">
+            <button type="submit">確認画面へ</button>
+        </form>
+    </div>
+
+    <script>
+    function showTab(tabName) {
+        // 1. 一旦全部隠す
+        document.getElementById('area-all').style.display = 'none';
+        document.getElementById('area-local').style.display = 'none';
+        document.getElementById('area-delivery').style.display = 'none';
+        
+        // 2. 選ばれたやつだけ表示
+        document.getElementById('area-' + tabName).style.display = 'block';
+    }
+    </script>
+
+    <div class="button-row">
+        <button type="button" class="btn" onclick="location.href='../html/librarian_myPage.php'">戻る</button>
+    </div>
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>新規書籍登録</title>
+
+    <link rel = "stylesheet" href="../css/書籍登録.css">
+
+</head>
+
+<body>
+
+<div class="container">
+    <h1>新規書籍登録</h1>
+
+    <form method="POST" action="登録確認.php">
+        <div class="form-group">
+            <label>書籍名：</label>
+            <input type="text" name="title">
+        </div>
+
+        <div class="form-group">
+            <label>著者名：</label>
+            <input type="text" name="author-name">
+        </div>
+
+        <div class="form-group">
+            <label>著者名(カナ)：</label>
+            <input type="text" name="author-kana">
+        </div>
+
+        <div class="form-group">
+            <label>ISBN：</label>
+            <input type="text" name="isbn">
+        </div>
+
+        <div class="form-group">
+            <label>ジャンル(類)：</label>
+            <input type="text" name="genre-rui">
+        </div>
+
+        <div class="form-group">
+            <label>ジャンル(網)：</label>
+            <input type="text" name="genre-mou">
+        </div>
+
+        <div class="form-group">
+            <label>ジャンル(目)：</label>
+            <input type="text" name="genre-me">
+        </div>
+
+
+        <div class="form-group">
+            <label>出版日：</label>
+            <div class="triple-input">
+                <input type="text" name="publication_year"> 年
+                <input type="text" name="publication_month"> 月
+                <input type="text" name="publication_day"> 日
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>出版社：</label>
+            <input type="text" name="publisher">
+        </div>
+
+        <div class="button-container">
+            <button type="button" class="btn" onclick="history.back()">戻る</button>
+            <button type="submit" class="btn">確認画面へ</button>
+        </div>
+    </form>
+</div>
+
+
+
+</body>
+
+</html>

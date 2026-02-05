@@ -4,10 +4,18 @@
     $db = new db_connect();
     $db->connect();
 
-    $error_message = $_SESSION['error'] ?? '';
-    if (isset($_SESSION['error'])) {
+    $error_message = $_SESSION['message'] ?? '';
+    if (isset($_SESSION['message'])) {
         echo "<script>alert('" . htmlspecialchars($error_message, ENT_QUOTES, 'UTF-8') . "');</script>";
-        unset($_SESSION['error']);
+        unset($_SESSION['message']);
+    }
+
+    $message_csrf = "不正にログアウトが行なわたか、タイムアウトしました";    //大体、タイムアウト=セッション有効期限切れらしい
+    $message_nomal = "不正なリクエストです。ログアウトしました";
+    if (isset($_GET['error']) && $_GET['error'] == 'csrf_alert') {
+        echo "<script>alert('" . htmlspecialchars($message_csrf, ENT_QUOTES, 'UTF-8') . "');</script>";
+    } else if (isset($_GET['error']) && $_GET['error'] == 'nomal_alert') {
+        echo "<script>alert('" . htmlspecialchars($message_nomal, ENT_QUOTES, 'UTF-8') . "');</script>";
     }
 
     try {
@@ -113,10 +121,13 @@
             </div>
             <button type="submit">ログイン</button>
         </form>
+        <p>OR</p>
+        <button onclick="location.href='../html/register.php'">新規登録がお済でない方はこちらから</button>
 
         <div class="sub-actions">
-            <button onclick="location.href='../html/register.php'">新規登録</button>
+            <button onclick="location.href='../html/teacher.php'">先生はこちら</button>
             <button onclick="location.href='../html/librarian_login.php'">司書の方はこちら</button>
+            <button onclick="location.href='../html/deliverer_login.php'">配送員の方はこちら</button>
         </div>
     </div>
 </body>
