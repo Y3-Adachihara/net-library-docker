@@ -215,6 +215,20 @@
             $stmt = $db->pdo->prepare($sql);
             $stmt->execute();
 
+            //司書テーブル作成
+            $sql = "CREATE TABLE IF NOT EXISTS librarian (
+                librarian_id INT AUTO_INCREMENT PRIMARY KEY,
+                school_id INT NOT NULL,
+                login_id VARCHAR(20) NOT NULL,
+                password VARCHAR(100),
+                family_name VARCHAR(50),
+                first_name VARCHAR(50),
+                FOREIGN KEY (school_id) REFERENCES school(school_id),
+                UNIQUE (school_id, login_id)
+            );";
+            $stmt = $db->pdo->prepare($sql);
+            $stmt->execute();   
+
             //外部キー制約を再度有効化
             $sql = "SET FOREIGN_KEY_CHECKS=1;";
             $stmt = $db->pdo->prepare($sql);
