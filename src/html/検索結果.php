@@ -22,6 +22,7 @@ $mou       = isset($_GET["genre-mou"]) ? $_GET["genre-mou"] : '';
 $me        = isset($_GET["genre-me"]) ? $_GET["genre-me"] : '';
 $publisher = isset($_GET["search-publisher"]) ? $_GET["search-publisher"] : '';
 $author    = isset($_GET["search-author"]) ? $_GET["search-author"] : '';
+$selected_school = isset($_GET["school-filter"]) ? $_GET["school-filter"] : '';
 $librarian_school_id = isset($_SESSION['librarian_school_id']) ? $_SESSION['librarian_school_id'] : null;
 
 $librarian_school_name = '';
@@ -125,12 +126,16 @@ try {
         $params[] = $genre_code . "%";
     }
 
+    if (!empty($selected_school)) {
+        // 学校フィルターが選択されている場合、その学校で絞り込み
+        $sql .= " AND book_stack.school_id = ?";
+        $params[] = $selected_school;
+    }
+
     if (empty($params)) {
-        // 生徒の学校IDで絞り込み
-        if ($librarian_school_id !== null) {
-            $sql .= " AND book_stack.position = ?";
-            $params[] = $librarian_school_id;
-        }
+        // どの検索条件も指定されなかった場合、司書の学校に基づいて絞り込む
+        $sql .= " AND book_stack.school_id = ?";
+        $params[] = $librarian_school_id;
     }
 
     $stmt = $db->pdo->prepare($sql);
@@ -145,7 +150,7 @@ try {
     exit;
 }finally {
         $db->close(); // DB接続解除   
-    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -196,7 +201,16 @@ try {
                 <?php if (!empty($author)): ?>
                 <li>著者名：<?php echo h($author); ?></li>
                 <?php endif; ?>
-                <?php if (empty($title) && empty($id) && empty($rui) && empty($mou) && empty($me) && empty($publisher) && empty($author)): ?>
+                <?php if (!empty($selected_school)): ?>
+                <li>学校フィルター：<?php 
+                    foreach ($schools as $school) {
+                        if ($school['school_id'] == $selected_school) {
+                            echo h($school['school_name']);
+                            break;
+                        }
+                    }?></li>
+                <?php endif; ?>
+                <?php if (empty($title) && empty($id) && empty($rui) && empty($mou) && empty($me) && empty($publisher) && empty($author) && empty($selected_school)): ?>
                 <li>検索条件が指定されなかったため、<?php echo h($librarian_school_name); ?>の全書籍を表示します。</li>
                 <?php endif; ?>
             </ul>

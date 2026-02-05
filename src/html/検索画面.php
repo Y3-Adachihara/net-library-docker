@@ -152,6 +152,18 @@
                 <label>著者名：</label>
                 <input type="text" name="search-author">
             </div>
+            <div class="form-group">
+                <label>学校：</label>
+                <select name="school-filter">
+                    <option value="">指定しない</option>
+                    <?php foreach ($schools as $school): ?>
+                        <?php if ($school['school_id'] == 0) continue; ?>
+                        <option value="<?php echo htmlspecialchars($school['school_id']); ?>">
+                            <?php echo htmlspecialchars($school['school_name']); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
         </div>
 
         <div class="button-row">

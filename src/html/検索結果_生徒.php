@@ -97,7 +97,7 @@ try {
     }
     if (!empty($selected_school)) {
         // 学校フィルターが選択されている場合、その学校で絞り込み
-        $sql .= " AND book_stack.position = ?";
+        $sql .= " AND book_stack.school_id = ?";
         $params[] = $selected_school;
     }
     // ジャンル検索が必要な場合はここに追加ロジックが入りますが、
@@ -126,7 +126,7 @@ try {
 
     if (empty($params)) {
         // どの検索条件も指定されなかった場合、学生の学校に基づいて絞り込む
-        $sql .= " AND book_stack.position = ?";
+        $sql .= " AND book_stack.school_id = ?";
         $params[] = $student_school_id;
     }
 
