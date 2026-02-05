@@ -183,8 +183,8 @@
                 $available_date = date('Y年m月d日', strtotime($is_denied['start_date'] . '+1 day'));
 
                 // 予約した本が貸出禁止期間に入っていた場合は、こいつらを付け足す
-                $_SESSION['message'] .= "\nこの本は" . $deny_start . " から " . $deny_end . "まで、貸出禁止期間となっています。";
-                $_SESSION['message'] .= "\nそのため、貸出は" . $available_date . "以降となります。ご了承ください。";
+                $_SESSION['message'] .= "\\nこの本は" . $deny_start . " から " . $deny_end . "まで、貸出禁止期間となっています。";
+                $_SESSION['message'] .= "\\nそのため、貸出は" . $available_date . "以降となります。ご了承ください。";
             }
             header("Location: ../html/test.php");   // ここは多分ファイル名変わる
             exit();
