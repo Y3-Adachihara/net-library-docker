@@ -84,11 +84,7 @@
         </form>
 
         <form method="GET" class="librarian-menu-form">
-            <button type="submit" formaction="../html/検索画面.html" class="add-book-button">書籍検索</button>
-            <button type="submit" formaction="../html/貸出返却.php" class="manage-users-button">貸出・返却</button>
-            <button type="submit" formaction="../html/librarian_reservation_reference.php" class="manage-users-button">予約状況参照</button>
-            <button type="submit" formaction="../html/書籍登録.html" class="add-book-button">新規書籍登録</button>
-            <button type="submit" formaction="../html/librarian_bookManagement.php" class="add-book-button">予約された本の管理画面</button>
+            <button type="submit" formaction="../html/deliverer_book_management.php" class="add-book-button">搬入搬出画面へ</button>
         </form>
 
         <div class ="info-table-container">
