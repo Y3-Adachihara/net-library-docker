@@ -22,6 +22,7 @@ $mou       = isset($_GET["genre-mou"]) ? $_GET["genre-mou"] : '';
 $me        = isset($_GET["genre-me"]) ? $_GET["genre-me"] : '';
 $publisher = isset($_GET["search-publisher"]) ? $_GET["search-publisher"] : '';
 $author    = isset($_GET["search-author"]) ? $_GET["search-author"] : '';
+$selected_school = isset($_GET["school-filter"]) ? $_GET["school-filter"] : '';
 $student_school_id = isset($_SESSION['student_school_id']) ? $_SESSION['student_school_id'] : null;
 $student_fullname = $_SESSION['student_family_name'] . ' ' . $_SESSION['student_first_name'] ?? 'ゲスト';
 
@@ -94,6 +95,11 @@ try {
         $sql .= " AND author_name LIKE ?";
         $params[] = "%" . $author . "%";
     }
+    if (!empty($selected_school)) {
+        // 学校フィルターが選択されている場合、その学校で絞り込み
+        $sql .= " AND book_stack.position = ?";
+        $params[] = $selected_school;
+    }
     // ジャンル検索が必要な場合はここに追加ロジックが入りますが、
     // 今回はbook_id表示の修正に集中します。
     // 類・網・目を連結して検索用文字列を作る（例: 類9, 網1, 目3 → "913"）
@@ -119,11 +125,9 @@ try {
     }
 
     if (empty($params)) {
-        // 生徒の学校IDで絞り込み
-        if ($student_school_id !== null) {
-            $sql .= " AND book_stack.position = ?";
-            $params[] = $student_school_id;
-        }
+        // どの検索条件も指定されなかった場合、学生の学校に基づいて絞り込む
+        $sql .= " AND book_stack.position = ?";
+        $params[] = $student_school_id;
     }
 
     $stmt = $db->pdo->prepare($sql);
@@ -201,7 +205,7 @@ try {
                 <th>タイトル</th>
                 <th>出版社</th>
                 <th>場所</th>
-                <th>貸出可能？</th>
+                <th>予約しない貸出</th>
                 <th>貸出</th>
                 <th>予約</th>
             </tr>
@@ -245,13 +249,13 @@ try {
                     </td>
 
                     <td class="action">
-                        <?php if (isset($row['status_id']) && $row['status_id'] == 1): ?>
+                        <?php //if (isset($row['status_id']) && $row['status_id'] == 1): ?>
                             <button type="button" class="borrow-btn" onclick="location.href='borrow.php?book_id=<?php echo h($row['book_id']); ?>'">
-                                貸出
+                                貸出・返却
                             </button>
-                        <?php else: ?>
-                            <button type="button" disabled style="background:#ccc;">不可</button>
-                        <?php endif; ?>
+                        <?php //else: ?>
+                            <!--<button type="button" disabled style="background:#ccc;">不可</button>-->
+                        <?php //endif; ?>
                     </td>
 
                     <td class="action">
