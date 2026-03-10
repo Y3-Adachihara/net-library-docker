@@ -18,11 +18,13 @@ class db_connect {
             $this->pdo = new PDO($dsn, $this->user, $this->pass);
 
         } catch (PDOException $e) {
-            echo "データベース接続エラー：" . $e->getMessage(); //デバッグ用。あとで消す！
-            throw new PDOException($e->getMessage(), (int)$e->getCode());
+            // echo "データベース接続エラー：" . $e->getMessage(); //デバッグ用。あとで消す！
+            // throw new PDOException($e->getMessage(), (int)$e->getCode());
+            throw $e;
         } catch (Exception $e) {
-            echo "エラー：" . $e->getMessage(); //デバッグ用。あとで消す！
-            throw new Exception($e->getMessage(), (int)$e->getCode());
+            // echo "エラー：" . $e->getMessage(); //デバッグ用。あとで消す！
+            // throw new Exception($e->getMessage(), (int)$e->getCode());
+            throw $e;
         }
     }
 
@@ -30,7 +32,5 @@ class db_connect {
     public function close() {
         $this->pdo = null;
     }
-
-    //Webアプリケーションなので、Javaのようにcloseメソッドは不要（ブラウザを閉じたら自動的に切断される）
 }
 ?>

@@ -1,8 +1,8 @@
 <?php
     require_once '../db_connect.php';
     session_start();
-    $db = new db_connect();
-    $db->connect();
+
+    $system_error_message = "";
 
     $error_message = $_SESSION['message'] ?? '';
     if (isset($_SESSION['message'])) {
@@ -19,6 +19,9 @@
     }
 
     try {
+        $db = new db_connect();
+        $db->connect();
+
         $sql = "SELECT * FROM school";
         $stmt = $db->pdo->prepare($sql);
         $stmt->execute();
@@ -26,11 +29,13 @@
         $schools = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     } catch (PDOException $e) {
-        echo "データベースエラー：" . $e->getMessage(); //デバッグ用。あとで消す！
-        exit;
+        error_log("データベースエラー: " . $e->getMessage()); //エラーログに記録
+        $system_error_message = "データベース通信エラーが発生しました。しばらく経ってからやり直してください。";
+        // echo "データベースエラー：" . $e->getMessage(); //デバッグ用。あとで消す！
     } catch (Exception $e) {
-        echo "エラー：" . $e->getMessage(); //デバッグ用。あとで消す！
-        exit;
+        error_log("予期しないエラー: " . $e->getMessage()); //エラーログに記録
+        $system_error_message = "予期せぬエラーが発生しました。システム管理者にお問い合わせください。";
+        // echo "エラー：" . $e->getMessage(); //デバッグ用。あとで消す！
     } finally {
         $db->close();
     }
@@ -46,7 +51,12 @@
     <link rel="stylesheet" href="../css/login.css">
 </head>
 <body>
-
+    <?php if ($system_error_message !== ""): ?>
+        <div style="color: red; padding: 20px; border: 1px solid red; background-color: #fee; text-align: center;">
+            <h3>現在システムをご利用いただけません</h3>
+            <p><?php echo htmlspecialchars($system_error_message, ENT_QUOTES, 'UTF-8'); ?></p>
+        </div>
+    <?php else: ?>
     <header class="main-header">
         <div class="header-logo">
             <a href="student_login.php">インターネット図書館</a>
@@ -125,10 +135,11 @@
         <button onclick="location.href='../html/register.php'">新規登録がお済でない方はこちらから</button>
 
         <div class="sub-actions">
-            <button onclick="location.href='../html/teacher.php'">先生はこちら</button>
+            <!--<button onclick="location.href='../html/teacher.php'">先生はこちら</button>-->
             <button onclick="location.href='../html/librarian_login.php'">司書の方はこちら</button>
             <button onclick="location.href='../html/deliverer_login.php'">配送員の方はこちら</button>
         </div>
     </div>
+    <?php endif;?>
 </body>
 </html>
