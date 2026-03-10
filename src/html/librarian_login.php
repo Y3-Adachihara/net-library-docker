@@ -87,7 +87,7 @@
         <!-- 新規登録と司書用のボタン hrefの値は仮。遷移先の画面が完成したときに設定する -->
         <div class="sub-actions">
             <button onclick="location.href='../html/student_login.php'">戻る</button>
-            <button onclick="location.href='../html/librarian_register.php'">新規登録がお済でない方はこちら</button>
+            <!--<button onclick="location.href='../html/librarian_register.php'">新規登録がお済でない方はこちら</button>-->
         </div>
     </div>
 </body>
