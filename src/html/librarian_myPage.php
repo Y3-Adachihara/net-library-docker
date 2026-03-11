@@ -138,6 +138,8 @@
     $lastYear_date_str = $lastYear_date->format('Y-m-d H:i:s');
 
     $fetchAll_record = [];  //結果が無かった場合に備えて初期化
+    $error_message = null;
+    $news_list = []; // 初期化
         
     try {
         $db = new db_connect();
@@ -177,28 +179,22 @@
         $stmt->bindValue(':school_id', $school_id, PDO::PARAM_INT);
         $stmt->execute();
         $fetchAll_record= $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // お知らせを取得（公開中のもの、最新5件）
+        $sql_news = "SELECT * FROM announcements WHERE is_active = 1 ORDER BY announcements_date DESC LIMIT 5";
+        $stmt_news = $db->pdo->prepare($sql_news);
+        $stmt_news->execute();
+        $news_list = $stmt_news->fetchAll(PDO::FETCH_ASSOC);
             
     } catch (PDOException $e) {
-        $error_message = "データの取得に失敗しました。" . $e->getMessage();
-        echo "<script>alert('" . htmlspecialchars($error_message, ENT_QUOTES, 'UTF-8') . "');</script>";
-    } catch (Exception $e) {
-        $error_message = "予期せぬエラーが発生しました。" . $e->getMessage();
-        echo "<script>alert('" . htmlspecialchars($error_message, ENT_QUOTES, 'UTF-8') . "');</script>";
+        error_log("DBエラー：" . $e->getMessage());
+        $error_message = "データベース通信エラーが発生しました。しばらく経ってからやり直してください。";
+    } catch (PDOexception $e) {
+        error_log("予期しないエラー: " . $e->getMessage());
+        $error_message = "予期せぬエラーが発生しました。システム管理者にお問い合わせください。";
+    } finally {
+        $db->close();
     }
-
-    $news_list = []; // 初期化
-    try {
-      // お知らせを取得（公開中のもの、最新5件）
-      $sql_news = "SELECT * FROM announcements WHERE is_active = 1 ORDER BY announcements_date DESC LIMIT 5";
-      $stmt_news = $db->pdo->prepare($sql_news);
-      $stmt_news->execute();
-      $news_list = $stmt_news->fetchAll(PDO::FETCH_ASSOC);
-
-    } catch (Exception $e) {
-    // エラーが出ても画面全体が止まらないように静かに処理、またはログに残す
-    // echo "お知らせ取得エラー: " . h($e->getMessage()); 
-    }
-
 ?>
 
 <!DOCTYPE html>
@@ -217,6 +213,12 @@
     }
 </script>
     <body>
+        <? if ($error_message != null): ?>
+            <div style="color: red; padding: 20px; border: 1px solid red; background-color: #fee; text-align: center;">
+                <h3>現在システムをご利用いただけません</h3>
+                <p><?php echo h($error_message); ?></p>
+            </div>
+        <?php else: ?>
         <header class="main-header">
         <div class="header-logo">
             <a href="librarian_myPage.php">司書用Myページ(<?php echo h($school_name); ?>)</a>
@@ -480,4 +482,5 @@
         </div>
 	
     </body>
+    <? endif; ?>
 </html>

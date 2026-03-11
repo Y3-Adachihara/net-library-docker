@@ -2,9 +2,6 @@
     session_start();
     require_once '../db_connect.php';
     
-    $db = new db_connect();
-    $db->connect();
-
     // ログアウトしていなかったときは、まだログインページからセッションが続くため、セッション変数に値を格納
     $message = $_SESSION['message'] ?? '';
     if (isset($_SESSION['message'])) {
@@ -17,11 +14,28 @@
         echo "<script>alert('" . htmlspecialchars($message, ENT_QUOTES, 'UTF-8') . "');</script>";
     }
 
-    $sql = "SELECT * FROM school";
-    $stmt = $db->pdo->prepare($sql);
-    $stmt->execute();
+    $schools = null;
+    $error_message = null;
 
-    $schools = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    try {
+        $db = new db_connect();
+        $db->connect();
+
+        $sql = "SELECT * FROM school";
+        $stmt = $db->pdo->prepare($sql);
+        $stmt->execute();
+
+        $schools = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        error_log("DBエラー：" . $e->getMessage());
+        $error_message = "データベース通信エラーが発生しました。しばらく経ってからやり直してください。";
+    } catch (PDOexception $e) {
+        error_log("予期しないエラー: " . $e->getMessage());
+        $error_message = "予期せぬエラーが発生しました。システム管理者にお問い合わせください。";
+    } finally {
+        $db->close();
+    }
+    
 ?>
 
 <!DOCTYPE html>
@@ -34,6 +48,12 @@
 </head>
 
 <body>
+    <?php if ($error_message != null): ?>
+        <div style="color: red; padding: 20px; border: 1px solid red; background-color: #fee; text-align: center;">
+            <h3>現在システムをご利用いただけません</h3>
+            <p><?php echo htmlspecialchars($error_message, ENT_QUOTES, 'UTF-8'); ?></p>
+        </div>
+    <? else: ?>
     <header class="main-header">
         <div class="header-logo">
             <a href="login_copy.php">インターネット図書館</a>
@@ -91,4 +111,5 @@
         </div>
     </div>
 </body>
+<?php endif; ?>
 </html>
