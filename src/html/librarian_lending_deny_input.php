@@ -16,6 +16,7 @@
         return htmlspecialchars($str, ENT_QUOTES, 'UTF-8');
     }
 
+    $error_message = null;
     // 検索ボタンが押された場合
     if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['keyword'])) {
         $search_keyword = trim($_GET['keyword']);
@@ -38,8 +39,14 @@
                 $stmt->execute();
                 $search_results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            } catch (Exception $e) {
-                $error_message = "検索エラー: " . $e->getMessage();
+            } catch (PDOException $e) {
+                error_log("DBエラー：" . $e->getMessage());
+                $error_message = "データベース通信エラーが発生しました。しばらく経ってからやり直してください。";
+            } catch (PDOexception $e) {
+                error_log("予期しないエラー: " . $e->getMessage());
+                $error_message = "予期せぬエラーが発生しました。システム管理者にお問い合わせください。";
+            } finally {
+                $db->close();
             }
         }
     }
@@ -70,6 +77,13 @@
             unset($_SESSION['message']);
         }
     ?>
+
+    <?php if ($error_message !== null): ?>
+        <div style="color: red; padding: 20px; border: 1px solid red; background-color: #fee; text-align: center;">
+                <h3>現在システムをご利用いただけません</h3>
+                <p><?php echo h($error_message); ?></p>
+            </div>
+        <?php else: ?>
     <header class="main-header">
         <div class="header-logo">貸出禁止設定</div>
         <nav class="header-nav">
@@ -130,4 +144,5 @@
         </div>
     </div>
 </body>
+<?php endif; ?>
 </html>
