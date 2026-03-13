@@ -1,7 +1,6 @@
 <?php
     session_start();
     require_once '../db_connect.php';
-
     
     if (!isset($_SESSION['student_id'])) {
         // 学生としてログインしていない場合、ログインページへリダイレクト
@@ -44,6 +43,8 @@
         echo '<input type="hidden" name="csrf_token" value="' . htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8') . '">';
     }
 
+    $error_message = null;
+
     try {
         $db = new db_connect();
         $db->connect();
@@ -82,11 +83,11 @@
 
 
     } catch (PDOException $e) {
-        echo "データベースエラー：" . $e->getMessage(); //デバッグ用。あとで消す！
-        exit;
-    } catch (Exception $e) {
-        echo "エラー：" . $e->getMessage(); //デバッグ用。あとで消す！
-        exit;
+        error_log("DBエラー：" . $e->getMessage());
+        $error_message = "データベース通信エラーが発生しました。しばらく経ってからやり直してください。";
+    } catch (PDOexception $e) {
+        error_log("予期しないエラー: " . $e->getMessage());
+        $error_message = "予期せぬエラーが発生しました。システム管理者にお問い合わせください。";
     } finally {
         $db->close();
     }
@@ -102,7 +103,12 @@
     <title>予約内容の確認</title>
     <link rel="stylesheet" href="../css/reservation_confirm.css"> </head>
 <body>
-
+    <? if ($error_message != null): ?>
+            <div style="color: red; padding: 20px; border: 1px solid red; background-color: #fee; text-align: center;">
+                <h3>現在システムをご利用いただけません</h3>
+                <p><?php echo h($error_message); ?></p>
+            </div>
+    <?php else: ?>
     <header class="site-header">
         <div class="header-logo">図書管理システム</div>
         <div class="header-user-area">
@@ -192,4 +198,5 @@
     </main>
 
 </body>
+<?php endif; ?>
 </html>

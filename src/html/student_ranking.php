@@ -34,6 +34,7 @@
         return ['Lv' => '1', 'title' => 'ゲスト', 'color' => '#95a5a6'];
     }
 
+    $error_message = null;
     try {
         $db = new db_connect();
         $db->connect();
@@ -105,11 +106,13 @@
 
 
     } catch (PDOException $e) {
-        $error_message = "データの取得に失敗しました。" . $e->getMessage();
-        echo "<script>alert('" . htmlspecialchars($error_message, ENT_QUOTES, 'UTF-8') . "');</script>";
-    } catch (Exception $e) {
-        $error_message = "予期せぬエラーが発生しました。" . $e->getMessage();
-        echo "<script>alert('" . htmlspecialchars($error_message, ENT_QUOTES, 'UTF-8') . "');</script>";
+        error_log("DBエラー：" . $e->getMessage());
+        $error_message = "データベース通信エラーが発生しました。しばらく経ってからやり直してください。";
+    } catch (PDOexception $e) {
+        error_log("予期しないエラー: " . $e->getMessage());
+        $error_message = "予期せぬエラーが発生しました。システム管理者にお問い合わせください。";
+    } finally {
+        $db->close();
     }
 ?>
 
@@ -122,7 +125,12 @@
     <link rel="stylesheet" href="../css/student_ranking.css">
 </head>
 <body>
-
+<? if ($error_message != null): ?>
+            <div style="color: red; padding: 20px; border: 1px solid red; background-color: #fee; text-align: center;">
+                <h3>現在システムをご利用いただけません</h3>
+                <p><?php echo h($error_message); ?></p>
+            </div>
+        <?php else: ?>
 <header>
     <div class="header-container">
         <a href="stu_myPage.php">マイページへ戻る</a>
@@ -200,4 +208,5 @@
 </main>
 
 </body>
+<?php endif; ?>
 </html>

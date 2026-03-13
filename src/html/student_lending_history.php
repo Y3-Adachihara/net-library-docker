@@ -16,14 +16,12 @@ $student_name = $family_name . " " . $first_name;
 $student_id = $_SESSION['student_id'];
 
 $results = [];
+$error_message = null;
 
 try {
-    // ★共通ファイルを使ってデータベース接続
     $db = new db_connect();
     $db->connect();
 
-    // SQL作成
-    // bookテーブルのカラム名はご自身の環境に合わせて調整してください（author または author_name など）
 	$sql = "SELECT * FROM lending 
         JOIN book_stack ON lending.book_id = book_stack.book_id 
         JOIN book_info ON book_stack.isbn = book_info.isbn 
@@ -35,10 +33,15 @@ try {
     $stmt->execute();
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-} catch (Exception $e) {
-    // エラー時はメッセージを表示して終了
-    exit('Database Error: ' . $e->getMessage());
-}
+    } catch (PDOException $e) {
+        error_log("DBエラー：" . $e->getMessage());
+        $error_message = "データベース通信エラーが発生しました。しばらく経ってからやり直してください。";
+    } catch (PDOexception $e) {
+        error_log("予期しないエラー: " . $e->getMessage());
+        $error_message = "予期せぬエラーが発生しました。システム管理者にお問い合わせください。";
+    } finally {
+        $db->close();
+    }
 ?>
 
 <!DOCTYPE html>
@@ -135,6 +138,12 @@ try {
     </style>
 </head>
 <body>
+    <? if ($error_message != null): ?>
+            <div style="color: red; padding: 20px; border: 1px solid red; background-color: #fee; text-align: center;">
+                <h3>現在システムをご利用いただけません</h3>
+                <p><?php echo h($error_message); ?></p>
+            </div>
+        <?php else: ?>
     <div class="container">
         <div class="page-header">
             <h2>📘 <?php echo htmlspecialchars($student_name, ENT_QUOTES); ?> さんの貸出履歴</h2>
@@ -230,4 +239,5 @@ try {
     </div>
 
 </body>
+<?php endif; ?>
 </html>
