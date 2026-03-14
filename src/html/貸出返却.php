@@ -57,6 +57,7 @@
     $librarian_school_name = '';
     $librarian_fullname = '';
 
+    $error_message = null;
     try {
         $db = new db_connect();
         $db->connect();
@@ -90,13 +91,13 @@
         $stmt->execute();
         $status_list = $stmt->fetchAll(PDO::FETCH_ASSOC); // status_id と status_name の連想配列を取得
     } catch (PDOException $e) {
-        echo "データベースエラー: " . h($e->getMessage());
-        exit;
+        error_log("DBエラー：" . $e->getMessage());
+        $error_message = "データベース通信エラーが発生しました。しばらく経ってからやり直してください。"
     } catch (Exception $e) {
-        echo "エラー: " . h($e->getMessage());
-        exit;
+        error_log("予期せぬエラー：" . $e->getMessage());
+        $error_message = "予期せぬエラーが発生しました。システム管理者にお問い合わせください。";
     } finally {
-        $db->close(); // DB接続解除   
+        $db->close();
     }
 ?>
 
@@ -109,6 +110,12 @@
     <link rel = "stylesheet" href="../css/貸出返却.css">
 </head>
 <body>
+    <? if ($error_message != null): ?>
+            <div style="color: red; padding: 20px; border: 1px solid red; background-color: #fee; text-align: center;">
+                <h3>現在システムをご利用いただけません</h3>
+                <p><?php echo h($error_message); ?></p>
+            </div>
+        <?php else: ?>
 <header>
     <a href="#"><?php echo htmlspecialchars($librarian_fullname); ?> さん(<?php echo htmlspecialchars($librarian_school_name); ?>)の検索画面</a>
     <button class="logout-btn" onclick="confirmLogout()">ログアウト</button>
@@ -184,6 +191,7 @@
     </form>
 </div>
 </body>
+<?php endif ?>
 </html>
 <script>
     function confirmLogout() {

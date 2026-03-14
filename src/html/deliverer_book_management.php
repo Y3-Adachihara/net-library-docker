@@ -122,6 +122,7 @@
 
     }
     
+    $system_error_message = null;
 
     try {
         $db = new db_connect();
@@ -217,11 +218,13 @@
 
 
     } catch (PDOException $e) {
-        $error_message = "データの取得に失敗しました。" . $e->getMessage();
-        echo "<script>alert('" . htmlspecialchars($error_message, ENT_QUOTES, 'UTF-8') . "');</script>";
+        error_log("DBエラー：" . $e->getMessage());
+        $system_error_message = "データベース通信エラーが発生しました。しばらく経ってからやり直してください。"
     } catch (Exception $e) {
-        $error_message = "予期せぬエラーが発生しました。" . $e->getMessage();
-        echo "<script>alert('" . htmlspecialchars($error_message, ENT_QUOTES, 'UTF-8') . "');</script>";
+        error_log("予期せぬエラー：" . $e->getMessage());
+        $system_error_message = "予期せぬエラーが発生しました。システム管理者にお問い合わせください。";
+    } finally {
+        $db->close();
     }
 ?>
 
@@ -242,6 +245,12 @@
     <link rel="stylesheet" href="../css/librarian_myPage.css">
 </head>
 <body>
+        <? if ($system_error_message != null): ?>
+            <div style="color: red; padding: 20px; border: 1px solid red; background-color: #fee; text-align: center;">
+                <h3>現在システムをご利用いただけません</h3>
+                <p><?php echo h($error_message); ?></p>
+            </div>
+        <?php else: ?>
     <!-- ログアウトボタンを押したときのCSFSトークン発行 -->
         <form method="POST" action = "../php/logout.php" name = "link_logoutFORM">
             <?php
@@ -319,4 +328,5 @@
         <button type="button" class="btn" onclick="location.href='../html/deliverer_myPage.php'">配送員マイページへ戻る</button>
     </div>
 </body>
+<?php endif; ?>
 </html>
