@@ -50,6 +50,7 @@
                 $_SESSION['student_number'] = $row['number'];
                 $_SESSION['student_family_name'] = $row['family_name'];
                 $_SESSION['student_first_name'] = $row['first_name'];
+                $_SESSION['stu_login_successed_message'] = 'ログインに成功しました！';
                 header("Location: ../html/stu_myPage.php");
                 exit();
 

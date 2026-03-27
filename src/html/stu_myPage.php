@@ -11,6 +11,12 @@
         exit();
     }
 
+    $message = $_SESSION['stu_login_successed_message'] ?? null;
+    if (isset($_SESSION['stu_login_successed_message'])) {
+        echo "<script>alert('" . htmlspecialchars($message, ENT_QUOTES, 'UTF-8') . "');</script>";
+        unset($_SESSION['stu_login_successed_message']);
+    }
+
     $student_id = $_SESSION['student_id'];
     $family_name = $_SESSION['student_family_name'];
     $first_name = $_SESSION['student_first_name'];

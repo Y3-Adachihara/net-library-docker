@@ -63,9 +63,9 @@
         </div>
         <nav class="header-nav">
             <ul>
-                <li><a href="#" onclick="alert('余裕があったら、ログインの方法やヘルプ等を説明するページを作ってもいいかも？'); return false;">はじめての方へ</a></li>
-                <li><a href="#" onclick="alert('このシステムを利用している学校一覧を表示してもいいかも'); return false;">学校一覧</a></li>
-                <li><a href="#" onclick="alert('（難しいので）言語切り替え機能は準備中です'); return false;">言語切り替え</a></li>
+                <li><a href="#" onclick="alert('各機能の使い方や画面に応じた説明'); return false;">はじめての方へ</a></li>
+                <li><a href="#" onclick="alert('このシステムを利用している学校一覧'); return false;">学校一覧</a></li>
+                <li><a href="#" onclick="alert('英語や中国語、韓国語などに切り替えるための言語選択ダイアログ'); return false;">言語切り替え</a></li>
             </ul>
         </nav>
     </header>
