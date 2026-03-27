@@ -138,7 +138,7 @@ try {
 
 } catch (PDOException $e) {
         error_log("DBエラー：" . $e->getMessage());
-        $error_message = "データベース通信エラーが発生しました。しばらく経ってからやり直してください。"
+        $error_message = "データベース通信エラーが発生しました。しばらく経ってからやり直してください。";
     } catch (Exception $e) {
         error_log("予期せぬエラー：" . $e->getMessage());
         $error_message = "予期せぬエラーが発生しました。システム管理者にお問い合わせください。";
