@@ -15,20 +15,20 @@ if (!isset($_SESSION['student_id'])) {
 		unset($_SESSION['search_result_message']);
 	}
 
-    // CSRFトークン発行関数(発行するだけで、セッション変数への保存は行わないから注意！)
+    // CSRFトークン発行関数
     function csrf_token_generate(): string {
-        $toke_byte = random_bytes(16);
-        $csrf_token = bin2hex($toke_byte);
-        return $csrf_token;
+        if (empty($_SESSION['csrf_token'])) {
+            $toke_byte = random_bytes(16);
+            $_SESSION['csrf_token'] = bin2hex($toke_byte);
+        }
+        return $_SESSION['csrf_token'];
     }
     // CSRFトークンの生成
     $csrf_token = csrf_token_generate();
 
     // CSRFトークンセット関数
     function set_csrf_token(String $csrf_token): void {
-        // CSRF対策用のトークンをセッションに保存
-        $_SESSION['csrf_token'] = $csrf_token;
-        echo '<input type="hidden" name="csrf_token" value="' . htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8') . '">';
+        echo '<input type="hidden" name="csrf_token" value="' . htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8') . '">';
     }
 
     $student_fullname = $_SESSION['student_family_name'] . ' ' . $_SESSION['student_first_name'] ?? 'ゲスト';

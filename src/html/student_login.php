@@ -76,12 +76,12 @@
             <div class="form-group">
 
                 <?php 
-                    $toke_byte = random_bytes(16);
-                    $csrf_token = bin2hex($toke_byte);
-                    // CSRF対策用のトークンをセッションに保存
-                    $_SESSION['csrf_token'] = $csrf_token;
+                    if (empty($_SESSION['csrf_token'])) {
+                        $toke_byte = random_bytes(16);
+                        $_SESSION['csrf_token'] = bin2hex($toke_byte);
+                    }
                 ?>
-                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
 
                 <!-- 学校を選択させる -->
                 <label for="school">学校:</label>

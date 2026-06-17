@@ -57,11 +57,12 @@
         
         <form action="../php/reservation_process.php" method="POST" class="reservation-form">
             <?php 
-                $toke_byte = random_bytes(16);
-                $csrf_token = bin2hex($toke_byte);
-                $_SESSION['csrf_token'] = $csrf_token;
+                if (empty($_SESSION['csrf_token'])) {
+                    $toke_byte = random_bytes(16);
+                    $_SESSION['csrf_token'] = bin2hex($toke_byte);
+                }
             ?>
-            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
+            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
 
             <div class="form-group">
                 <label for="school">学校</label>
